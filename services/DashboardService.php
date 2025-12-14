@@ -591,7 +591,7 @@ class DashboardService {
      */
     public function getDashboardSummary($dashboardData, $role) {
         $summary = [
-            'total_laporan' => $dashboardData['laporan_stats']['total'] ?? 0,
+            'total_laporan' => $dashboardData['laporan_stats']['total_laporan'] ?? 0,
             'pending_laporan' => count($dashboardData['pending_laporan'] ?? []),
             'recent_activities' => count($dashboardData['recent_laporan'] ?? [])
         ];

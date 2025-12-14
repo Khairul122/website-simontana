@@ -26,7 +26,8 @@ class BencanaAPIClient {
         $headers = [
             'Content-Type: application/json',
             'Accept: application/json',
-            'X-Requested-With: XMLHttpRequest'
+            'X-Requested-With: XMLHttpRequest',
+            'User-Agent: Disaster-Monitoring-System/1.0'
         ];
 
         if ($token) {
@@ -282,7 +283,8 @@ class BencanaAPIClient {
             CURLOPT_HTTPHEADER => [
                 'Content-Type: application/json',
                 'Accept: application/json',
-                'X-Requested-With: XMLHttpRequest'
+                'X-Requested-With: XMLHttpRequest',
+                'User-Agent: Disaster-Monitoring-System/1.0'
             ],
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_TIMEOUT => $this->apiTimeout,
