@@ -304,13 +304,27 @@ class DashboardService {
     }
 
     /**
+     * Get laporan statistics dari backend API
+     */
+    private function getLaporanStats($token) {
+        try {
+            // Get laporan statistics dari backend API
+            $response = $this->apiClient->apiRequest('laporan/statistics', 'GET', null, $token);
+            return $response['success'] ? ($response['data'] ?? []) : [];
+        } catch (Exception $e) {
+            error_log("getLaporanStats Error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
      * Get dashboard data dari backend API
      */
     public function getDashboardData($token, $role) {
         try {
             // Data dasar untuk semua role
             $dashboardData = [
-                'laporan_stats' => $this->apiClient->getLaporanStats($token),
+                'laporan_stats' => $this->getLaporanStats($token),
                 'recent_laporan' => $this->getRecentLaporan($token),
                 'pending_laporan' => $this->getPendingLaporan($token),
             ];
@@ -343,9 +357,11 @@ class DashboardService {
      */
     private function getRecentLaporan($token) {
         try {
-            $response = $this->apiClient->getLaporan($token, ['limit' => 5]);
+            // Get recent laporan dari backend API
+            $response = $this->apiClient->apiRequest('laporan?limit=5', 'GET', null, $token);
             return $response['success'] ? ($response['data'] ?? []) : [];
         } catch (Exception $e) {
+            error_log("getRecentLaporan Error: " . $e->getMessage());
             return [];
         }
     }
@@ -355,9 +371,11 @@ class DashboardService {
      */
     private function getPendingLaporan($token) {
         try {
-            $response = $this->apiClient->getPendingLaporan($token);
+            // Get pending laporan dari backend API
+            $response = $this->apiClient->apiRequest('laporan?status=menunggu', 'GET', null, $token);
             return $response['success'] ? ($response['data'] ?? []) : [];
         } catch (Exception $e) {
+            error_log("getPendingLaporan Error: " . $e->getMessage());
             return [];
         }
     }
@@ -367,9 +385,16 @@ class DashboardService {
      */
     private function getUserStats($token) {
         try {
-            $response = $this->apiClient->getUserStats($token);
-            return $response;
+            // Get user statistics dari backend API
+            $response = $this->apiClient->apiRequest('admin/users', 'GET', null, $token);
+            return [
+                'total' => $response['success'] ? count($response['data'] ?? []) : 0,
+                'aktif' => $response['success'] ? count(array_filter($response['data'] ?? [], function($user) {
+                    return isset($user['status']) && $user['status'] === 'active';
+                })) : 0
+            ];
         } catch (Exception $e) {
+            error_log("getUserStats Error: " . $e->getMessage());
             return ['total' => 0, 'aktif' => 0];
         }
     }
@@ -379,9 +404,11 @@ class DashboardService {
      */
     private function getMonitoringStats($token) {
         try {
-            $response = $this->apiClient->getMonitoringStatistics($token);
+            // Get monitoring statistics dari backend API
+            $response = $this->apiClient->apiRequest('monitoring/statistics', 'GET', null, $token);
             return $response['success'] ? ($response['data'] ?? []) : [];
         } catch (Exception $e) {
+            error_log("getMonitoringStats Error: " . $e->getMessage());
             return [];
         }
     }
@@ -403,16 +430,83 @@ class DashboardService {
      */
     private function getBMKGData($token) {
         try {
-            // Coba endpoint yang membutuhkan auth
-            $response = $this->apiClient->getLatestBMKG($token);
-            if ($response['success']) {
-                return $response['data'] ?? [];
+            // Gunakan endpoint BMKG yang tersedia
+            $bmkgUrl = 'http://127.0.0.1:8000/api/bmkg/all';
+
+            $ch = curl_init();
+            curl_setopt_array($ch, [
+                CURLOPT_URL => $bmkgUrl,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_HTTPHEADER => [
+                    'Content-Type: application/json',
+                    'Accept: application/json',
+                    'Authorization: Bearer ' . $token
+                ],
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_TIMEOUT => 30,
+                CURLOPT_FOLLOWLOCATION => true
+            ]);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $error = curl_error($ch);
+            curl_close($ch);
+
+            if ($error) {
+                throw new Exception("CURL Error: " . $error);
             }
 
-            // Fallback ke mock data
-            $mockResponse = $this->apiClient->getMockGempaTerbaru();
-            return $mockResponse['success'] ? ($mockResponse['data'] ?? []) : [];
+            $responseData = json_decode($response, true);
+
+            if ($httpCode >= 400) {
+                // Fallback ke mock data jika auth endpoint gagal
+                return $this->getBMKGMockData();
+            }
+
+            // Jika data null, gunakan mock data
+            if ($responseData['success'] && $responseData['data']['data']['earthquake'] === null) {
+                return $this->getBMKGMockData();
+            }
+
+            return $responseData['success'] ? ($responseData['data'] ?? []) : $this->getBMKGMockData();
         } catch (Exception $e) {
+            error_log("getBMKGData Error: " . $e->getMessage());
+            return $this->getBMKGMockData();
+        }
+    }
+
+    /**
+     * Get BMKG mock data untuk fallback
+     */
+    private function getBMKGMockData() {
+        try {
+            $mockUrl = 'http://127.0.0.1:8000/api/bmkg-test/all';
+
+            $ch = curl_init();
+            curl_setopt_array($ch, [
+                CURLOPT_URL => $mockUrl,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_HTTPHEADER => [
+                    'Content-Type: application/json',
+                    'Accept: application/json'
+                ],
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_TIMEOUT => 30,
+                CURLOPT_FOLLOWLOCATION => true
+            ]);
+
+            $response = curl_exec($ch);
+            $error = curl_error($ch);
+            curl_close($ch);
+
+            if ($error) {
+                throw new Exception("CURL Error: " . $error);
+            }
+
+            $responseData = json_decode($response, true);
+            return $responseData['success'] ? ($responseData['data'] ?? []) : [];
+        } catch (Exception $e) {
+            error_log("getBMKGMockData Error: " . $e->getMessage());
             return [];
         }
     }

@@ -514,5 +514,86 @@ class AuthController {
             ]);
         }
     }
+
+    /**
+     * Set login session after successful AJAX login
+     */
+    public function setLoginSession() {
+        error_log("=== setLoginSession called ===");
+        error_log("REQUEST_METHOD: " . $_SERVER['REQUEST_METHOD']);
+        error_log("POST data: " . print_r($_POST, true));
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $token = $_POST['token'] ?? '';
+            $userData = $_POST['user_data'] ?? '';
+
+            error_log("Token received: " . substr($token, 0, 20) . "...");
+            error_log("User data received: " . substr($userData, 0, 100) . "...");
+
+            if (empty($token) || empty($userData)) {
+                error_log("Missing token or user data");
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Token dan user data diperlukan'
+                ]);
+                return;
+            }
+
+            try {
+                // Decode user data
+                $userArray = json_decode($userData, true);
+                error_log("Decoded user array: " . print_r($userArray, true));
+
+                if (!$userArray) {
+                    throw new Exception('Invalid user data format. JSON decode failed.');
+                }
+
+                // Set session data
+                $_SESSION['user_id'] = $userArray['id'] ?? null;
+                $_SESSION['username'] = $userArray['username'] ?? null;
+                $_SESSION['nama'] = $userArray['nama'] ?? $userArray['username'] ?? null;
+                $_SESSION['role'] = $userArray['role'] ?? null;
+                $_SESSION['email'] = $userArray['email'] ?? null;
+                $_SESSION['logged_in'] = true;
+                $_SESSION['login_time'] = time();
+
+                error_log("Session data set: " . print_r($_SESSION, true));
+
+                // Store API token
+                try {
+                    $this->apiClient->storeApiToken($token);
+                    error_log("API token stored successfully");
+                } catch (Exception $apiEx) {
+                    error_log("Failed to store API token: " . $apiEx->getMessage());
+                }
+
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Session berhasil diatur',
+                    'role' => $userArray['role'],
+                    'redirect_url' => 'index.php?controller=dashboard&action=index'
+                ]);
+
+            } catch (Exception $e) {
+                error_log("Exception in setLoginSession: " . $e->getMessage());
+                error_log("Stack trace: " . $e->getTraceAsString());
+
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Gagal mengatur session: ' . $e->getMessage()
+                ]);
+            }
+        } else {
+            error_log("Invalid request method: " . $_SERVER['REQUEST_METHOD']);
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false,
+                'message' => 'Invalid request method'
+            ]);
+        }
+    }
 }
 ?>

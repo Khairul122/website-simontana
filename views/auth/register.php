@@ -991,24 +991,7 @@
                     Data Anda aman dan terenkripsi
                 </div>
 
-                <!-- Testing Section (Development) -->
-                <div class="testing-section mt-4" style="border-top: 1px solid var(--gray-200); padding-top: 1rem;">
-                    <div class="text-center">
-                        <small class="text-muted mb-2 d-block">Testing Tools (Development)</small>
-                        <div class="d-flex gap-2 justify-content-center">
-                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.testBackendConnection()">
-                                <i class="fas fa-plug"></i> Test Backend
-                            </button>
-                            <button type="button" class="btn btn-sm btn-outline-info" onclick="window.testBMKGAPI()">
-                                <i class="fas fa-cloud"></i> Test BMKG API
-                            </button>
-                        </div>
-                        <small class="text-muted d-block mt-1">
-                            <kbd>Ctrl+B</kbd> Test Backend | <kbd>Ctrl+M</kbd> Test BMKG
-                        </small>
-                    </div>
-                </div>
-            </div>
+                 </div>
         </div>
     </div>
 
@@ -1334,72 +1317,7 @@
                 window.history.replaceState(null, null, window.location.href);
             }
 
-            // Backend Connection Test Functionality
-            window.testBackendConnection = function() {
-                showAlert('Menguji koneksi ke backend...', 'info', 'Testing Connection');
-
-                fetch('index.php?controller=auth&action=testConnection', {
-                    method: 'GET',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showAlert('Koneksi backend berhasil!', 'success', 'Connection Test');
-                        console.log('Backend Status:', data.api_status);
-                    } else {
-                        showAlert('Koneksi backend gagal: ' + data.error, 'error', 'Connection Test');
-                        console.error('Connection Error:', data);
-                    }
-                })
-                .catch(error => {
-                    showAlert('Error testing connection: ' + error.message, 'error', 'Connection Test');
-                    console.error('Test Error:', error);
-                });
-            };
-
-            // BMKG API Test Functionality
-            window.testBMKGAPI = function() {
-                showAlert('Menguji integrasi BMKG API...', 'info', 'BMKG API Test');
-
-                fetch('index.php?controller=auth&action=testBMKGAPI', {
-                    method: 'GET',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showAlert('Integrasi BMKG API berhasil!', 'success', 'BMKG API Test');
-                        console.log('BMKG Data:', data);
-                    } else {
-                        showAlert('Integrasi BMKG API gagal: ' + data.error, 'error', 'BMKG API Test');
-                        console.error('BMKG API Error:', data);
-                    }
-                })
-                .catch(error => {
-                    showAlert('Error testing BMKG API: ' + error.message, 'error', 'BMKG API Test');
-                    console.error('BMKG Test Error:', error);
-                });
-            };
-
-            // Add keyboard shortcuts for testing (Ctrl+B for backend, Ctrl+M for BMKG)
-            document.addEventListener('keydown', function(e) {
-                if (e.ctrlKey && e.key === 'b') {
-                    e.preventDefault();
-                    window.testBackendConnection();
-                }
-                if (e.ctrlKey && e.key === 'm') {
-                    e.preventDefault();
-                    window.testBMKGAPI();
-                }
-            });
-        });
+                    });
     </script>
 </body>
 </html>

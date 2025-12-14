@@ -29,7 +29,7 @@
                     <div class="float-right">
                       <p class="card-text text-right">Total Laporan</p>
                       <div class="fluid-container">
-                        <h3 class="card-title font-weight-bold text-right mb-0"><?php echo number_format($dashboard['stats']['total_laporan']); ?></h3>
+                        <h3 class="card-title font-weight-bold text-right mb-0"><?php echo number_format($dashboard['laporan_stats']['total_laporan'] ?? 0); ?></h3>
                       </div>
                     </div>
                   </div>
@@ -53,7 +53,7 @@
                     <div class="float-right">
                       <p class="card-text text-right">Menunggu</p>
                       <div class="fluid-container">
-                        <h3 class="card-title font-weight-bold text-right mb-0"><?php echo number_format($dashboard['stats']['laporan_menunggu']); ?></h3>
+                        <h3 class="card-title font-weight-bold text-right mb-0"><?php echo number_format($dashboard['laporan_stats']['laporan_per_status']['menunggu_verifikasi'] ?? 0); ?></h3>
                       </div>
                     </div>
                   </div>
@@ -77,7 +77,7 @@
                     <div class="float-right">
                       <p class="card-text text-right">Diproses</p>
                       <div class="fluid-container">
-                        <h3 class="card-title font-weight-bold text-right mb-0"><?php echo number_format($dashboard['stats']['laporan_diproses']); ?></h3>
+                        <h3 class="card-title font-weight-bold text-right mb-0"><?php echo number_format($dashboard['laporan_stats']['laporan_per_status']['sedang_diproses'] ?? 0); ?></h3>
                       </div>
                     </div>
                   </div>
@@ -101,7 +101,7 @@
                     <div class="float-right">
                       <p class="card-text text-right">Selesai</p>
                       <div class="fluid-container">
-                        <h3 class="card-title font-weight-bold text-right mb-0"><?php echo number_format($dashboard['stats']['laporan_selesai']); ?></h3>
+                        <h3 class="card-title font-weight-bold text-right mb-0"><?php echo number_format($dashboard['laporan_stats']['laporan_per_status']['selesai'] ?? 0); ?></h3>
                       </div>
                     </div>
                   </div>
@@ -128,14 +128,14 @@
                     <div class="float-right">
                       <p class="card-text text-right">Total Pengguna</p>
                       <div class="fluid-container">
-                        <h3 class="card-title font-weight-bold text-right mb-0"><?php echo number_format($dashboard['stats']['total_pengguna']); ?></h3>
+                        <h3 class="card-title font-weight-bold text-right mb-0"><?php echo number_format($dashboard['user_stats']['total'] ?? 0); ?></h3>
                       </div>
                     </div>
                   </div>
                   <p class="text-muted mt-3 mb-0">
                     <span class="text-success">
                       <i class="mdi mdi-account-check"></i>
-                      <?php echo $dashboard['stats']['pengguna_aktif']; ?> pengguna aktif
+                      <?php echo number_format($dashboard['user_stats']['aktif'] ?? 0); ?> pengguna aktif
                     </span>
                   </p>
                 </div>

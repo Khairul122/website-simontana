@@ -792,24 +792,7 @@
                     </a>
                 </div>
 
-                <!-- Testing Section (Development) -->
-                <div class="testing-section mt-4" style="border-top: 1px solid var(--gray-200); padding-top: 1rem;">
-                    <div class="text-center">
-                        <small class="text-muted mb-2 d-block">Testing Tools (Development)</small>
-                        <div class="d-flex gap-2 justify-content-center">
-                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.testBackendConnection()">
-                                <i class="fas fa-plug"></i> Test Backend
-                            </button>
-                            <button type="button" class="btn btn-sm btn-outline-info" onclick="window.testBMKGAPI()">
-                                <i class="fas fa-cloud"></i> Test BMKG API
-                            </button>
-                        </div>
-                        <small class="text-muted d-block mt-1">
-                            <kbd>Ctrl+B</kbd> Test Backend | <kbd>Ctrl+M</kbd> Test BMKG
-                        </small>
-                    </div>
-                </div>
-            </div>
+                   </div>
         </div>
     </div>
 
@@ -965,16 +948,55 @@
                     console.log('API Response:', data);
 
                     if (data.success) {
-                        showToast('Login berhasil! Mengarahkan ke dashboard...', 'success');
+                        showToast('Login berhasil! Mengatur session...', 'success');
 
-                        // Store token and user data (simplified)
+                        // Store token and user data in localStorage first
                         localStorage.setItem('api_token', data.data.token);
                         localStorage.setItem('user_data', JSON.stringify(data.data.user));
 
-                        // Redirect to dashboard
-                        setTimeout(() => {
-                            window.location.href = 'index.php?controller=dashboard&action=index';
-                        }, 1500);
+                        // Set PHP session for website authentication
+                        console.log('Setting session with data:', {
+                            token: data.data.token.substring(0, 20) + '...',
+                            user_data: data.data.user
+                        });
+
+                        const sessionFormData = new FormData();
+                        sessionFormData.append('token', data.data.token);
+                        sessionFormData.append('user_data', JSON.stringify(data.data.user));
+
+                        console.log('Sending session request...');
+
+                        fetch('index.php?controller=auth&action=setLoginSession', {
+                            method: 'POST',
+                            body: sessionFormData,
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        })
+                        .then(response => {
+                            console.log('Session response status:', response.status);
+                            return response.json();
+                        })
+                        .then(sessionData => {
+                            console.log('Session response data:', sessionData);
+
+                            if (sessionData.success) {
+                                showToast('Session berhasil diatur! Mengarahkan ke dashboard...', 'success');
+
+                                // Redirect to dashboard
+                                setTimeout(() => {
+                                    window.location.href = sessionData.redirect_url;
+                                }, 1000);
+                            } else {
+                                console.error('Session setup failed:', sessionData.message);
+                                showToast('Gagal mengatur session: ' + sessionData.message, 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Session Error:', error);
+                            console.error('Session Error details:', error.message, error.stack);
+                            showToast('Gagal mengatur session: ' + error.message, 'error');
+                        });
                     } else {
                         showToast(data.message || 'Login gagal. Silakan coba lagi.', 'error');
                     }
@@ -1008,81 +1030,7 @@
                 window.history.replaceState(null, null, window.location.href);
             }
 
-            // Backend Connection Test Functionality
-            window.testBackendConnection = function() {
-                showToast('Menguji koneksi ke backend...', 'info', 'Testing Connection');
-
-                fetch('index.php?controller=auth&action=testConnection', {
-                    method: 'GET',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showToast('Koneksi backend berhasil!', 'success', 'Connection Test');
-                        console.log('Backend Status:', data.api_status);
-                    } else {
-                        showToast('Koneksi backend gagal: ' + data.error, 'error', 'Connection Test');
-                        console.error('Connection Error:', data);
-                    }
-                })
-                .catch(error => {
-                    showToast('Error testing connection: ' + error.message, 'error', 'Connection Test');
-                    console.error('Test Error:', error);
-                });
-            };
-
-            // BMKG API Test Functionality
-            window.testBMKGAPI = function() {
-                showToast('Menguji integrasi BMKG API...', 'info', 'BMKG API Test');
-
-                fetch('index.php?controller=auth&action=testBMKGAPI', {
-                    method: 'GET',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showToast('Integrasi BMKG API berhasil!', 'success', 'BMKG API Test');
-                        console.log('BMKG Data:', data);
-                    } else {
-                        showToast('Integrasi BMKG API gagal: ' + data.error, 'error', 'BMKG API Test');
-                        console.error('BMKG API Error:', data);
-                    }
-                })
-                .catch(error => {
-                    showToast('Error testing BMKG API: ' + error.message, 'error', 'BMKG API Test');
-                    console.error('BMKG Test Error:', error);
-                });
-            };
-
-            // Add keyboard shortcuts for testing (Ctrl+B for backend, Ctrl+M for BMKG)
-            document.addEventListener('keydown', function(e) {
-                if (e.ctrlKey && e.key === 'b') {
-                    e.preventDefault();
-                    window.testBackendConnection();
-                }
-                if (e.ctrlKey && e.key === 'm') {
-                    e.preventDefault();
-                    window.testBMKGAPI();
-                }
-            });
-
-            // Auto-test backend connection on page load (development mode)
-            <?php if (defined('ENVIRONMENT') && ENVIRONMENT === 'development'): ?>
-            document.addEventListener('DOMContentLoaded', function() {
-                setTimeout(function() {
-                    window.testBackendConnection();
-                }, 2000);
-            });
-            <?php endif; ?>
-        });
+                    });
     </script>
 </body>
 </html>
