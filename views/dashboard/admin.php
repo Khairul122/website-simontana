@@ -311,6 +311,122 @@
           </div>
           <?php endif; ?>
 
+          <!-- BMKG Integration -->
+          <?php if (!empty($dashboard['bmkg_formatted'])): ?>
+          <div class="row mt-4">
+            <div class="col-lg-12">
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="card-title mb-0">
+                      <i class="mdi mdi-cloud text-info"></i>
+                      Integrasi BMKG
+                    </h4>
+                    <small class="text-muted">
+                      Terakhir diperbarui: <?php echo date('d M Y H:i', strtotime($dashboard['bmkg_formatted']['weather_info']['updated_at'] ?? 'now')); ?>
+                    </small>
+                  </div>
+
+                  <div class="row">
+                    <!-- Latest Earthquake -->
+                    <div class="col-md-4">
+                      <div class="card border-left border-warning border-3">
+                        <div class="card-body">
+                          <div class="d-flex justify-content-between">
+                            <div>
+                              <h6 class="card-title">Gempa Terkini</h6>
+                              <p class="text-muted mb-1">
+                                <i class="mdi mdi-map-marker"></i>
+                                <?php echo htmlspecialchars($dashboard['bmkg_formatted']['latest_earthquake']['location']); ?>
+                              </p>
+                              <p class="text-muted mb-0">
+                                <strong>Magnitude:</strong> <?php echo $dashboard['bmkg_formatted']['latest_earthquake']['magnitude']; ?>
+                              </p>
+                            </div>
+                            <div class="text-right">
+                              <i class="mdi mdi-house-crack text-warning" style="font-size: 2rem;"></i>
+                            </div>
+                          </div>
+                          <div class="mt-2">
+                            <small class="text-muted">
+                              <?php echo htmlspecialchars($dashboard['bmkg_formatted']['latest_earthquake']['time']); ?> |
+                              Kedalaman: <?php echo htmlspecialchars($dashboard['bmkg_formatted']['latest_earthquake']['depth']); ?>
+                            </small>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Weather Info -->
+                    <div class="col-md-4">
+                      <div class="card border-left border-info border-3">
+                        <div class="card-body">
+                          <div class="d-flex justify-content-between">
+                            <div>
+                              <h6 class="card-title">Cuaca Terkini</h6>
+                              <p class="text-muted mb-1">
+                                <i class="mdi mdi-thermometer"></i>
+                                <?php echo htmlspecialchars($dashboard['bmkg_formatted']['weather_info']['temperature']); ?>
+                              </p>
+                              <p class="text-muted mb-0">
+                                <strong>Kelembaban:</strong> <?php echo htmlspecialchars($dashboard['bmkg_formatted']['weather_info']['humidity']); ?>
+                              </p>
+                            </div>
+                            <div class="text-right">
+                              <i class="mdi mdi-cloud-sun text-info" style="font-size: 2rem;"></i>
+                            </div>
+                          </div>
+                          <div class="mt-2">
+                            <small class="text-muted">
+                              <?php echo htmlspecialchars($dashboard['bmkg_formatted']['weather_info']['description']); ?> |
+                              Angin: <?php echo htmlspecialchars($dashboard['bmkg_formatted']['weather_info']['wind']); ?>
+                            </small>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Tsunami Warning -->
+                    <div class="col-md-4">
+                      <div class="card border-left border-success border-3">
+                        <div class="card-body">
+                          <div class="d-flex justify-content-between">
+                            <div>
+                              <h6 class="card-title">Peringatan Tsunami</h6>
+                              <p class="text-muted mb-1">
+                                <i class="mdi mdi-water"></i>
+                                <?php echo htmlspecialchars($dashboard['bmkg_formatted']['tsunami_warning']['status']); ?>
+                              </p>
+                              <p class="text-muted mb-0">
+                                <small><?php echo htmlspecialchars($dashboard['bmkg_formatted']['tsunami_warning']['message']); ?></small>
+                              </p>
+                            </div>
+                            <div class="text-right">
+                              <i class="mdi mdi-waves text-success" style="font-size: 2rem;"></i>
+                            </div>
+                          </div>
+                          <div class="mt-2">
+                            <div class="progress" style="height: 4px;">
+                              <div class="progress-bar bg-success" style="width: 100%;"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Refresh Button -->
+                  <div class="text-right mt-3">
+                    <button class="btn btn-sm btn-outline-primary" onclick="refreshBMKGData()">
+                      <i class="mdi mdi-refresh"></i> Refresh Data BMKG
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <?php endif; ?>
+
           <!-- Quick Actions -->
           <div class="row mt-4">
             <div class="col-lg-12">
@@ -381,6 +497,126 @@
   <script>
     function viewDetail(id) {
       window.location.href = 'index.php?controller=laporan&action=detail&id=' + id;
+    }
+
+    function refreshBMKGData() {
+      const button = event.target.closest('button');
+      const originalText = button.innerHTML;
+
+      button.innerHTML = '<i class="mdi mdi-refresh mdi-spin"></i> Refreshing...';
+      button.disabled = true;
+
+      // Refresh BMKG data via API call
+      fetch('index.php?controller=dashboard&action=refreshData', {
+        method: 'GET',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Show success message
+          if (typeof showToast !== 'undefined') {
+            showToast('Data BMKG berhasil diperbarui!', 'success');
+          } else {
+            alert('Data BMKG berhasil diperbarui!');
+          }
+
+          // Reload page to show updated data
+          setTimeout(() => {
+            location.reload();
+          }, 1000);
+        } else {
+          throw new Error(data.message || 'Failed to refresh BMKG data');
+        }
+      })
+      .catch(error => {
+        console.error('Error refreshing BMKG data:', error);
+        if (typeof showToast !== 'undefined') {
+          showToast('Gagal memperbarui data BMKG: ' + error.message, 'error');
+        } else {
+          alert('Gagal memperbarui data BMKG: ' + error.message);
+        }
+      })
+      .finally(() => {
+        button.innerHTML = originalText;
+        button.disabled = false;
+      });
+    }
+
+    // Test Dashboard API (Development)
+    function testDashboardAPI() {
+      fetch('index.php?controller=dashboard&action=testDashboardAPI', {
+        method: 'GET',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Dashboard API Test Results:', data);
+        if (typeof showToast !== 'undefined') {
+          showToast('Dashboard API test completed. Check console for details.', 'info');
+        }
+      })
+      .catch(error => {
+        console.error('Dashboard API Test Error:', error);
+        if (typeof showToast !== 'undefined') {
+          showToast('Dashboard API test failed. Check console for details.', 'error');
+        }
+      });
+    }
+
+    // Auto-refresh BMKG data every 5 minutes
+    setInterval(function() {
+      // Only refresh if user is still active
+      if (document.visibilityState === 'visible') {
+        fetch('index.php?controller=dashboard&action=refreshData', {
+          method: 'GET',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success && data.data.bmkg_formatted) {
+            // Update BMKG data without full page reload
+            updateBMKGDisplay(data.data.bmkg_formatted);
+          }
+        })
+        .catch(error => {
+          console.log('Auto-refresh BMKG failed:', error);
+        });
+      }
+    }, 300000); // 5 minutes
+
+    function updateBMKGDisplay(bmkgData) {
+      // Update earthquake info
+      const earthquakeLocation = document.querySelector('.card h6:contains("Gempa Terkini")');
+      if (earthquakeLocation && bmkgData.latest_earthquake) {
+        const earthquakeCard = earthquakeLocation.closest('.card-body');
+        earthquakeCard.querySelector('p:nth-child(2)').innerHTML =
+          `<i class="mdi mdi-map-marker"></i> ${bmkgData.latest_earthquake.location}`;
+        earthquakeCard.querySelector('p:nth-child(3)').innerHTML =
+          `<strong>Magnitude:</strong> ${bmkgData.latest_earthquake.magnitude}`;
+      }
+
+      // Update weather info
+      const weatherInfo = bmkgData.weather_info;
+      if (weatherInfo) {
+        const weatherCard = document.querySelector('h6:contains("Cuaca Terkini")');
+        if (weatherCard) {
+          const card = weatherCard.closest('.card-body');
+          card.querySelector('p:nth-child(2)').innerHTML =
+            `<i class="mdi mdi-thermometer"></i> ${weatherInfo.temperature}`;
+          card.querySelector('p:nth-child(3)').innerHTML =
+            `<strong>Kelembaban:</strong> ${weatherInfo.humidity}`;
+        }
+      }
     }
   </script>
 </body>

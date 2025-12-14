@@ -733,7 +733,7 @@
                     <p class="form-subtitle">Masuk ke akun SIMONTA Anda</p>
                 </div>
 
-                <form action="index.php?controller=auth&action=login" method="POST" id="loginForm">
+                <form action="#" method="POST" id="loginForm" onsubmit="return false;">
                     <div class="form-group">
                         <label for="username" class="form-label">Username</label>
                         <div class="input-group">
@@ -764,6 +764,7 @@
                                 <i class="fas fa-eye" id="eyeIcon"></i>
                             </button>
                         </div>
+                        <small class="text-muted">Minimal 4 karakter</small>
                     </div>
 
                     <div class="form-check">
@@ -789,6 +790,24 @@
                         <i class="fas fa-user-plus"></i>
                         Daftar Sekarang
                     </a>
+                </div>
+
+                <!-- Testing Section (Development) -->
+                <div class="testing-section mt-4" style="border-top: 1px solid var(--gray-200); padding-top: 1rem;">
+                    <div class="text-center">
+                        <small class="text-muted mb-2 d-block">Testing Tools (Development)</small>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.testBackendConnection()">
+                                <i class="fas fa-plug"></i> Test Backend
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-info" onclick="window.testBMKGAPI()">
+                                <i class="fas fa-cloud"></i> Test BMKG API
+                            </button>
+                        </div>
+                        <small class="text-muted d-block mt-1">
+                            <kbd>Ctrl+B</kbd> Test Backend | <kbd>Ctrl+M</kbd> Test BMKG
+                        </small>
+                    </div>
                 </div>
             </div>
         </div>
@@ -915,24 +934,60 @@
                     return;
                 }
 
-                if (password.length < 6) {
+                if (password.length < 4) {
                     console.log("Validation failed: password too short");
-                    showToast('Password minimal 6 karakter', 'error');
+                    showToast('Password minimal 4 karakter', 'error');
                     return;
                 }
 
-                console.log("Validation passed, submitting form...");
+                console.log("Validation passed, submitting to backend API...");
 
                 // Show loading state
                 loginBtn.disabled = true;
                 loginBtnText.textContent = 'Memproses...';
                 loginSpinner.classList.remove('d-none');
 
-                console.log("Submitting form to:", this.action);
-                console.log("Form method:", this.method);
+                // Submit to backend API via AJAX
+                const formData = new FormData();
+                formData.append('username', username);
+                formData.append('password', password);
 
-                // Submit form
-                this.submit();
+                fetch('http://127.0.0.1:8000/api/auth/login', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('API Response:', data);
+
+                    if (data.success) {
+                        showToast('Login berhasil! Mengarahkan ke dashboard...', 'success');
+
+                        // Store token and user data (simplified)
+                        localStorage.setItem('api_token', data.data.token);
+                        localStorage.setItem('user_data', JSON.stringify(data.data.user));
+
+                        // Redirect to dashboard
+                        setTimeout(() => {
+                            window.location.href = 'index.php?controller=dashboard&action=index';
+                        }, 1500);
+                    } else {
+                        showToast(data.message || 'Login gagal. Silakan coba lagi.', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Login Error:', error);
+                    showToast('Terjadi kesalahan koneksi. Silakan coba lagi.', 'error');
+                })
+                .finally(() => {
+                    loginBtn.disabled = false;
+                    loginBtnText.textContent = 'Masuk';
+                    loginSpinner.classList.add('d-none');
+                });
             });
 
             function showAlert(message, type = 'info') {
@@ -952,6 +1007,81 @@
             if (window.history.replaceState) {
                 window.history.replaceState(null, null, window.location.href);
             }
+
+            // Backend Connection Test Functionality
+            window.testBackendConnection = function() {
+                showToast('Menguji koneksi ke backend...', 'info', 'Testing Connection');
+
+                fetch('index.php?controller=auth&action=testConnection', {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast('Koneksi backend berhasil!', 'success', 'Connection Test');
+                        console.log('Backend Status:', data.api_status);
+                    } else {
+                        showToast('Koneksi backend gagal: ' + data.error, 'error', 'Connection Test');
+                        console.error('Connection Error:', data);
+                    }
+                })
+                .catch(error => {
+                    showToast('Error testing connection: ' + error.message, 'error', 'Connection Test');
+                    console.error('Test Error:', error);
+                });
+            };
+
+            // BMKG API Test Functionality
+            window.testBMKGAPI = function() {
+                showToast('Menguji integrasi BMKG API...', 'info', 'BMKG API Test');
+
+                fetch('index.php?controller=auth&action=testBMKGAPI', {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast('Integrasi BMKG API berhasil!', 'success', 'BMKG API Test');
+                        console.log('BMKG Data:', data);
+                    } else {
+                        showToast('Integrasi BMKG API gagal: ' + data.error, 'error', 'BMKG API Test');
+                        console.error('BMKG API Error:', data);
+                    }
+                })
+                .catch(error => {
+                    showToast('Error testing BMKG API: ' + error.message, 'error', 'BMKG API Test');
+                    console.error('BMKG Test Error:', error);
+                });
+            };
+
+            // Add keyboard shortcuts for testing (Ctrl+B for backend, Ctrl+M for BMKG)
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.key === 'b') {
+                    e.preventDefault();
+                    window.testBackendConnection();
+                }
+                if (e.ctrlKey && e.key === 'm') {
+                    e.preventDefault();
+                    window.testBMKGAPI();
+                }
+            });
+
+            // Auto-test backend connection on page load (development mode)
+            <?php if (defined('ENVIRONMENT') && ENVIRONMENT === 'development'): ?>
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(function() {
+                    window.testBackendConnection();
+                }, 2000);
+            });
+            <?php endif; ?>
         });
     </script>
 </body>

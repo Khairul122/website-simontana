@@ -279,7 +279,7 @@ class AuthController {
     }
 
     /**
-     * Validasi data registrasi
+     * Validasi data registrasi (Updated dengan validasi backend baru)
      */
     private function validateRegisterData($data) {
         $errors = [];
@@ -289,23 +289,33 @@ class AuthController {
             $errors['username'] = 'Username wajib diisi';
         } elseif (strlen($data['username']) < 4) {
             $errors['username'] = 'Username minimal 4 karakter';
+        } elseif (strlen($data['username']) > 255) {
+            $errors['username'] = 'Username maksimal 255 karakter';
+        } elseif (!preg_match('/^[a-zA-Z0-9_]+$/', $data['username'])) {
+            $errors['username'] = 'Username hanya boleh mengandung huruf, angka, dan underscore';
         }
 
-        // Validasi password
+        // Validasi password (sesuai frontend - minimal 4 karakter)
         if (empty($data['password'])) {
             $errors['password'] = 'Password wajib diisi';
-        } elseif (strlen($data['password']) < 6) {
-            $errors['password'] = 'Password minimal 6 karakter';
+        } elseif (strlen($data['password']) < 4) {
+            $errors['password'] = 'Password minimal 4 karakter';
         }
 
         // Validasi password confirmation
-        if ($data['password'] !== $data['password_confirmation']) {
+        if (empty($data['password_confirmation'])) {
+            $errors['password_confirmation'] = 'Konfirmasi password wajib diisi';
+        } elseif ($data['password'] !== $data['password_confirmation']) {
             $errors['password_confirmation'] = 'Konfirmasi password tidak cocok';
         }
 
         // Validasi nama
         if (empty($data['nama'])) {
             $errors['nama'] = 'Nama lengkap wajib diisi';
+        } elseif (strlen($data['nama']) < 3) {
+            $errors['nama'] = 'Nama minimal 3 karakter';
+        } elseif (strlen($data['nama']) > 255) {
+            $errors['nama'] = 'Nama maksimal 255 karakter';
         }
 
         // Validasi email
@@ -313,18 +323,36 @@ class AuthController {
             $errors['email'] = 'Email wajib diisi';
         } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
             $errors['email'] = 'Format email tidak valid';
+        } elseif (strlen($data['email']) > 255) {
+            $errors['email'] = 'Email maksimal 255 karakter';
         }
 
-        // Validasi role
+        // Validasi role (sesuai backend Laravel)
         if (empty($data['role'])) {
             $errors['role'] = 'Role wajib dipilih';
         } elseif (!$this->apiClient->isValidWebRole($data['role'])) {
-            $errors['role'] = 'Role tidak valid untuk website';
+            $errors['role'] = 'Role tidak valid untuk website. Pilih: Admin, PetugasBPBD, atau OperatorDesa';
         }
 
-        // Validasi no telepon
-        if (!empty($data['no_telepon']) && !preg_match('/^[0-9]{10,13}$/', $data['no_telepon'])) {
-            $errors['no_telepon'] = 'Format nomor telepon tidak valid';
+        // Validasi no telepon (optional)
+        if (!empty($data['no_telepon'])) {
+            if (!preg_match('/^[0-9]{10,13}$/', $data['no_telepon'])) {
+                $errors['no_telepon'] = 'Format nomor telepon tidak valid. Gunakan 10-13 digit angka';
+            } elseif (strlen($data['no_telepon']) > 20) {
+                $errors['no_telepon'] = 'Nomor telepon maksimal 20 digit';
+            }
+        }
+
+        // Validasi alamat (optional)
+        if (!empty($data['alamat']) && strlen($data['alamat']) > 1000) {
+            $errors['alamat'] = 'Alamat maksimal 1000 karakter';
+        }
+
+        // Validasi ID Desa (optional, harus numeric jika ada)
+        if (!empty($data['id_desa'])) {
+            if (!is_numeric($data['id_desa'])) {
+                $errors['id_desa'] = 'ID Desa harus berupa angka';
+            }
         }
 
         return $errors;
@@ -428,6 +456,62 @@ class AuthController {
                     'message' => $e->getMessage()
                 ]);
             }
+        }
+    }
+
+    /**
+     * Test connection ke backend API
+     */
+    public function testConnection() {
+        try {
+            // Test basic API connection
+            $response = $this->apiClient->getApiStatus();
+
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'message' => 'Backend connection successful',
+                'api_status' => $response,
+                'api_base_url' => $this->apiClient->getApiBaseUrl(),
+                'timestamp' => date('Y-m-d H:i:s')
+            ]);
+        } catch (Exception $e) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false,
+                'message' => 'Backend connection failed',
+                'error' => $e->getMessage(),
+                'api_base_url' => $this->apiClient->getApiBaseUrl(),
+                'timestamp' => date('Y-m-d H:i:s')
+            ]);
+        }
+    }
+
+    /**
+     * Test BMKG API integration
+     */
+    public function testBMKGAPI() {
+        try {
+            // Test mock BMKG data (no auth required)
+            $gempaResponse = $this->apiClient->getMockGempaTerbaru();
+            $allDataResponse = $this->apiClient->getMockAllBMKGData();
+
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'message' => 'BMKG API integration successful',
+                'gempa_terbaru' => $gempaResponse,
+                'all_data' => $allDataResponse,
+                'timestamp' => date('Y-m-d H:i:s')
+            ]);
+        } catch (Exception $e) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false,
+                'message' => 'BMKG API integration failed',
+                'error' => $e->getMessage(),
+                'timestamp' => date('Y-m-d H:i:s')
+            ]);
         }
     }
 }

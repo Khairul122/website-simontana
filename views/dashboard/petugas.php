@@ -260,6 +260,173 @@
           </div>
           <?php endif; ?>
 
+          <!-- BMKG Integration for Petugas BPBD -->
+          <?php if (!empty($dashboard['bmkg_formatted'])): ?>
+          <div class="row mt-4">
+            <div class="col-lg-12">
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="card-title mb-0">
+                      <i class="mdi mdi-earthquake text-danger"></i>
+                      Informasi Bencana BMKG - Prioritas BPBD
+                    </h4>
+                    <div>
+                      <span class="badge badge-info">
+                        <i class="mdi mdi-update"></i>
+                        <?php echo date('H:i', strtotime($dashboard['bmkg_formatted']['weather_info']['updated_at'] ?? 'now')); ?>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <!-- Critical Earthquake Alert -->
+                    <div class="col-md-6">
+                      <div class="card <?php echo $dashboard['bmkg_formatted']['latest_earthquake']['magnitude'] > 5.0 ? 'bg-danger text-white' : 'border-left border-warning border-3'; ?>">
+                        <div class="card-body">
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="card-title mb-0">
+                              <i class="mdi mdi-home-city"></i>
+                              Gempa Terkini
+                              <?php if ($dashboard['bmkg_formatted']['latest_earthquake']['magnitude'] > 5.0): ?>
+                                <span class="badge badge-danger ml-2">KRITIS</span>
+                              <?php endif; ?>
+                            </h6>
+                            <?php if ($dashboard['bmkg_formatted']['latest_earthquake']['magnitude'] > 5.0): ?>
+                              <button class="btn btn-sm btn-light" onclick="showEarthquakeAlert()">
+                                <i class="mdi mdi-bell"></i> Alert
+                              </button>
+                            <?php endif; ?>
+                          </div>
+                          <div class="row">
+                            <div class="col-md-8">
+                              <p class="mb-1">
+                                <strong>Lokasi:</strong> <?php echo htmlspecialchars($dashboard['bmkg_formatted']['latest_earthquake']['location']); ?>
+                              </p>
+                              <p class="mb-1">
+                                <strong>Magnitude:</strong> <?php echo $dashboard['bmkg_formatted']['latest_earthquake']['magnitude']; ?> |
+                                <strong>Kedalaman:</strong> <?php echo htmlspecialchars($dashboard['bmkg_formatted']['latest_earthquake']['depth']); ?>
+                              </p>
+                              <p class="mb-0 text-muted">
+                                <small><?php echo htmlspecialchars($dashboard['bmkg_formatted']['latest_earthquake']['status']); ?></small>
+                              </p>
+                            </div>
+                            <div class="col-md-4 text-center">
+                              <div class="display-4 <?php echo $dashboard['bmkg_formatted']['latest_earthquake']['magnitude'] > 5.0 ? 'text-white' : 'text-danger'; ?>">
+                                <?php echo $dashboard['bmkg_formatted']['latest_earthquake']['magnitude']; ?>
+                              </div>
+                              <small>SR</small>
+                            </div>
+                          </div>
+                          <?php if ($dashboard['bmkg_formatted']['latest_earthquake']['magnitude'] > 5.0): ?>
+                          <div class="alert alert-warning mt-2 mb-0">
+                            <i class="mdi mdi-alert"></i> <strong>Tindakan Darurat:</strong> Segera koordinasi dengan tim SAR dan evakuasi jika needed.
+                          </div>
+                          <?php endif; ?>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Weather Impact Assessment -->
+                    <div class="col-md-6">
+                      <div class="card border-left border-info border-3">
+                        <div class="card-body">
+                          <h6 class="card-title mb-3">
+                            <i class="mdi mdi-cloud-alert"></i>
+                            Analisis Cuaca untuk Respons
+                          </h6>
+                          <div class="row text-center">
+                            <div class="col-md-4">
+                              <div class="weather-metric">
+                                <i class="mdi mdi-thermometer text-primary" style="font-size: 1.5rem;"></i>
+                                <div class="h5 mb-0"><?php echo htmlspecialchars($dashboard['bmkg_formatted']['weather_info']['temperature']); ?></div>
+                                <small>Suhu</small>
+                              </div>
+                            </div>
+                            <div class="col-md-4">
+                              <div class="weather-metric">
+                                <i class="mdi mdi-water-percent text-info" style="font-size: 1.5rem;"></i>
+                                <div class="h5 mb-0"><?php echo htmlspecialchars($dashboard['bmkg_formatted']['weather_info']['humidity']); ?></div>
+                                <small>Kelembaban</small>
+                              </div>
+                            </div>
+                            <div class="col-md-4">
+                              <div class="weather-metric">
+                                <i class="mdi mdi-wind text-warning" style="font-size: 1.5rem;"></i>
+                                <div class="h5 mb-0"><?php echo htmlspecialchars($dashboard['bmkg_formatted']['weather_info']['wind']); ?></div>
+                                <small>Angin</small>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="mt-3">
+                            <p class="mb-0 text-muted">
+                              <strong>Kondisi:</strong> <?php echo htmlspecialchars($dashboard['bmkg_formatted']['weather_info']['description']); ?>
+                            </p>
+                            <p class="mb-0 text-muted">
+                              <small><i class="mdi mdi-information"></i> Perhatikan kondisi cuaca untuk operasi lapangan dan evakuasi</small>
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Tsunami Warning Alert -->
+                  <div class="row mt-3">
+                    <div class="col-md-12">
+                      <div class="card <?php echo strpos($dashboard['bmkg_formatted']['tsunami_warning']['status'], 'Tidak Ada') === false ? 'bg-danger text-white' : 'border-left border-success border-3'; ?>">
+                        <div class="card-body">
+                          <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                              <i class="mdi mdi-waves mr-2" style="font-size: 1.5rem;"></i>
+                              <div>
+                                <h6 class="card-title mb-1">
+                                  Peringatan Tsunami
+                                  <?php if (strpos($dashboard['bmkg_formatted']['tsunami_warning']['status'], 'Tidak Ada') === false): ?>
+                                    <span class="badge badge-danger">AKTIF</span>
+                                  <?php else: ?>
+                                    <span class="badge badge-success">AMAN</span>
+                                  <?php endif; ?>
+                                </h6>
+                                <p class="mb-0">
+                                  <strong>Status:</strong> <?php echo htmlspecialchars($dashboard['bmkg_formatted']['tsunami_warning']['status']); ?>
+                                </p>
+                                <p class="mb-0">
+                                  <small><?php echo htmlspecialchars($dashboard['bmkg_formatted']['tsunami_warning']['message']); ?></small>
+                                </p>
+                              </div>
+                            </div>
+                            <?php if (strpos($dashboard['bmkg_formatted']['tsunami_warning']['status'], 'Tidak Ada') === false): ?>
+                            <div>
+                              <button class="btn btn-light btn-sm" onclick="activateTsunamiProtocol()">
+                                <i class="mdi mdi-alert"></i> Aktifkan Protokol
+                              </button>
+                            </div>
+                            <?php endif; ?>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- BPBD Action Buttons -->
+                  <div class="text-right mt-3">
+                    <button class="btn btn-sm btn-danger" onclick="refreshBMKGData()">
+                      <i class="mdi mdi-refresh"></i> Refresh Data Kritis
+                    </button>
+                    <button class="btn btn-sm btn-primary ml-1" onclick="showBMKGDetails()">
+                      <i class="mdi mdi-chart-line"></i> Detail Analisis
+                    </button>
+                    <button class="btn btn-sm btn-success ml-1" onclick="generateBMKGReport()">
+                      <i class="mdi mdi-file-document"></i> Generate Laporan
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <?php endif; ?>
+
           <!-- Quick Actions -->
           <div class="row mt-4">
             <div class="col-lg-12">

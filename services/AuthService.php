@@ -295,12 +295,8 @@ class AuthService {
         // Password validation
         if (empty($data['password'])) {
             $errors['password'] = 'Password wajib diisi';
-        } elseif (strlen($data['password']) < 6) {
-            $errors['password'] = 'Password minimal 6 karakter';
-        } elseif (!preg_match('/[A-Z]/', $data['password'])) {
-            $errors['password'] = 'Password harus mengandung minimal 1 huruf kapital';
-        } elseif (!preg_match('/[0-9]/', $data['password'])) {
-            $errors['password'] = 'Password harus mengandung minimal 1 angka';
+        } elseif (strlen($data['password']) < 4) {
+            $errors['password'] = 'Password minimal 4 karakter';
         }
 
         // Password confirmation

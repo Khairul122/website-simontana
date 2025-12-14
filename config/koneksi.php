@@ -6,7 +6,7 @@
  */
 
 class BencanaAPIClient {
-    // Konfigurasi REST API Backend Laravel
+    // Konfigurasi REST API Backend Laravel (Updated with BMKG Integration)
     private $apiBaseUrl = "http://127.0.0.1:8000/api";
     private $apiTimeout = 30;
     private $lastError = null;
@@ -203,46 +203,107 @@ class BencanaAPIClient {
     }
 
     /**
-     * BMKG endpoints untuk Website
+     * BMKG endpoints untuk Website (Updated dengan backend baru yang sudah diintegrasikan)
      */
     public function getBMKGDashboard($token) {
-        return $this->apiRequest('bmkg/dashboard', 'GET', null, $token);
+        return $this->apiRequest('bmkg/all', 'GET', null, $token);
     }
 
     public function getGempaTerbaru($token) {
-        return $this->apiRequest('bmkg/gempa/terbaru', 'GET', null, $token);
+        return $this->apiRequest('bmkg/earthquake/latest', 'GET', null, $token);
     }
 
-    public function getGempa24Jam($token) {
-        return $this->apiRequest('bmkg/gempa/24-jam', 'GET', null, $token);
+    public function getGempaDirasakan($token) {
+        return $this->apiRequest('bmkg/earthquake/felt', 'GET', null, $token);
     }
 
     public function getRiwayatGempa($token, $params = []) {
-        $query = http_build_query($params);
-        $endpoint = 'bmkg/gempa/riwayat' . ($query ? '?' . $query : '');
-        return $this->apiRequest($endpoint, 'GET', null, $token);
+        return $this->getGempaDirasakan($token); // Felt earthquakes sebagai riwayat
     }
 
     public function getStatistikGempa($token) {
-        return $this->apiRequest('bmkg/gempa/statistik', 'GET', null, $token);
+        return $this->apiRequest('bmkg/statistics', 'GET', null, $token);
     }
 
     public function getCekGempaKoordinat($token, $params) {
         $query = http_build_query($params);
-        $endpoint = 'bmkg/gempa/cek-koordinat?' . $query;
+        $endpoint = 'bmkg/earthquake/check?' . $query;
         return $this->apiRequest($endpoint, 'GET', null, $token);
     }
 
     public function getPeringatanTsunami($token) {
-        return $this->apiRequest('bmkg/gempa/peringatan-tsunami', 'GET', null, $token);
+        return $this->apiRequest('bmkg/tsunami', 'GET', null, $token);
     }
 
-    public function getCuacaInfo($token) {
-        return $this->apiRequest('bmkg/cuaca', 'GET', null, $token);
+    public function getCuacaInfo($token, $province = null) {
+        $query = $province ? '?province=' . urlencode($province) : '';
+        $endpoint = 'bmkg/weather' . $query;
+        return $this->apiRequest($endpoint, 'GET', null, $token);
     }
 
     public function getPeringatanCuaca($token) {
-        return $this->apiRequest('bmkg/cuaca/peringatan', 'GET', null, $token);
+        return $this->apiRequest('bmkg/weather', 'GET', null, $token); // Weather info includes warnings
+    }
+
+    /**
+     * Additional BMKG endpoints untuk backend baru
+     */
+    public function getBMKGDataFromDatabase($token, $type = null, $limit = 10) {
+        $params = [];
+        if ($type) $params['type'] = $type;
+        if ($limit != 10) $params['limit'] = $limit;
+
+        $query = http_build_query($params);
+        $endpoint = 'bmkg/database' . ($query ? '?' . $query : '');
+        return $this->apiRequest($endpoint, 'GET', null, $token);
+    }
+
+    /**
+     * Mock BMKG data untuk testing (no auth required)
+     */
+    public function getMockGempaTerbaru() {
+        $url = $this->apiBaseUrl . '/../bmkg-test/earthquake/latest';
+        return $this->makeApiCall($url);
+    }
+
+    public function getMockAllBMKGData() {
+        $url = $this->apiBaseUrl . '/../bmkg-test/all';
+        return $this->makeApiCall($url);
+    }
+
+    /**
+     * Generic API call untuk mock data
+     */
+    private function makeApiCall($url) {
+        $ch = curl_init();
+        curl_setopt_array($ch, [
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json',
+                'Accept: application/json',
+                'X-Requested-With: XMLHttpRequest'
+            ],
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_TIMEOUT => $this->apiTimeout,
+            CURLOPT_FOLLOWLOCATION => true
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
+        curl_close($ch);
+
+        if ($error) {
+            throw new Exception("CURL Error: " . $error);
+        }
+
+        $responseData = json_decode($response, true);
+        if ($httpCode >= 400) {
+            throw new Exception('API Error: ' . ($responseData['message'] ?? 'Unknown error'));
+        }
+
+        return $responseData;
     }
 
     /**

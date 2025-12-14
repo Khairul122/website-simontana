@@ -877,7 +877,7 @@
                     <p class="form-subtitle">Daftar untuk mulai menggunakan SIMONTA</p>
                 </div>
 
-                <form action="index.php?controller=auth&action=doRegister" method="POST" id="registerForm">
+                <form action="#" method="POST" id="registerForm">
                     <div class="form-row">
                         <div class="form-group">
                             <label for="nama" class="form-label">Nama Lengkap</label>
@@ -917,6 +917,7 @@
                                     <i class="fas fa-eye" id="eyeIcon"></i>
                                 </button>
                             </div>
+                            <small class="text-muted">Minimal 4 karakter (semakin kuat semakin baik)</small>
                             <div class="password-strength">
                                 <div class="progress" id="passwordStrengthBar">
                                     <div class="progress-bar" id="passwordStrengthProgress"></div>
@@ -988,6 +989,24 @@
                 <div class="security-note">
                     <i class="fas fa-shield-alt"></i>
                     Data Anda aman dan terenkripsi
+                </div>
+
+                <!-- Testing Section (Development) -->
+                <div class="testing-section mt-4" style="border-top: 1px solid var(--gray-200); padding-top: 1rem;">
+                    <div class="text-center">
+                        <small class="text-muted mb-2 d-block">Testing Tools (Development)</small>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.testBackendConnection()">
+                                <i class="fas fa-plug"></i> Test Backend
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-info" onclick="window.testBMKGAPI()">
+                                <i class="fas fa-cloud"></i> Test BMKG API
+                            </button>
+                        </div>
+                        <small class="text-muted d-block mt-1">
+                            <kbd>Ctrl+B</kbd> Test Backend | <kbd>Ctrl+M</kbd> Test BMKG
+                        </small>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1098,22 +1117,19 @@
                 let strength = 0;
                 const feedback = [];
 
-                if (password.length >= 8) strength++;
-                else feedback.push('minimal 8 karakter');
+                if (password.length >= 4) strength++;
+                else feedback.push('minimal 4 karakter');
 
-                if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
-                else feedback.push('huruf besar dan kecil');
-
+                if (password.length >= 6) strength++;
+                if (/[a-z]/.test(password)) strength++;
+                if (/[A-Z]/.test(password)) strength++;
                 if (/[0-9]/.test(password)) strength++;
-                else feedback.push('angka');
-
                 if (/[^a-zA-Z0-9]/.test(password)) strength++;
-                else feedback.push('simbol khusus');
 
                 return {
-                    score: strength,
+                    score: Math.min(strength, 4),
                     maxScore: 4,
-                    percentage: (strength / 4) * 100,
+                    percentage: (Math.min(strength, 4) / 4) * 100,
                     feedback: feedback
                 };
             }
@@ -1220,8 +1236,8 @@
                     return;
                 }
 
-                if (password.length < 6) {
-                    showAlert('Password minimal 6 karakter', 'danger');
+                if (password.length < 4) {
+                    showAlert('Password minimal 4 karakter', 'danger');
                     return;
                 }
 
@@ -1235,16 +1251,69 @@
                     return;
                 }
 
-                // Show loading and submit
+                // Show loading
                 registerBtn.disabled = true;
                 registerBtnText.textContent = 'Mendaftar...';
                 registerSpinner.classList.remove('d-none');
 
-                console.log("Submitting form to:", this.action);
-                console.log("Form method:", this.method);
+                console.log("Submitting registration to API...");
 
-                // Submit form
-                this.submit();
+                // Prepare form data for API
+                const formData = new FormData();
+                formData.append('nama', nama);
+                formData.append('username', username);
+                formData.append('email', email);
+                formData.append('password', password);
+                formData.append('password_confirmation', passwordConfirmation);
+                formData.append('role', role);
+
+                const noTelepon = document.getElementById('no_telepon').value.trim();
+                if (noTelepon) {
+                    formData.append('no_telepon', noTelepon);
+                }
+
+                // Send registration request to backend API
+                fetch('http://127.0.0.1:8000/api/auth/register', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Registration response:', data);
+
+                    if (data.success) {
+                        showAlert('Registrasi berhasil! Mengalihkan ke halaman login...', 'success');
+
+                        // Redirect to login after successful registration
+                        setTimeout(() => {
+                            window.location.href = 'index.php?controller=auth&action=index';
+                        }, 2000);
+                    } else {
+                        // Handle validation errors
+                        let errorMessage = data.message || 'Registrasi gagal';
+
+                        if (data.errors) {
+                            const errorMessages = Object.values(data.errors).flat();
+                            errorMessage = errorMessages.join(', ');
+                        }
+
+                        showAlert(errorMessage, 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Registration error:', error);
+                    showAlert('Terjadi kesalahan saat registrasi. Silakan coba lagi.', 'danger');
+                })
+                .finally(() => {
+                    // Hide loading
+                    registerBtn.disabled = false;
+                    registerBtnText.textContent = 'Daftar Sekarang';
+                    registerSpinner.classList.add('d-none');
+                });
             });
 
             function showAlert(message, type = 'info', autoDismiss = true) {
@@ -1264,6 +1333,72 @@
             if (window.history.replaceState) {
                 window.history.replaceState(null, null, window.location.href);
             }
+
+            // Backend Connection Test Functionality
+            window.testBackendConnection = function() {
+                showAlert('Menguji koneksi ke backend...', 'info', 'Testing Connection');
+
+                fetch('index.php?controller=auth&action=testConnection', {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert('Koneksi backend berhasil!', 'success', 'Connection Test');
+                        console.log('Backend Status:', data.api_status);
+                    } else {
+                        showAlert('Koneksi backend gagal: ' + data.error, 'error', 'Connection Test');
+                        console.error('Connection Error:', data);
+                    }
+                })
+                .catch(error => {
+                    showAlert('Error testing connection: ' + error.message, 'error', 'Connection Test');
+                    console.error('Test Error:', error);
+                });
+            };
+
+            // BMKG API Test Functionality
+            window.testBMKGAPI = function() {
+                showAlert('Menguji integrasi BMKG API...', 'info', 'BMKG API Test');
+
+                fetch('index.php?controller=auth&action=testBMKGAPI', {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert('Integrasi BMKG API berhasil!', 'success', 'BMKG API Test');
+                        console.log('BMKG Data:', data);
+                    } else {
+                        showAlert('Integrasi BMKG API gagal: ' + data.error, 'error', 'BMKG API Test');
+                        console.error('BMKG API Error:', data);
+                    }
+                })
+                .catch(error => {
+                    showAlert('Error testing BMKG API: ' + error.message, 'error', 'BMKG API Test');
+                    console.error('BMKG Test Error:', error);
+                });
+            };
+
+            // Add keyboard shortcuts for testing (Ctrl+B for backend, Ctrl+M for BMKG)
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.key === 'b') {
+                    e.preventDefault();
+                    window.testBackendConnection();
+                }
+                if (e.ctrlKey && e.key === 'm') {
+                    e.preventDefault();
+                    window.testBMKGAPI();
+                }
+            });
         });
     </script>
 </body>

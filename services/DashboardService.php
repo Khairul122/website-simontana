@@ -274,7 +274,7 @@ class DashboardService {
     }
 
     /**
-     * Get quick actions berdasarkan role
+     * Get quick actions berdasarkan role (Updated dengan BMKG integration)
      */
     public function getQuickActions($role) {
         $actions = [
@@ -282,13 +282,15 @@ class DashboardService {
                 ['icon' => 'fa-plus', 'text' => 'Tambah Pengguna', 'url' => 'index.php?controller=user&action=create'],
                 ['icon' => 'fa-chart-bar', 'text' => 'Lihat Statistik', 'url' => 'index.php?controller=report&action=stats'],
                 ['icon' => 'fa-cog', 'text' => 'Pengaturan', 'url' => 'index.php?controller=settings&action=index'],
-                ['icon' => 'fa-download', 'text' => 'Export Data', 'url' => 'index.php?controller=export&action=index']
+                ['icon' => 'fa-download', 'text' => 'Export Data', 'url' => 'index.php?controller=export&action=index'],
+                ['icon' => 'fa-cloud', 'text' => 'BMKG Integration', 'url' => 'index.php?controller=bmkg&action=index']
             ],
             'PetugasBPBD' => [
                 ['icon' => 'fa-list', 'text' => 'Laporan Menunggu', 'url' => 'index.php?controller=laporan&action=menunggu'],
                 ['icon' => 'fa-map-marker-alt', 'text' => 'Peta Bencana', 'url' => 'index.php?controller=map&action=index'],
                 ['icon' => 'fa-bell', 'text' => 'Peringatan', 'url' => 'index.php?controller=warning&action=index'],
-                ['icon' => 'fa-file-alt', 'text' => 'Buat Laporan', 'url' => 'index.php?controller=laporan&action=create']
+                ['icon' => 'fa-file-alt', 'text' => 'Buat Laporan', 'url' => 'index.php?controller=laporan&action=create'],
+                ['icon' => 'fa-house-crack', 'text' => 'Info Gempa', 'url' => 'index.php?controller=bmkg&action=earthquake']
             ],
             'OperatorDesa' => [
                 ['icon' => 'fa-plus', 'text' => 'Lapor Bencana', 'url' => 'index.php?controller=laporan&action=create'],
@@ -299,6 +301,224 @@ class DashboardService {
         ];
 
         return $actions[$role] ?? [];
+    }
+
+    /**
+     * Get dashboard data dari backend API
+     */
+    public function getDashboardData($token, $role) {
+        try {
+            // Data dasar untuk semua role
+            $dashboardData = [
+                'laporan_stats' => $this->apiClient->getLaporanStats($token),
+                'recent_laporan' => $this->getRecentLaporan($token),
+                'pending_laporan' => $this->getPendingLaporan($token),
+            ];
+
+            // Role-specific data
+            switch ($role) {
+                case 'Admin':
+                    $dashboardData['user_stats'] = $this->getUserStats($token);
+                    $dashboardData['monitoring_stats'] = $this->getMonitoringStats($token);
+                    break;
+                case 'PetugasBPBD':
+                    $dashboardData['bpbd_reports'] = $this->getBPBDReports($token);
+                    $dashboardData['bmkg_data'] = $this->getBMKGData($token);
+                    break;
+                case 'OperatorDesa':
+                    $dashboardData['desa_laporan'] = $this->getDesaLaporan($token);
+                    $dashboardData['local_cuaca'] = $this->getLocalCuaca($token);
+                    break;
+            }
+
+            return $dashboardData;
+        } catch (Exception $e) {
+            error_log("DashboardService Error: " . $e->getMessage());
+            return $this->getFallbackDashboardData($role);
+        }
+    }
+
+    /**
+     * Get recent laporan data
+     */
+    private function getRecentLaporan($token) {
+        try {
+            $response = $this->apiClient->getLaporan($token, ['limit' => 5]);
+            return $response['success'] ? ($response['data'] ?? []) : [];
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Get pending laporan data
+     */
+    private function getPendingLaporan($token) {
+        try {
+            $response = $this->apiClient->getPendingLaporan($token);
+            return $response['success'] ? ($response['data'] ?? []) : [];
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Get user statistics
+     */
+    private function getUserStats($token) {
+        try {
+            $response = $this->apiClient->getUserStats($token);
+            return $response;
+        } catch (Exception $e) {
+            return ['total' => 0, 'aktif' => 0];
+        }
+    }
+
+    /**
+     * Get monitoring statistics
+     */
+    private function getMonitoringStats($token) {
+        try {
+            $response = $this->apiClient->getMonitoringStatistics($token);
+            return $response['success'] ? ($response['data'] ?? []) : [];
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Get BPBD reports
+     */
+    private function getBPBDReports($token) {
+        try {
+            $response = $this->apiClient->getBPBDReports($token);
+            return $response['success'] ? ($response['data'] ?? []) : [];
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Get BMKG data untuk dashboard
+     */
+    private function getBMKGData($token) {
+        try {
+            // Coba endpoint yang membutuhkan auth
+            $response = $this->apiClient->getLatestBMKG($token);
+            if ($response['success']) {
+                return $response['data'] ?? [];
+            }
+
+            // Fallback ke mock data
+            $mockResponse = $this->apiClient->getMockGempaTerbaru();
+            return $mockResponse['success'] ? ($mockResponse['data'] ?? []) : [];
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Get desa laporan untuk operator
+     */
+    private function getDesaLaporan($token) {
+        try {
+            $userId = $_SESSION['user_id'] ?? null;
+            $response = $this->apiClient->getDesaLaporan($token, $userId);
+            return $response['success'] ? ($response['data'] ?? []) : [];
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Get local weather data
+     */
+    private function getLocalCuaca($token) {
+        try {
+            $response = $this->apiClient->getLocalBMKG($token);
+            return $response['success'] ? ($response['data'] ?? []) : [];
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Get fallback dashboard data jika API error
+     */
+    private function getFallbackDashboardData($role) {
+        return [
+            'laporan_stats' => ['total' => 0, 'menunggu' => 0, 'diproses' => 0, 'selesai' => 0],
+            'recent_laporan' => [],
+            'pending_laporan' => [],
+            'user_stats' => ['total' => 0, 'aktif' => 0],
+            'bmkg_data' => [
+                'earthquake' => ['magnitude' => 0, 'location' => 'Data tidak tersedia'],
+                'weather' => ['temperature' => 'N/A', 'description' => 'Data tidak tersedia']
+            ]
+        ];
+    }
+
+    /**
+     * Format BMKG data untuk dashboard display
+     */
+    public function formatBMKGData($bmkgData) {
+        $formatted = [
+            'latest_earthquake' => [
+                'magnitude' => $bmkgData['earthquake']['magnitude'] ?? 0,
+                'location' => $bmkgData['earthquake']['wilayah'] ?? 'Tidak diketahui',
+                'depth' => $bmkgData['earthquake']['kedalaman'] ?? 'N/A',
+                'status' => $bmkgData['earthquake']['potensi'] ?? 'Tidak ada data',
+                'time' => $bmkgData['earthquake']['tanggal'] ?? 'N/A',
+                'icon' => 'fa-house-crack',
+                'color' => 'warning'
+            ],
+            'weather_info' => [
+                'temperature' => $bmkgData['cuaca']['temperature'] ?? '28°C',
+                'description' => $bmkgData['cuaca']['description'] ?? 'Cerah Berawan',
+                'humidity' => $bmkgData['cuaca']['humidity'] ?? '75%',
+                'wind' => $bmkgData['cuaca']['wind'] ?? '10 km/h',
+                'updated_at' => $bmkgData['updated_at'] ?? date('Y-m-d H:i:s'),
+                'icon' => 'fa-cloud-sun',
+                'color' => 'info'
+            ],
+            'tsunami_warning' => [
+                'status' => $bmkgData['tsunami']['status'] ?? 'Tidak Ada Peringatan',
+                'message' => $bmkgData['tsunami']['informasi'] ?? 'Tidak ada informasi tsunami',
+                'icon' => 'fa-water',
+                'color' => 'success'
+            ]
+        ];
+
+        return $formatted;
+    }
+
+    /**
+     * Get dashboard statistics summary
+     */
+    public function getDashboardSummary($dashboardData, $role) {
+        $summary = [
+            'total_laporan' => $dashboardData['laporan_stats']['total'] ?? 0,
+            'pending_laporan' => count($dashboardData['pending_laporan'] ?? []),
+            'recent_activities' => count($dashboardData['recent_laporan'] ?? [])
+        ];
+
+        // Role-specific summary
+        switch ($role) {
+            case 'Admin':
+                $summary['total_users'] = $dashboardData['user_stats']['total'] ?? 0;
+                $summary['active_users'] = $dashboardData['user_stats']['aktif'] ?? 0;
+                break;
+            case 'PetugasBPBD':
+                $summary['bpbd_reports'] = count($dashboardData['bpbd_reports'] ?? []);
+                $summary['bmkg_alerts'] = !empty($dashboardData['bmkg_data']) ? 1 : 0;
+                break;
+            case 'OperatorDesa':
+                $summary['desa_reports'] = count($dashboardData['desa_laporan'] ?? []);
+                $summary['weather_alerts'] = !empty($dashboardData['local_cuaca']['warnings']) ? 1 : 0;
+                break;
+        }
+
+        return $summary;
     }
 }
 ?>

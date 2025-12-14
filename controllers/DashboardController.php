@@ -6,11 +6,14 @@
 
 class DashboardController {
     private $apiClient;
+    private $dashboardService;
 
     public function __construct() {
         // Inisialisasi API Client
         require_once 'config/koneksi.php';
+        require_once 'services/DashboardService.php';
         $this->apiClient = getAPIClient();
+        $this->dashboardService = new DashboardService($this->apiClient);
     }
 
     /**
@@ -76,8 +79,19 @@ class DashboardController {
         }
 
         try {
-            // Ambil data dashboard untuk admin
-            $dashboardData = $this->getAdminDashboardData();
+            // Ambil data dashboard untuk admin menggunakan DashboardService
+            $token = $this->apiClient->getApiToken();
+            $dashboardData = $this->dashboardService->getDashboardData($token, 'Admin');
+            $dashboardSummary = $this->dashboardService->getDashboardSummary($dashboardData, 'Admin');
+
+            // Format BMKG data untuk display
+            $bmkgFormatted = [];
+            if (!empty($dashboardData['bmkg_data'])) {
+                $bmkgFormatted = $this->dashboardService->formatBMKGData($dashboardData['bmkg_data']);
+            }
+
+            // Get quick actions
+            $quickActions = $this->dashboardService->getQuickActions('Admin');
 
             $data = [
                 'title' => 'Dashboard Admin - SIMONTA BENCANA',
@@ -85,9 +99,15 @@ class DashboardController {
                 'role' => 'Admin',
                 'user' => [
                     'nama' => $_SESSION['nama'] ?? '',
-                    'username' => $_SESSION['username'] ?? ''
+                    'username' => $_SESSION['username'] ?? '',
+                    'avatar' => $this->dashboardService->getUserAvatar($_SESSION['nama'] ?? '')
                 ],
-                'dashboard' => $dashboardData
+                'dashboard' => array_merge($dashboardData, [
+                    'summary' => $dashboardSummary,
+                    'bmkg_formatted' => $bmkgFormatted,
+                    'quick_actions' => $quickActions,
+                    'notifications' => $this->dashboardService->getNotifications($_SESSION['user_id'] ?? null, 'Admin')
+                ])
             ];
 
             // Ambil notifikasi dari session
@@ -131,8 +151,19 @@ class DashboardController {
         }
 
         try {
-            // Ambil data dashboard untuk petugas
-            $dashboardData = $this->getPetugasDashboardData();
+            // Ambil data dashboard untuk petugas BPBD menggunakan DashboardService
+            $token = $this->apiClient->getApiToken();
+            $dashboardData = $this->dashboardService->getDashboardData($token, 'PetugasBPBD');
+            $dashboardSummary = $this->dashboardService->getDashboardSummary($dashboardData, 'PetugasBPBD');
+
+            // Format BMKG data untuk display
+            $bmkgFormatted = [];
+            if (!empty($dashboardData['bmkg_data'])) {
+                $bmkgFormatted = $this->dashboardService->formatBMKGData($dashboardData['bmkg_data']);
+            }
+
+            // Get quick actions
+            $quickActions = $this->dashboardService->getQuickActions('PetugasBPBD');
 
             $data = [
                 'title' => 'Dashboard Petugas BPBD - SIMONTA BENCANA',
@@ -140,9 +171,15 @@ class DashboardController {
                 'role' => 'PetugasBPBD',
                 'user' => [
                     'nama' => $_SESSION['nama'] ?? '',
-                    'username' => $_SESSION['username'] ?? ''
+                    'username' => $_SESSION['username'] ?? '',
+                    'avatar' => $this->dashboardService->getUserAvatar($_SESSION['nama'] ?? '')
                 ],
-                'dashboard' => $dashboardData
+                'dashboard' => array_merge($dashboardData, [
+                    'summary' => $dashboardSummary,
+                    'bmkg_formatted' => $bmkgFormatted,
+                    'quick_actions' => $quickActions,
+                    'notifications' => $this->dashboardService->getNotifications($_SESSION['user_id'] ?? null, 'PetugasBPBD')
+                ])
             ];
 
             // Ambil notifikasi dari session
@@ -186,8 +223,19 @@ class DashboardController {
         }
 
         try {
-            // Ambil data dashboard untuk operator
-            $dashboardData = $this->getOperatorDashboardData();
+            // Ambil data dashboard untuk operator desa menggunakan DashboardService
+            $token = $this->apiClient->getApiToken();
+            $dashboardData = $this->dashboardService->getDashboardData($token, 'OperatorDesa');
+            $dashboardSummary = $this->dashboardService->getDashboardSummary($dashboardData, 'OperatorDesa');
+
+            // Format BMKG data untuk display
+            $bmkgFormatted = [];
+            if (!empty($dashboardData['local_cuaca'])) {
+                $bmkgFormatted = $this->dashboardService->formatBMKGData($dashboardData['local_cuaca']);
+            }
+
+            // Get quick actions
+            $quickActions = $this->dashboardService->getQuickActions('OperatorDesa');
 
             $data = [
                 'title' => 'Dashboard Operator Desa - SIMONTA BENCANA',
@@ -195,9 +243,15 @@ class DashboardController {
                 'role' => 'OperatorDesa',
                 'user' => [
                     'nama' => $_SESSION['nama'] ?? '',
-                    'username' => $_SESSION['username'] ?? ''
+                    'username' => $_SESSION['username'] ?? '',
+                    'avatar' => $this->dashboardService->getUserAvatar($_SESSION['nama'] ?? '')
                 ],
-                'dashboard' => $dashboardData
+                'dashboard' => array_merge($dashboardData, [
+                    'summary' => $dashboardSummary,
+                    'bmkg_formatted' => $bmkgFormatted,
+                    'quick_actions' => $quickActions,
+                    'notifications' => $this->dashboardService->getNotifications($_SESSION['user_id'] ?? null, 'OperatorDesa')
+                ])
             ];
 
             // Ambil notifikasi dari session
@@ -425,6 +479,96 @@ class DashboardController {
 
         // Load view file yang sudah lengkap dengan template
         include 'views/' . $viewName . '.php';
+    }
+
+    /**
+     * Test dashboard API endpoints (untuk development)
+     */
+    public function testDashboardAPI() {
+        try {
+            $token = $this->apiClient->getApiToken();
+            $role = $this->getCurrentRole();
+
+            if (!$token) {
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'User not authenticated'
+                ]);
+                return;
+            }
+
+            // Test various dashboard endpoints
+            $testResults = [
+                'laporan_stats' => $this->apiClient->getLaporanStats($token),
+                'recent_laporan' => $this->apiClient->getLaporan($token, ['limit' => 5]),
+                'pending_laporan' => $this->apiClient->getPendingLaporan($token),
+                'bmkg_data' => $this->apiClient->getMockAllBMKGData(),
+                'bmkg_earthquake' => $this->apiClient->getMockGempaTerbaru()
+            ];
+
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'message' => 'Dashboard API test completed',
+                'role' => $role,
+                'results' => $testResults,
+                'timestamp' => date('Y-m-d H:i:s')
+            ]);
+
+        } catch (Exception $e) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false,
+                'message' => 'Dashboard API test failed: ' . $e->getMessage(),
+                'timestamp' => date('Y-m-d H:i:s')
+            ]);
+        }
+    }
+
+    /**
+     * Refresh dashboard data via AJAX
+     */
+    public function refreshData() {
+        try {
+            $token = $this->apiClient->getApiToken();
+            $role = $this->getCurrentRole();
+
+            if (!$token) {
+                throw new Exception('User not authenticated');
+            }
+
+            // Get fresh dashboard data
+            $dashboardData = $this->dashboardService->getDashboardData($token, $role);
+            $dashboardSummary = $this->dashboardService->getDashboardSummary($dashboardData, $role);
+
+            // Format BMKG data
+            $bmkgFormatted = [];
+            if (!empty($dashboardData['bmkg_data']) || !empty($dashboardData['local_cuaca'])) {
+                $bmkgSource = $dashboardData['bmkg_data'] ?? $dashboardData['local_cuaca'];
+                $bmkgFormatted = $this->dashboardService->formatBMKGData($bmkgSource);
+            }
+
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'message' => 'Dashboard data refreshed successfully',
+                'data' => [
+                    'dashboard' => $dashboardData,
+                    'summary' => $dashboardSummary,
+                    'bmkg_formatted' => $bmkgFormatted
+                ],
+                'timestamp' => date('Y-m-d H:i:s')
+            ]);
+
+        } catch (Exception $e) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false,
+                'message' => 'Failed to refresh dashboard data: ' . $e->getMessage(),
+                'timestamp' => date('Y-m-d H:i:s')
+            ]);
+        }
     }
 }
 ?>
