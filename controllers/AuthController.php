@@ -69,6 +69,7 @@ class AuthController {
 
                     // Simpan data user ke session
                     $userData = $response['data']['user'];
+                    $_SESSION['user'] = $userData; // Save complete user object
                     $_SESSION['user_id'] = $userData['id'];
                     $_SESSION['username'] = $userData['username'];
                     $_SESSION['nama'] = $userData['nama'] ?? $userData['username'];
@@ -362,7 +363,8 @@ class AuthController {
      * Cek apakah user sudah login
      */
     private function isLoggedIn() {
-        return isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
+        return (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) &&
+               (isset($_SESSION['user']) && !empty($_SESSION['user']));
     }
 
     /**
@@ -373,13 +375,13 @@ class AuthController {
 
         switch ($role) {
             case 'Admin':
-                header('Location: index.php?controller=dashboard&action=index');
+                header('Location: index.php?controller=dashboard&action=admin');
                 break;
             case 'PetugasBPBD':
-                header('Location: index.php?controller=dashboard&action=index');
+                header('Location: index.php?controller=dashboard&action=petugas');
                 break;
             case 'OperatorDesa':
-                header('Location: index.php?controller=dashboard&action=index');
+                header('Location: index.php?controller=dashboard&action=operator');
                 break;
             default:
                 header('Location: index.php?controller=beranda&action=index');
@@ -550,6 +552,7 @@ class AuthController {
                 }
 
                 // Set session data
+                $_SESSION['user'] = $userArray; // Save complete user object
                 $_SESSION['user_id'] = $userArray['id'] ?? null;
                 $_SESSION['username'] = $userArray['username'] ?? null;
                 $_SESSION['nama'] = $userArray['nama'] ?? $userArray['username'] ?? null;
@@ -569,11 +572,28 @@ class AuthController {
                 }
 
                 header('Content-Type: application/json');
+                // Redirect berdasarkan role user
+                $redirectUrl = '';
+                switch($userArray['role']) {
+                    case 'Admin':
+                        $redirectUrl = 'index.php?controller=dashboard&action=admin';
+                        break;
+                    case 'PetugasBPBD':
+                        $redirectUrl = 'index.php?controller=dashboard&action=petugas';
+                        break;
+                    case 'OperatorDesa':
+                        $redirectUrl = 'index.php?controller=dashboard&action=operator';
+                        break;
+                    default:
+                        $redirectUrl = 'index.php'; // fallback
+                        break;
+                }
+
                 echo json_encode([
                     'success' => true,
                     'message' => 'Session berhasil diatur',
                     'role' => $userArray['role'],
-                    'redirect_url' => 'index.php?controller=dashboard&action=index'
+                    'redirect_url' => $redirectUrl
                 ]);
 
             } catch (Exception $e) {

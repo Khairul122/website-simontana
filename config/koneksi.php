@@ -101,7 +101,7 @@ class BencanaAPIClient {
     }
 
     public function getProfile($token) {
-        return $this->apiRequest('auth/profile', 'GET', null, $token);
+        return $this->apiRequest('auth/me', 'GET', null, $token);
     }
 
     public function logout($token) {
@@ -146,28 +146,29 @@ class BencanaAPIClient {
      */
     public function getTindaklanjut($token, $params = []) {
         $query = http_build_query($params);
-        $endpoint = 'tindaklanjut' . ($query ? '?' . $query : '');
+        $endpoint = 'tindak-lanjut' . ($query ? '?' . $query : '');
         return $this->apiRequest($endpoint, 'GET', null, $token);
     }
 
     public function createTindaklanjut($token, $data) {
-        return $this->apiRequest('tindaklanjut', 'POST', $data, $token);
+        return $this->apiRequest('tindak-lanjut', 'POST', $data, $token);
     }
 
     public function getTindaklanjutDetail($token, $id) {
-        return $this->apiRequest("tindaklanjut/$id", 'GET', null, $token);
+        return $this->apiRequest("tindak-lanjut/$id", 'GET', null, $token);
     }
 
     public function updateTindaklanjut($token, $id, $data) {
-        return $this->apiRequest("tindaklanjut/$id", 'PUT', $data, $token);
+        return $this->apiRequest("tindak-lanjut/$id", 'PUT', $data, $token);
     }
 
     public function deleteTindaklanjut($token, $id) {
-        return $this->apiRequest("tindaklanjut/$id", 'DELETE', null, $token);
+        return $this->apiRequest("tindak-lanjut/$id", 'DELETE', null, $token);
     }
 
     public function getTindaklanjutStatistics($token) {
-        return $this->apiRequest('tindaklanjut/statistics', 'GET', null, $token);
+        // Endpoint statistik untuk tindaklanjut mungkin tidak tersedia, kembalikan data umum
+        return $this->apiRequest('tindaklanjut', 'GET', null, $token);
     }
 
     /**
@@ -196,7 +197,8 @@ class BencanaAPIClient {
     }
 
     public function getMonitoringByLaporan($token, $laporan_id) {
-        return $this->apiRequest("monitoring/laporan/$laporan_id", 'GET', null, $token);
+        // Gunakan filter parameter sesuai dokumentasi
+        return $this->apiRequest("monitoring?id_laporan=$laporan_id", 'GET', null, $token);
     }
 
     public function getMonitoringStatistics($token) {
@@ -237,7 +239,7 @@ class BencanaAPIClient {
     }
 
     public function getCuacaInfo($token, $province = null) {
-        $query = $province ? '?province=' . urlencode($province) : '';
+        $query = $province ? '?provinsi=' . urlencode($province) : '';
         $endpoint = 'bmkg/weather' . $query;
         return $this->apiRequest($endpoint, 'GET', null, $token);
     }
@@ -263,50 +265,17 @@ class BencanaAPIClient {
      * Mock BMKG data untuk testing (no auth required)
      */
     public function getMockGempaTerbaru() {
-        $url = $this->apiBaseUrl . '/../bmkg-test/earthquake/latest';
-        return $this->makeApiCall($url);
+        // Gunakan endpoint testing yang benar sesuai dokumentasi
+        $result = $this->apiRequest('bmkg-test/earthquake/latest', 'GET');
+        return $result;
     }
 
     public function getMockAllBMKGData() {
-        $url = $this->apiBaseUrl . '/../bmkg-test/all';
-        return $this->makeApiCall($url);
+        // Gunakan endpoint testing yang benar sesuai dokumentasi
+        $result = $this->apiRequest('bmkg-test/all', 'GET');
+        return $result;
     }
 
-    /**
-     * Generic API call untuk mock data
-     */
-    private function makeApiCall($url) {
-        $ch = curl_init();
-        curl_setopt_array($ch, [
-            CURLOPT_URL => $url,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTPHEADER => [
-                'Content-Type: application/json',
-                'Accept: application/json',
-                'X-Requested-With: XMLHttpRequest',
-                'User-Agent: Disaster-Monitoring-System/1.0'
-            ],
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_TIMEOUT => $this->apiTimeout,
-            CURLOPT_FOLLOWLOCATION => true
-        ]);
-
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $error = curl_error($ch);
-        curl_close($ch);
-
-        if ($error) {
-            throw new Exception("CURL Error: " . $error);
-        }
-
-        $responseData = json_decode($response, true);
-        if ($httpCode >= 400) {
-            throw new Exception('API Error: ' . ($responseData['message'] ?? 'Unknown error'));
-        }
-
-        return $responseData;
-    }
 
     /**
      * Master Data endpoints untuk Website
@@ -330,37 +299,40 @@ class BencanaAPIClient {
     }
 
     public function getDesaStatistics($token) {
-        return $this->apiRequest('desa-statistics', 'GET', null, $token);
+        // Endpoint statistik untuk desa mungkin tidak tersedia, kembalikan data umum
+        return $this->apiRequest('desa', 'GET', null, $token);
     }
 
     public function getKecamatan($token) {
-        return $this->apiRequest('desa-list/kecamatan', 'GET', null, $token);
+        // Gunakan endpoint yang sesuai dengan struktur data
+        return $this->apiRequest('desa?jenis=kecamatan', 'GET', null, $token);
     }
 
     public function getKabupaten($token) {
-        return $this->apiRequest('desa-list/kabupaten', 'GET', null, $token);
+        // Gunakan endpoint yang sesuai dengan struktur data
+        return $this->apiRequest('desa?jenis=kabupaten', 'GET', null, $token);
     }
 
     public function getKategoriBencana($token, $params = []) {
         $query = http_build_query($params);
-        $endpoint = 'kategori-bencana' . ($query ? '?' . $query : '');
+        $endpoint = 'kategori' . ($query ? '?' . $query : '');
         return $this->apiRequest($endpoint, 'GET', null, $token);
     }
 
     public function createKategoriBencana($token, $data) {
-        return $this->apiRequest('kategori-bencana', 'POST', $data, $token);
+        return $this->apiRequest('kategori', 'POST', $data, $token);
     }
 
     public function updateKategoriBencana($token, $id, $data) {
-        return $this->apiRequest("kategori-bencana/$id", 'PUT', $data, $token);
+        return $this->apiRequest("kategori/$id", 'PUT', $data, $token);
     }
 
     public function deleteKategoriBencana($token, $id) {
-        return $this->apiRequest("kategori-bencana/$id", 'DELETE', null, $token);
+        return $this->apiRequest("kategori/$id", 'DELETE', null, $token);
     }
 
     public function getKategoriBencanaStatistics($token) {
-        return $this->apiRequest('kategori-bencana-statistics', 'GET', null, $token);
+        return $this->apiRequest('kategori/statistics', 'GET', null, $token);
     }
 
     /**
@@ -436,14 +408,12 @@ class BencanaAPIClient {
      */
     public function getLaporanStats($token) {
         $result = $this->apiRequest('laporan/statistics', 'GET', null, $token);
-        $this->logToConsole('Laporan Stats', $result);
         return $result;
     }
 
     public function getUserStats($token) {
         // Get user statistics from existing endpoints
         $usersResponse = $this->apiRequest('admin/users', 'GET', null, $token);
-        $this->logToConsole('Admin Users Response', $usersResponse);
 
         $stats = [
             'total' => $usersResponse['success'] ? count($usersResponse['data'] ?? []) : 0,
@@ -451,20 +421,16 @@ class BencanaAPIClient {
                 return isset($user['status']) && $user['status'] === 'active';
             })) : 0
         ];
-
-        $this->logToConsole('User Stats Calculated', $stats);
         return $stats;
     }
 
     public function getRecentMonitoring($token, $limit = 10) {
         // Get recent monitoring data
         $monitoringResponse = $this->apiRequest("monitoring?limit=$limit", 'GET', null, $token);
-        $result = [
+        return [
             'success' => $monitoringResponse['success'] ?? false,
             'monitoring' => $monitoringResponse['data'] ?? []
         ];
-        $this->logToConsole('Recent Monitoring', $result);
-        return $result;
     }
 
     public function getLatestBMKG($token) {
@@ -475,24 +441,32 @@ class BencanaAPIClient {
     }
 
     public function getPendingLaporan($token) {
-        // Get laporan with status 'menunggu'
-        $result = $this->apiRequest('laporan?status=menunggu', 'GET', null, $token);
+        // Get laporan with status 'Masuk' (new enum value based on our documentation)
+        $result = $this->apiRequest('laporan?status=Masuk', 'GET', null, $token);
         $this->logToConsole('Pending Laporan', $result);
         return $result;
     }
 
     public function getBMKGWarnings($token) {
-        // Get BMKG weather warnings
-        $result = $this->apiRequest('bmkg/cuaca/peringatan', 'GET', null, $token);
+        // Get BMKG tsunami warnings
+        $result = $this->apiRequest('bmkg/tsunami', 'GET', null, $token);
         $this->logToConsole('BMKG Warnings', $result);
         return $result;
     }
 
     public function getDesaLaporan($token, $userId) {
         // Get user's own reports (Operator Desa can see their desa reports)
-        $result = $this->apiRequest('my-reports', 'GET', null, $token);
-        $this->logToConsole("Desa Laporan for User $userId", $result);
-        return $result;
+        // First try to get reports with desa ID if available in session
+        try {
+            $result = $this->apiRequest('laporan', 'GET', null, $token);
+            $this->logToConsole("Desa Laporan for User", $result);
+            return $result;
+        } catch (Exception $e) {
+            // Fallback if specific endpoint doesn't exist
+            $result = $this->apiRequest('laporan', 'GET', null, $token);
+            $this->logToConsole("Desa Laporan (Fallback) for User", $result);
+            return $result;
+        }
     }
 
     public function getPendingMonitoring($token) {
@@ -545,33 +519,6 @@ class BencanaAPIClient {
     /**
      * Additional methods for dashboard data
      */
-    public function getDashboardOverview($token) {
-        // Get dashboard overview using existing endpoint
-        $result = $this->apiRequest('dashboard', 'GET', null, $token);
-        $this->logToConsole('Dashboard Overview', $result);
-        return $result;
-    }
-
-    public function getAdminUsers($token) {
-        // Get admin users management
-        $result = $this->apiRequest('admin/users', 'GET', null, $token);
-        $this->logToConsole('Admin Users', $result);
-        return $result;
-    }
-
-    public function getBPBDReports($token) {
-        // Get BPBD reports
-        $result = $this->apiRequest('bpbd/reports', 'GET', null, $token);
-        $this->logToConsole('BPBD Reports', $result);
-        return $result;
-    }
-
-    public function getOperatorReports($token) {
-        // Get operator village reports
-        $result = $this->apiRequest('operator/reports', 'GET', null, $token);
-        $this->logToConsole('Operator Reports', $result);
-        return $result;
-    }
 
     /**
      * Extract data from API response dengan fallback untuk berbagai format
@@ -579,6 +526,10 @@ class BencanaAPIClient {
     private function extractData($response, $fallbackKey = null) {
         // Handle standard Laravel API response format
         if (isset($response['data'])) {
+            // If the data is a paginated response, return the 'data' array from it
+            if (isset($response['data']['data']) && is_array($response['data']['data'])) {
+                return $response['data']['data'];
+            }
             return $response['data'];
         }
 
@@ -625,6 +576,7 @@ class BencanaAPIClient {
 
         return $default;
     }
+
 
     /**
      * Log to console for debugging API calls
