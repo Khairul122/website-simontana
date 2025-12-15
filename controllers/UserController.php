@@ -21,10 +21,20 @@ class UserController {
             session_start();
         }
 
-        if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || $_SESSION['user_role'] !== 'Admin') {
+        // Debug session
+        error_log("=== USER CONTROLLER INDEX DEBUG ===");
+        error_log("Session Status: " . session_status());
+        error_log("Session Data: " . json_encode($_SESSION));
+        error_log("Logged In check: " . (isset($_SESSION['logged_in']) ? $_SESSION['logged_in'] : 'NOT_SET'));
+        error_log("User Role check: " . (isset($_SESSION['user_role']) ? $_SESSION['user_role'] : 'NOT_SET'));
+
+        if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || ($_SESSION['role'] ?? $_SESSION['user_role']) !== 'Admin') {
+            error_log("Authentication FAILED - Redirecting to login");
             header('Location: index.php?controller=auth&action=login');
             exit;
         }
+
+        error_log("Authentication SUCCESS - Proceeding with user index");
 
         // Get API token
         require_once __DIR__ . '/../config/koneksi.php';
@@ -83,8 +93,8 @@ class UserController {
             'filters' => $params,
             'success_message' => $success_message,
             'error_message' => $error_message,
-            'user_role' => $_SESSION['user_role'],
-            'user_nama' => $_SESSION['user_nama']
+            'user_role' => $_SESSION['role'] ?? $_SESSION['user_role'] ?? 'Guest',
+            'user_nama' => $_SESSION['nama'] ?? $_SESSION['user_nama'] ?? 'User'
         ];
 
         // Load view
@@ -143,8 +153,8 @@ class UserController {
             'success_message' => $success_message,
             'error_message' => $error_message,
             'old_input' => $old_input,
-            'user_role' => $_SESSION['user_role'],
-            'user_nama' => $_SESSION['user_nama']
+            'user_role' => $_SESSION['role'] ?? $_SESSION['user_role'] ?? 'Guest',
+            'user_nama' => $_SESSION['nama'] ?? $_SESSION['user_nama'] ?? 'User'
         ];
 
         // Load view

@@ -152,16 +152,28 @@ function loadServiceOrController($fileInfo) {
     return null;
 }
 
+// Debug router
+error_log("=== ROUTER DEBUG ===");
+error_log("Controller: " . $controller);
+error_log("Action: " . $action);
+
 // Cari file controller atau service
 $fileInfo = findControllerFile($controller);
 
+error_log("File Info: " . ($fileInfo ? json_encode($fileInfo) : 'NULL'));
+
 if ($fileInfo && file_exists($fileInfo['file'])) {
+    error_log("File found: " . $fileInfo['file']);
+
     // Load dan instantiate class
     $instance = loadServiceOrController($fileInfo);
 
     if ($instance) {
+        error_log("Class instantiated: " . get_class($instance));
+
         // Cek apakah method ada
         if (method_exists($instance, $action)) {
+            error_log("Method found: " . $action);
             // Panggil method
             try {
                 $instance->$action();

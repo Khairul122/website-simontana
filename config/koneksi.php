@@ -21,7 +21,9 @@ class BencanaAPIClient {
      * Sesuai PERANCANGAN.md: Website mengakses data melalui RESTful API Backend Laravel
      */
     public function apiRequest($endpoint, $method = 'GET', $data = null, $token = null) {
-        $url = $this->apiBaseUrl . '/' . ltrim($endpoint, '/');
+        // Remove 'api/' prefix if already present to avoid duplication
+        $endpoint = preg_replace('/^api\//', '', $endpoint);
+        $url = $this->apiBaseUrl . '/' . $endpoint;
 
         // Debug logging
         error_log("=== API REQUEST ===");

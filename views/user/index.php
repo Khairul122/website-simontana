@@ -122,7 +122,7 @@
                   <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
                       <h4 class="card-title mb-0">Daftar User</h4>
-                      <p class="text-muted mb-0">Total <?php echo $pagination['total']; ?> user terdaftar</p>
+                      <p class="text-muted mb-0">Total <?php echo $pagination['total'] ?? 0; ?> user terdaftar</p>
                     </div>
                     <div>
                       <button type="button" class="btn btn-primary" onclick="window.location.href='index.php?controller=user&action=form'">
@@ -242,16 +242,16 @@
                   </div>
 
                   <!-- Pagination -->
-                  <?php if ($pagination['total'] > 0): ?>
+                  <?php if (($pagination['total'] ?? 0) > 0): ?>
                     <div class="d-flex justify-content-between align-items-center">
                       <div class="text-muted">
-                        Menampilkan <?php echo $pagination['from']; ?> - <?php echo $pagination['to']; ?> dari <?php echo $pagination['total']; ?> data
+                        Menampilkan <?php echo $pagination['from'] ?? 0; ?> - <?php echo $pagination['to'] ?? 0; ?> dari <?php echo $pagination['total'] ?? 0; ?> data
                       </div>
                       <nav>
                         <ul class="pagination mb-0">
                           <?php
-                          $currentPage = $pagination['current_page'];
-                          $lastPage = $pagination['last_page'];
+                          $currentPage = $pagination['current_page'] ?? 1;
+                          $lastPage = $pagination['last_page'] ?? 1;
                           $queryString = $_SERVER['QUERY_STRING'];
                           parse_str($queryString, $queryParams);
                           unset($queryParams['page']);
