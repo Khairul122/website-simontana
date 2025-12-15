@@ -17,7 +17,10 @@ class UserController {
      */
     public function index() {
         // Check if user is logged in and is Admin
-        session_start();
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+
         if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || $_SESSION['user_role'] !== 'Admin') {
             header('Location: index.php?controller=auth&action=login');
             exit;
@@ -25,8 +28,12 @@ class UserController {
 
         // Get API token
         require_once __DIR__ . '/../config/koneksi.php';
-        $apiClient = getAPIClient();
-        $token = $apiClient->getStoredApiToken();
+        $token = getStoredApiToken();
+
+        // Debug: Log token status
+        error_log("UserController Index Token Debug: " . ($token ? "TOKEN_AVAILABLE" : "NO_TOKEN"));
+        error_log("Session Status: " . (session_status() === PHP_SESSION_ACTIVE ? "ACTIVE" : "NOT_ACTIVE"));
+        error_log("Session Data: " . json_encode($_SESSION));
 
         // Handle search and filter parameters
         $params = [];
@@ -88,7 +95,9 @@ class UserController {
      */
     public function form($id = null) {
         // Check if user is logged in and is Admin
-        session_start();
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
         if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || $_SESSION['user_role'] !== 'Admin') {
             header('Location: index.php?controller=auth&action=login');
             exit;
@@ -96,8 +105,7 @@ class UserController {
 
         // Get API token
         require_once __DIR__ . '/../config/koneksi.php';
-        $apiClient = getAPIClient();
-        $token = $apiClient->getStoredApiToken();
+        $token = getStoredApiToken();
 
         // Get user data if editing
         $user = null;
@@ -146,7 +154,9 @@ class UserController {
      */
     public function store() {
         // Check if user is logged in and is Admin
-        session_start();
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
         if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || $_SESSION['user_role'] !== 'Admin') {
             header('Location: index.php?controller=auth&action=login');
             exit;
@@ -159,8 +169,7 @@ class UserController {
 
         // Get API token
         require_once __DIR__ . '/../config/koneksi.php';
-        $apiClient = getAPIClient();
-        $token = $apiClient->getStoredApiToken();
+        $token = getStoredApiToken();
 
         // Format user data
         $userData = $this->userService->formatUserData($_POST, false);
@@ -196,7 +205,9 @@ class UserController {
      */
     public function update($id) {
         // Check if user is logged in and is Admin
-        session_start();
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
         if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || $_SESSION['user_role'] !== 'Admin') {
             header('Location: index.php?controller=auth&action=login');
             exit;
@@ -209,8 +220,7 @@ class UserController {
 
         // Get API token
         require_once __DIR__ . '/../config/koneksi.php';
-        $apiClient = getAPIClient();
-        $token = $apiClient->getStoredApiToken();
+        $token = getStoredApiToken();
 
         // Format user data
         $userData = $this->userService->formatUserData($_POST, true);
@@ -246,7 +256,9 @@ class UserController {
      */
     public function delete($id) {
         // Check if user is logged in and is Admin
-        session_start();
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
         if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || $_SESSION['user_role'] !== 'Admin') {
             header('Location: index.php?controller=auth&action=login');
             exit;
@@ -254,8 +266,7 @@ class UserController {
 
         // Get API token
         require_once __DIR__ . '/../config/koneksi.php';
-        $apiClient = getAPIClient();
-        $token = $apiClient->getStoredApiToken();
+        $token = getStoredApiToken();
 
         // Delete user
         $response = $this->userService->deleteUser($token, $id);
@@ -275,7 +286,9 @@ class UserController {
      */
     public function show($id) {
         // Check if user is logged in and is Admin
-        session_start();
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
         if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || $_SESSION['user_role'] !== 'Admin') {
             http_response_code(403);
             echo json_encode(['success' => false, 'message' => 'Unauthorized']);
@@ -284,8 +297,7 @@ class UserController {
 
         // Get API token
         require_once __DIR__ . '/../config/koneksi.php';
-        $apiClient = getAPIClient();
-        $token = $apiClient->getStoredApiToken();
+        $token = getStoredApiToken();
 
         // Get user data
         $response = $this->userService->getUserById($token, $id);

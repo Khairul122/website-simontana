@@ -747,4 +747,12 @@ function isValidToken($token) {
 function sanitizeInput($input) {
     return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
 }
+
+/**
+ * Helper function untuk mendapatkan stored API token (backward compatibility)
+ */
+function getStoredApiToken() {
+    $apiClient = getAPIClient();
+    return $apiClient->getApiToken();
+}
 ?>
