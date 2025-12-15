@@ -401,6 +401,10 @@ class BencanaAPIClient {
         return $_SESSION['bencana_api_token'] ?? null;
     }
 
+    public function getStoredApiToken() {
+        return $this->getApiToken();
+    }
+
     public function clearApiToken() {
         unset($_SESSION['bencana_api_token']);
         unset($_SESSION['bencana_api_login_time']);

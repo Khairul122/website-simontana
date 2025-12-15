@@ -28,7 +28,8 @@ class UserController {
 
         // Get API token
         require_once __DIR__ . '/../config/koneksi.php';
-        $token = getStoredApiToken();
+        $apiClient = getAPIClient();
+        $token = $apiClient->getStoredApiToken();
 
         // Debug: Log token status
         error_log("UserController Index Token Debug: " . ($token ? "TOKEN_AVAILABLE" : "NO_TOKEN"));
@@ -105,7 +106,8 @@ class UserController {
 
         // Get API token
         require_once __DIR__ . '/../config/koneksi.php';
-        $token = getStoredApiToken();
+        $apiClient = getAPIClient();
+        $token = $apiClient->getStoredApiToken();
 
         // Get user data if editing
         $user = null;
@@ -169,7 +171,8 @@ class UserController {
 
         // Get API token
         require_once __DIR__ . '/../config/koneksi.php';
-        $token = getStoredApiToken();
+        $apiClient = getAPIClient();
+        $token = $apiClient->getStoredApiToken();
 
         // Format user data
         $userData = $this->userService->formatUserData($_POST, false);
@@ -220,7 +223,8 @@ class UserController {
 
         // Get API token
         require_once __DIR__ . '/../config/koneksi.php';
-        $token = getStoredApiToken();
+        $apiClient = getAPIClient();
+        $token = $apiClient->getStoredApiToken();
 
         // Format user data
         $userData = $this->userService->formatUserData($_POST, true);
@@ -266,7 +270,8 @@ class UserController {
 
         // Get API token
         require_once __DIR__ . '/../config/koneksi.php';
-        $token = getStoredApiToken();
+        $apiClient = getAPIClient();
+        $token = $apiClient->getStoredApiToken();
 
         // Delete user
         $response = $this->userService->deleteUser($token, $id);
@@ -297,7 +302,8 @@ class UserController {
 
         // Get API token
         require_once __DIR__ . '/../config/koneksi.php';
-        $token = getStoredApiToken();
+        $apiClient = getAPIClient();
+        $token = $apiClient->getStoredApiToken();
 
         // Get user data
         $response = $this->userService->getUserById($token, $id);
