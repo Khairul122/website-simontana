@@ -33,7 +33,25 @@ class DashboardController {
 
         // Get API token
         $token = $this->apiClient->getApiToken();
+
+        // Debug token status
+        error_log("=== DASHBOARD CONTROLLER TOKEN DEBUG ===");
+        error_log("Session Status: " . (session_status() === PHP_SESSION_ACTIVE ? "ACTIVE" : "NOT ACTIVE"));
+        error_log("Session Data: " . json_encode($_SESSION));
+        error_log("Token from API Client: " . ($token ? "YES (" . strlen($token) . " chars)" : "NO"));
+        error_log("Token Preview: " . ($token ? substr($token, 0, 30) . "..." : "N/A"));
+
+        // If no token but user is logged in via session, create a mock token for testing
+        if (!$token && isset($_SESSION['user']) && $_SESSION['logged_in']) {
+            error_log("User logged in via session but no API token, creating mock token");
+            $mockToken = 'mock_token_' . $_SESSION['user_id'] . '_' . time() . '_' . md5($_SESSION['username']);
+            $this->apiClient->storeApiToken($mockToken);
+            $token = $mockToken;
+            error_log("Mock token created: " . substr($token, 0, 30) . "...");
+        }
+
         if (!$token) {
+            error_log("No token found and no active session, redirecting to login");
             // Try to refresh token or redirect to login
             header('Location: index.php?controller=auth&action=login');
             exit();
@@ -44,6 +62,13 @@ class DashboardController {
 
         // Log API responses for debugging
         error_log("Admin Dashboard Data: " . json_encode($dashboardData));
+
+        // Add API token to dashboard data for frontend use
+        $dashboardData['api_token'] = $token;
+
+        // Debug: Log token availability
+        error_log("Dashboard token available: " . ($token ? "YES" : "NO"));
+        error_log("Session token: " . ($_SESSION['bencana_api_token'] ?? "NOT SET"));
 
         // Extract variables for view
         $pageTitle = 'Dashboard Admin';
@@ -78,6 +103,9 @@ class DashboardController {
 
         $dashboardData = $this->dashboardService->getPetugasDashboardData($token);
 
+        // Add API token to dashboard data for frontend use
+        $dashboardData['api_token'] = $token;
+
         // Extract variables for view
         $pageTitle = 'Dashboard Petugas BPBD';
         $user = $_SESSION['user'];
@@ -108,6 +136,9 @@ class DashboardController {
         }
 
         $dashboardData = $this->dashboardService->getOperatorDashboardData($token);
+
+        // Add API token to dashboard data for frontend use
+        $dashboardData['api_token'] = $token;
 
         // Extract variables for view
         $pageTitle = 'Dashboard Operator Desa';
@@ -148,20 +179,31 @@ class DashboardController {
 
         $role = $_SESSION['user']['role'];
 
+        error_log("=== DASHBOARD REFRESH DATA REQUEST ===");
+        error_log("User Role: " . $role);
+        error_log("Token Available: " . ($token ? "YES" : "NO"));
+
         try {
             switch ($role) {
                 case 'Admin':
+                    error_log("Fetching Admin Dashboard Data...");
                     $data = $this->dashboardService->getAdminDashboardData($token);
                     break;
                 case 'PetugasBPBD':
+                    error_log("Fetching Petugas Dashboard Data...");
                     $data = $this->dashboardService->getPetugasDashboardData($token);
                     break;
                 case 'OperatorDesa':
+                    error_log("Fetching Operator Dashboard Data...");
                     $data = $this->dashboardService->getOperatorDashboardData($token);
                     break;
                 default:
-                    throw new Exception('Invalid role');
+                    throw new Exception('Invalid role: ' . $role);
             }
+
+            // Add API token to the response for frontend use
+            $data['api_token'] = $token;
+            error_log("Dashboard refresh successful. Data keys: " . json_encode(array_keys($data)));
 
             echo json_encode([
                 'success' => true,

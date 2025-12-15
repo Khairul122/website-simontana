@@ -23,6 +23,14 @@ class BencanaAPIClient {
     public function apiRequest($endpoint, $method = 'GET', $data = null, $token = null) {
         $url = $this->apiBaseUrl . '/' . ltrim($endpoint, '/');
 
+        // Debug logging
+        error_log("=== API REQUEST ===");
+        error_log("Endpoint: " . $endpoint);
+        error_log("Method: " . $method);
+        error_log("Full URL: " . $url);
+        error_log("Token Available: " . ($token ? "YES (" . strlen($token) . " chars)" : "NO"));
+        error_log("Token Preview: " . ($token ? substr($token, 0, 20) . "..." : "N/A"));
+
         $headers = [
             'Content-Type: application/json',
             'Accept: application/json',
@@ -31,7 +39,19 @@ class BencanaAPIClient {
         ];
 
         if ($token) {
-            $headers[] = 'Authorization: Bearer ' . $token;
+            // For mock tokens, we'll modify the approach
+            if (strpos($token, 'mock_token') === 0) {
+                error_log("Using mock token - adjusting headers for development");
+                // For mock tokens, we'll use a different approach or skip auth
+                $headers[] = 'X-Mock-Auth: Bearer ' . $token;
+                $headers[] = 'X-Dev-Mode: true';
+            } else {
+                $authHeader = 'Authorization: Bearer ' . $token;
+                $headers[] = $authHeader;
+                error_log("Auth Header Added: " . substr($authHeader, 0, 40) . "...");
+            }
+        } else {
+            error_log("WARNING: No token provided for API request!");
         }
 
         $ch = curl_init();
@@ -65,12 +85,19 @@ class BencanaAPIClient {
 
         curl_close($ch);
 
+        // Debug response logging
+        error_log("HTTP Status: " . $httpCode);
+        error_log("CURL Error: " . ($error ? $error : "NONE"));
+        error_log("Raw Response: " . $response);
+
         if ($error) {
             $this->lastError = "CURL Error: " . $error;
+            error_log("API REQUEST FAILED: " . $this->lastError);
             throw new Exception($this->lastError);
         }
 
         $responseData = json_decode($response, true);
+        error_log("Parsed Response: " . json_encode($responseData));
 
         if ($httpCode >= 400) {
             $message = 'API Error';
@@ -80,9 +107,11 @@ class BencanaAPIClient {
                 $message = $responseData['error'];
             }
             $this->lastError = $message;
+            error_log("API ERROR (HTTP $httpCode): " . $message);
             throw new Exception($message);
         }
 
+        error_log("=== API REQUEST SUCCESS ===");
         return $responseData;
     }
 
@@ -408,6 +437,7 @@ class BencanaAPIClient {
      */
     public function getLaporanStats($token) {
         $result = $this->apiRequest('laporan/statistics', 'GET', null, $token);
+        $this->logToConsole('Laporan Statistics', $result);
         return $result;
     }
 
@@ -453,6 +483,28 @@ class BencanaAPIClient {
         $this->logToConsole('BMKG Warnings', $result);
         return $result;
     }
+
+    /**
+     * Additional endpoints untuk dashboard statistics
+     */
+    public function getBMKGStatistics($token) {
+        $result = $this->apiRequest('bmkg/statistics', 'GET', null, $token);
+        $this->logToConsole('BMKG Statistics', $result);
+        return $result;
+    }
+
+    // getDesaStatistics already exists at line 301
+// getKategoriBencanaStatistics already exists at line 334
+
+    // getMonitoringStatistics already exists at line 204
+// getRiwayatTindakanStatistics - new method
+    public function getRiwayatTindakanStatistics($token) {
+        $result = $this->apiRequest('riwayat-tindakan/statistics', 'GET', null, $token);
+        $this->logToConsole('Riwayat Tindakan Statistics', $result);
+        return $result;
+    }
+
+// getTindakLanjutStatistics - already handled by getTindaklanjutStatistics at line 169
 
     public function getDesaLaporan($token, $userId) {
         // Get user's own reports (Operator Desa can see their desa reports)
@@ -577,6 +629,40 @@ class BencanaAPIClient {
         return $default;
     }
 
+    /**
+     * User Management endpoints untuk Website
+     */
+    public function getUsers($token, $params = []) {
+        $query = http_build_query($params);
+        $endpoint = 'users' . ($query ? '?' . $query : '');
+        $result = $this->apiRequest($endpoint, 'GET', null, $token);
+        $this->logToConsole('Get Users', $result);
+        return $result;
+    }
+
+    public function getUserStatistics($token) {
+        $result = $this->apiRequest('users/statistics', 'GET', null, $token);
+        $this->logToConsole('User Statistics', $result);
+        return $result;
+    }
+
+    public function getUserDetail($token, $id) {
+        $result = $this->apiRequest("users/{$id}", 'GET', null, $token);
+        $this->logToConsole("Get User Detail (ID: {$id})", $result);
+        return $result;
+    }
+
+    public function updateUser($token, $id, $data) {
+        $result = $this->apiRequest("users/{$id}", 'PUT', $data, $token);
+        $this->logToConsole("Update User (ID: {$id})", $result);
+        return $result;
+    }
+
+    public function deleteUser($token, $id) {
+        $result = $this->apiRequest("users/{$id}", 'DELETE', null, $token);
+        $this->logToConsole("Delete User (ID: {$id})", $result);
+        return $result;
+    }
 
     /**
      * Log to console for debugging API calls
@@ -639,5 +725,26 @@ function getAPIClient() {
         $client = new BencanaAPIClient();
     }
     return $client;
+}
+
+/**
+ * Helper function untuk membuat mock token
+ */
+function createMockToken($userId, $username) {
+    return 'mock_token_' . $userId . '_' . time() . '_' . md5($username . time());
+}
+
+/**
+ * Helper function untuk memeriksa apakah token valid
+ */
+function isValidToken($token) {
+    return !empty($token) && (strpos($token, 'mock_token') === 0 || strlen($token) > 10);
+}
+
+/**
+ * Helper function untuk sanitasi input
+ */
+function sanitizeInput($input) {
+    return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
 }
 ?>
