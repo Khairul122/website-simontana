@@ -417,25 +417,6 @@
                 <p class="brand-subtitle">
                     Sistem Informasi Monitoring dan Penanganan Bencana yang terintegrasi untuk Indonesia yang lebih siap menghadapi bencana
                 </p>
-
-                <div class="role-badges">
-                    <div class="role-badge">
-                        <i class="fas fa-user-shield"></i>
-                        <span>Admin</span>
-                    </div>
-                    <div class="role-badge">
-                        <i class="fas fa-user-tie"></i>
-                        <span>Petugas BPBD</span>
-                    </div>
-                    <div class="role-badge">
-                        <i class="fas fa-user-check"></i>
-                        <span>Operator Desa</span>
-                    </div>
-                    <div class="role-badge">
-                        <i class="fas fa-user"></i>
-                        <span>Warga</span>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -892,7 +873,7 @@
                     }
 
                     if (response.ok && !responseText.includes('alert-danger') && !responseText.includes('Perbaiki kesalahan')) {
-                        this.notifier.success('Registrasi berhasil! Mengarahkan ke halaman login...');
+                        this.notifier.success('Registrasi berhasil!');
                         this.notifier.log('=== REGISTRATION SUCCESSFUL ===');
                         this.notifier.log('Registration successful details:', {
                             redirectUrl: response.url,
@@ -917,7 +898,7 @@
                             errorMessage = validationMatch.map(item => item.replace(/<[^>]*>/g, '')).join(', ');
                         }
 
-                        this.notifier.error(errorMessage);
+                        this.notifier.error('Registrasi gagal');
                         this.notifier.log('Registration failure details:', {
                             status: response.status,
                             statusText: response.statusText,
@@ -930,7 +911,7 @@
                     }
                 } catch (error) {
                     this.notifier.log('=== REGISTRATION NETWORK ERROR ===');
-                    this.notifier.error('Terjadi gangguan koneksi. Silakan coba lagi.');
+                    this.notifier.error('Registrasi gagal');
                     this.notifier.error('Network error details:', {
                         message: error.message,
                         name: error.name,
@@ -1016,7 +997,7 @@
                         this.notifier.log('Provinces API unexpected response:', data);
                     }
                 } catch (error) {
-                    this.notifier.error('Gagal menghubungi server untuk data provinsi');
+                    this.notifier.error('Registrasi gagal');
                     this.notifier.error('Provinces API error:', {
                         message: error.message,
                         name: error.name,
@@ -1067,7 +1048,7 @@
                         this.notifier.warning('Gagal memuat data kabupaten');
                     }
                 } catch (error) {
-                    this.notifier.error('Gagal menghubungi server untuk data kabupaten');
+                    this.notifier.error('Registrasi gagal');
                     this.notifier.error('Kabupaten API error:', error);
                 }
             }
@@ -1105,7 +1086,7 @@
                         this.notifier.warning('Gagal memuat data kecamatan');
                     }
                 } catch (error) {
-                    this.notifier.error('Gagal menghubungi server untuk data kecamatan');
+                    this.notifier.error('Registrasi gagal');
                     this.notifier.error('Kecamatan API error:', error);
                 }
             }
@@ -1140,7 +1121,7 @@
                         this.notifier.warning('Gagal memuat data desa');
                     }
                 } catch (error) {
-                    this.notifier.error('Gagal menghubungi server untuk data desa');
+                    this.notifier.error('Registrasi gagal');
                     this.notifier.error('Desa API error:', error);
                 }
             }
@@ -1149,7 +1130,6 @@
                 if (loading) {
                     this.submitBtn.disabled = true;
                     this.submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Mendaftar...';
-                    this.notifier.info('Sedang memproses pendaftaran...');
                     this.notifier.log('Loading state activated');
                 } else {
                     this.submitBtn.disabled = false;

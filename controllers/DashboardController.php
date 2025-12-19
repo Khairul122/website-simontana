@@ -4,7 +4,7 @@
  * Menampilkan dashboard yang berbeda untuk setiap role (Admin, Petugas BPBD, Operator Desa, Warga)
  */
 
-require_once '../config/koneksi.php';
+require_once __DIR__ . '/../config/koneksi.php';
 
 class DashboardController {
     private $apiClient;
@@ -144,21 +144,23 @@ class DashboardController {
         $userData = $this->apiClient->getCurrentUser();
         $role = $userData['role'] ?? 'warga';
 
-        // Redirect berdasarkan role
+        // Redirect ke beranda action berdasarkan role
         switch ($role) {
             case 'admin':
-                $this->admin();
+                header('Location: index.php?controller=dashboard&action=admin');
                 break;
             case 'petugas':
-                $this->petugas();
+                header('Location: index.php?controller=dashboard&action=petugas');
                 break;
             case 'operator':
-                $this->operator();
+                header('Location: index.php?controller=dashboard&action=operator');
                 break;
+            case 'warga':
             default:
-                header('Location: index.php?controller=beranda&action=index');
+                header('Location: index.php?controller=beranda&action=warga');
                 break;
         }
+        exit;
     }
 
     /**

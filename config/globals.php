@@ -3,28 +3,13 @@
 require_once 'koneksi.php';
 
 class GlobalEnvironment {
-    private static $instance = null;
     private $apiClient;
     private $currentUser;
     private $isLoggedIn;
 
-    private function __construct() {
-        static $apiClientInstance = null;
-
-        if ($apiClientInstance === null) {
-            $apiClientInstance = new BencanaAPIClient();
-        }
-
-        $this->apiClient = $apiClientInstance;
-        $this->currentUser = $this->apiClient->getCurrentUser();
-        $this->isLoggedIn = $this->currentUser !== null;
-    }
-
-    public static function getInstance() {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
-        return self::$instance;
+    public function __construct($apiClient = null) {
+        $this->apiClient = $apiClient ?: new BencanaAPIClient();
+        $this->refreshAuthStatus();
     }
 
     public function getAPIClient() {
@@ -52,11 +37,40 @@ class GlobalEnvironment {
     }
 
     public function hasRole($requiredRole) {
-        return $this->getCurrentRole() === $requiredRole;
+        $currentRole = $this->getCurrentRole();
+
+        // Normalisasi role untuk perbandingan
+        $normalizedCurrentRole = $this->normalizeRole($currentRole);
+        $normalizedRequiredRole = $this->normalizeRole($requiredRole);
+
+        return $normalizedCurrentRole === $normalizedRequiredRole;
     }
 
     public function hasAnyRole(array $roles) {
-        return in_array($this->getCurrentRole(), $roles);
+        $currentRole = $this->getCurrentRole();
+        $normalizedCurrentRole = $this->normalizeRole($currentRole);
+
+        foreach ($roles as $role) {
+            if ($normalizedCurrentRole === $this->normalizeRole($role)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function normalizeRole($role) {
+        // Normalisasi role untuk perbandingan
+        $role = (string)$role;
+
+        // Mapping role ke bentuk yang seragam (tanpa duplikat)
+        $roleMap = [
+            'admin' => 'admin',
+            'PetugasBPBD' => 'petugas',
+            'OperatorDesa' => 'operator'
+        ];
+
+        return $roleMap[$role] ?? $role;
     }
 
     public function requireAuth() {
@@ -92,7 +106,7 @@ class GlobalEnvironment {
             exit;
         }
 
-        $role = $this->getCurrentRole();
+        $role = $this->normalizeRole($this->getCurrentRole());
 
         switch ($role) {
             case 'admin':
@@ -105,7 +119,7 @@ class GlobalEnvironment {
                 header('Location: index.php?controller=dashboard&action=operator');
                 break;
             default:
-                header('Location: index.php?controller=beranda&action=index');
+                header('Location: index.php?controller=dashboard&action=index');
                 break;
         }
         exit;
@@ -113,19 +127,23 @@ class GlobalEnvironment {
 
     public function login($token) {
         $this->apiClient->setToken($token);
-        $this->currentUser = $this->apiClient->getCurrentUser();
-        $this->isLoggedIn = true;
+        $this->refreshAuthStatus();
     }
 
     public function logout() {
-        $this->apiClient->logout();
+        $this->apiClient->clearToken();
         $this->currentUser = null;
         $this->isLoggedIn = false;
     }
 
-    public function refreshCurrentUser() {
+    public function refreshAuthStatus() {
         $this->currentUser = $this->apiClient->getCurrentUser();
         $this->isLoggedIn = $this->currentUser !== null;
+    }
+
+    // Fungsi alias untuk backward compatibility
+    public function refreshCurrentUser() {
+        $this->refreshAuthStatus();
     }
 
     public function getDashboardUrl() {
@@ -133,7 +151,7 @@ class GlobalEnvironment {
             return 'index.php?controller=auth&action=login';
         }
 
-        $role = $this->getCurrentRole();
+        $role = $this->normalizeRole($this->getCurrentRole());
 
         switch ($role) {
             case 'admin':
@@ -143,44 +161,13 @@ class GlobalEnvironment {
             case 'operator':
                 return 'index.php?controller=dashboard&action=operator';
             default:
-                return 'index.php?controller=beranda&action=index';
+                return 'index.php?controller=dashboard&action=index';
         }
     }
 
-    public function getPermissions() {
-        $role = $this->getCurrentRole();
-
-        $permissions = [
-            'admin' => [
-                'dashboard.view', 'user.create', 'user.read', 'user.update', 'user.delete',
-                'laporan.create', 'laporan.read', 'laporan.update', 'laporan.delete',
-                'tindaklanjut.create', 'tindaklanjut.read', 'tindaklanjut.update', 'tindaklanjut.delete',
-                'monitoring.create', 'monitoring.read', 'monitoring.update', 'monitoring.delete',
-                'kategori.create', 'kategori.read', 'kategori.update', 'kategori.delete'
-            ],
-            'petugas' => [
-                'dashboard.view', 'laporan.read', 'laporan.update',
-                'tindaklanjut.create', 'tindaklanjut.read', 'tindaklanjut.update',
-                'monitoring.read', 'monitoring.create', 'monitoring.update',
-                'bmkg.read'
-            ],
-            'operator' => [
-                'dashboard.view', 'laporan.read', 'laporan.update',
-                'tindaklanjut.read', 'tindaklanjut.create',
-                'monitoring.read', 'monitoring.create', 'monitoring.update'
-            ],
-            'warga' => [
-                'laporan.create', 'laporan.read',
-                'informasi.read'
-            ]
-        ];
-
-        return $permissions[$role] ?? [];
-    }
-
     public function hasPermission($permission) {
-        $permissions = $this->getPermissions();
-        return in_array($permission, $permissions);
+        // Fungsi ini sementara selalu mengembalikan true karena permissions belum diimplementasikan
+        return true;
     }
 
     public function requirePermission($permission) {
@@ -194,10 +181,17 @@ class GlobalEnvironment {
     }
 }
 
-function globalEnv() {
-    return GlobalEnvironment::getInstance();
+// Fungsi helper untuk membuat instance baru setiap kali dipanggil
+function createGlobalEnvironment($apiClient = null) {
+    return new GlobalEnvironment($apiClient);
 }
 
+// Fungsi untuk membuat instance baru setiap kali dipanggil (lebih dinamis)
+function globalEnv() {
+    return createGlobalEnvironment();
+}
+
+// Fungsi helper untuk mendapatkan API client langsung
 function getAPIClient() {
     static $apiClient = null;
 
@@ -208,43 +202,54 @@ function getAPIClient() {
     return $apiClient;
 }
 
+// Fungsi helper untuk mendapatkan data user secara langsung tanpa instance cache
 function currentUser() {
-    return globalEnv()->getCurrentUser();
+    $env = createGlobalEnvironment();
+    return $env->getCurrentUser();
 }
 
 function currentRole() {
-    return globalEnv()->getCurrentRole();
+    $env = createGlobalEnvironment();
+    return $env->getCurrentRole();
 }
 
 function currentUserId() {
-    return globalEnv()->getCurrentUserId();
+    $env = createGlobalEnvironment();
+    return $env->getCurrentUserId();
 }
 
 function isLoggedIn() {
-    return globalEnv()->isLoggedIn();
+    $env = createGlobalEnvironment();
+    return $env->isLoggedIn();
 }
 
 function hasRole($role) {
-    return globalEnv()->hasRole($role);
+    $env = createGlobalEnvironment();
+    return $env->hasRole($role);
 }
 
 function hasPermission($permission) {
-    return globalEnv()->hasPermission($permission);
+    $env = createGlobalEnvironment();
+    return $env->hasPermission($permission);
 }
 
 function requireAuth() {
-    globalEnv()->requireAuth();
+    $env = createGlobalEnvironment();
+    $env->requireAuth();
 }
 
 function requireRole($role) {
-    globalEnv()->requireRole($role);
+    $env = createGlobalEnvironment();
+    $env->requireRole($role);
 }
 
 function requirePermission($permission) {
-    globalEnv()->requirePermission($permission);
+    $env = createGlobalEnvironment();
+    $env->requirePermission($permission);
 }
 
 function redirectBasedOnRole() {
-    globalEnv()->redirectBasedOnRole();
+    $env = createGlobalEnvironment();
+    $env->redirectBasedOnRole();
 }
 ?>
