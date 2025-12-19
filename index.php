@@ -2,8 +2,8 @@
 // Mulai session
 session_start();
 
-// Memuat konfigurasi REST API Client
-require_once 'config/koneksi.php';
+// Memuat konfigurasi Global Environment
+require_once 'config/globals.php';
 
 // Menentukan controller dan action default
 $controller = isset($_GET['controller']) ? $_GET['controller'] : 'auth';

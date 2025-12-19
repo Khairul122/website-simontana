@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - SIMONTA BENCANA</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -31,7 +28,7 @@
         /* Left Panel - Branding */
         .brand-panel {
             flex: 1;
-            background: #0d6efd;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             display: flex;
             flex-direction: column;
@@ -167,7 +164,7 @@
 
         .form-floating > .form-control:focus ~ label,
         .form-floating > .form-control:not(:placeholder-shown) ~ label {
-            color: #0d6efd;
+            color: #667eea;
         }
 
         .form-control {
@@ -180,12 +177,12 @@
         }
 
         .form-control:focus {
-            border-color: #0d6efd;
-            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
         }
 
         .btn-login {
-            background: #0d6efd;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border: none;
             border-radius: 12px;
             padding: 1rem;
@@ -197,9 +194,8 @@
         }
 
         .btn-login:hover {
-            background: #0b5ed7;
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(13, 110, 253, 0.3);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
         }
 
         .btn-login:disabled {
@@ -235,6 +231,29 @@
             padding: 0 1rem;
         }
 
+        .role-badges {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .role-badge {
+            background: #f3f4f6;
+            color: #374151;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .role-badge i {
+            font-size: 0.75rem;
+        }
+
         .register-link {
             text-align: center;
             margin-top: 2rem;
@@ -242,14 +261,14 @@
         }
 
         .register-link a {
-            color: #0d6efd;
+            color: #667eea;
             text-decoration: none;
             font-weight: 600;
             transition: color 0.3s ease;
         }
 
         .register-link a:hover {
-            color: #0b5ed7;
+            color: #764ba2;
         }
 
         /* Mobile Responsive */
@@ -289,103 +308,124 @@
 </head>
 <body>
     <div class="login-container">
-        <!-- Left Panel - Branding -->
-        <div class="brand-panel">
-            <div class="brand-content">
-                <div class="brand-logo">
-                    <i class="fas fa-hand-holding-medical"></i>
-                </div>
-                <h1 class="brand-title">SIMONTA BENCANA</h1>
-                <p class="brand-subtitle">
-                    Sistem Informasi Monitoring dan Penanganan Bencana Terintegrasi
-                </p>
+        <div class="row g-0">
+            <div class="col-md-7">
+                <div class="login-form">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-shield-alt fa-3x text-danger mb-3"></i>
+                        <h2 class="fw-bold text-dark">Selamat Datang</h2>
+                        <p class="text-muted">Masuk ke akun SIMONTA BENCANA Anda</p>
+                    </div>
 
-                <div class="brand-features">
-                    <div class="feature-item">
-                        <i class="fas fa-shield-alt"></i>
-                        <div>
-                            <strong>Real-time Monitoring</strong>
-                            <div class="small">Pantau kondisi bencana 24/7</div>
+                    <?php if (isset($error)): ?>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <?php echo htmlspecialchars($error); ?>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
-                    </div>
-                    <div class="feature-item">
-                        <i class="fas fa-users"></i>
-                        <div>
-                            <strong>Multi-Role Access</strong>
-                            <div class="small">Admin, Petugas, Operator, Warga</div>
+                    <?php endif; ?>
+
+                    <?php if (isset($success)): ?>
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <?php echo htmlspecialchars($success); ?>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
-                    </div>
-                    <div class="feature-item">
-                        <i class="fas fa-cloud-sun"></i>
-                        <div>
-                            <strong>BMKG Integration</strong>
-                            <div class="small">Data cuaca dan peringatan dini</div>
+                    <?php endif; ?>
+
+                    <form method="POST" action="index.php?controller=auth&action=login">
+                        <div class="mb-3">
+                            <label for="username" class="form-label fw-semibold">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <input type="text" class="form-control" id="username" name="username"
+                                       placeholder="Masukkan username" required>
+                            </div>
                         </div>
-                    </div>
-                    <div class="feature-item">
-                        <i class="fas fa-map-marked-alt"></i>
-                        <div>
-                            <strong>Geo-tagging</strong>
-                            <div class="small">Lokasi presisi laporan bencana</div>
+
+                        <div class="mb-4">
+                            <label for="password" class="form-label fw-semibold">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                                <input type="password" class="form-control" id="password" name="password"
+                                       placeholder="Masukkan password" required>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 mb-3">
+                            <button type="submit" class="btn btn-login btn-lg">
+                                <i class="fas fa-sign-in-alt me-2"></i> Masuk
+                            </button>
+                        </div>
+
+                        <div class="text-center">
+                            <a href="index.php?controller=auth&action=register" class="text-decoration-none">
+                                Belum punya akun? <strong>Daftar sekarang</strong>
+                            </a>
+                        </div>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <div class="text-center">
+                        <h6 class="text-muted mb-3">Akses Berdasarkan Peran</h6>
+                        <div class="row">
+                            <div class="col-6 col-md-3 mb-2">
+                                <div class="text-center">
+                                    <i class="fas fa-user-shield fa-2x text-primary mb-2"></i>
+                                    <div class="small">Admin</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3 mb-2">
+                                <div class="text-center">
+                                    <i class="fas fa-user-tie fa-2x text-success mb-2"></i>
+                                    <div class="small">Petugas BPBD</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3 mb-2">
+                                <div class="text-center">
+                                    <i class="fas fa-user-check fa-2x text-warning mb-2"></i>
+                                    <div class="small">Operator Desa</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3 mb-2">
+                                <div class="text-center">
+                                    <i class="fas fa-user fa-2x text-info mb-2"></i>
+                                    <div class="small">Warga</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Right Panel - Login Form -->
-        <div class="login-panel">
-            <div class="login-header">
-                <h1>Selamat Datang Kembali</h1>
-                <p>Masuk ke dashboard SIMONTA BENCANA Anda</p>
-            </div>
-
-            <div class="login-form-container">
-                <?php if (isset($error)): ?>
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <i class="fas fa-exclamation-circle me-2"></i>
-                        <?php echo htmlspecialchars($error); ?>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <div class="col-md-5">
+                <div class="logo-section d-flex flex-column justify-content-center h-100">
+                    <i class="fas fa-hand-holding-medical fa-4x text-danger mb-3"></i>
+                    <h1>SIMONTA BENCANA</h1>
+                    <p>Sistem Informasi Monitoring dan Penanganan Bencana</p>
+                    <hr class="my-3">
+                    <p class="small">
+                        <strong>Fitur Utama:</strong><br>
+                        " Pelaporan Bencana Real-time<br>
+                        " Pemantauan Status Bencana<br>
+                        " Koordinasi Tim Penanggulangan<br>
+                        " Integrasi BMKG<br>
+                        " Sistem Multi-Role
+                    </p>
+                    <div class="mt-auto">
+                        <a href="#" class="text-muted text-decoration-none small">
+                            <i class="fas fa-question-circle me-1"></i> Bantuan
+                        </a>
                     </div>
-                <?php endif; ?>
-
-                <?php if (isset($success)): ?>
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <i class="fas fa-check-circle me-2"></i>
-                        <?php echo htmlspecialchars($success); ?>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                <?php endif; ?>
-
-                <form method="POST" action="index.php?controller=auth&action=login">
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="username" name="username"
-                               placeholder="name@example.com" required>
-                        <label for="username">Username</label>
-                    </div>
-
-                    <div class="form-floating mb-3">
-                        <input type="password" class="form-control" id="password" name="password"
-                               placeholder="Password" required>
-                        <label for="password">Password</label>
-                    </div>
-
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-login">
-                            Masuk ke Dashboard
-                        </button>
-                    </div>
-                </form>
-
-                
-                <div class="register-link">
-                    Belum punya akun? <a href="index.php?controller=auth&action=register">Daftar sekarang</a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Include the existing JavaScript code for logging and authentication -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         class AuthNotifier {
@@ -475,7 +515,7 @@
             }
 
             init() {
-                this.notifier.log('Modern Auth handler initialized');
+                this.notifier.log('Auth handler initialized');
                 this.setupEventListeners();
                 this.checkExistingMessages();
             }
@@ -519,7 +559,7 @@
                     password: formData.get('password')
                 };
 
-                this.notifier.log('Modern login attempt started', loginData);
+                this.notifier.log('Login attempt started', loginData);
                 this.setLoadingState(true);
 
                 try {
@@ -528,7 +568,7 @@
                         body: formData
                     });
 
-                    this.notifier.log('Modern login response received', {
+                    this.notifier.log('Login response received', {
                         status: response.status,
                         statusText: response.statusText,
                         url: response.url,
@@ -539,7 +579,7 @@
 
                     const responseText = await response.text();
 
-                    this.notifier.log('Modern API Response Details', {
+                    this.notifier.log('API Response Details', {
                         responseLength: responseText.length,
                         containsError: responseText.includes('alert-danger'),
                         containsSuccess: responseText.includes('alert-success') || responseText.includes('dashboard'),
@@ -551,14 +591,14 @@
                     let jsonData = null;
                     try {
                         jsonData = JSON.parse(responseText);
-                        this.notifier.log('Modern API Response JSON', jsonData);
+                        this.notifier.log('API Response JSON', jsonData);
                     } catch (jsonError) {
-                        this.notifier.log('Modern response is not JSON, treating as HTML');
+                        this.notifier.log('Response is not JSON, treating as HTML');
                     }
 
                     if (response.ok && !responseText.includes('alert-danger')) {
                         this.notifier.success('Login berhasil! Mengarahkan ke dashboard...');
-                        this.notifier.log('Modern login successful', {
+                        this.notifier.log('Login successful', {
                             redirectUrl: response.url,
                             hasJsonData: jsonData !== null,
                             jsonData: jsonData
@@ -572,7 +612,7 @@
                         const errorMessage = errorMatch ? errorMatch[1].trim() : 'Login gagal. Periksa kembali username dan password.';
 
                         this.notifier.error(errorMessage);
-                        this.notifier.log('Modern login failed', {
+                        this.notifier.log('Login failed', {
                             status: response.status,
                             statusText: response.statusText,
                             responseHeaders: Object.fromEntries(response.headers.entries()),
@@ -583,12 +623,12 @@
                     }
                 } catch (error) {
                     this.notifier.error('Terjadi gangguan koneksi. Silakan coba lagi.');
-                    this.notifier.error('Modern network error', {
+                    this.notifier.error('Network error', {
                         message: error.message,
                         name: error.name,
                         stack: error.stack
                     });
-                    this.notifier.log('Modern network error details', {
+                    this.notifier.log('Network error details', {
                         errorType: error.constructor.name,
                         isNetworkError: error instanceof TypeError || error instanceof NetworkError,
                         errorMessage: error.message
@@ -605,29 +645,13 @@
                     this.notifier.info('Sedang memproses login...');
                 } else {
                     this.submitBtn.disabled = false;
-                    this.submitBtn.innerHTML = 'Masuk ke Dashboard';
+                    this.submitBtn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i> Masuk';
                     this.notifier.log('Loading state cleared');
                 }
             }
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('[MODERN AUTH] Modern login page loaded');
-            console.log('[MODERN AUTH] Design: Vertical half layout with modern aesthetics');
-            console.log('[MODERN AUTH] Features: Clean, minimal, practical');
-
-            // Add modern UX enhancements
-            const inputs = document.querySelectorAll('input[type="text"], input[type="password"]');
-            inputs.forEach(input => {
-                input.addEventListener('focus', function() {
-                    this.parentElement.classList.add('focused');
-                });
-                input.addEventListener('blur', function() {
-                    this.parentElement.classList.remove('focused');
-                });
-            });
-
-            // Initialize modern authentication handler
             new AuthHandler();
         });
     </script>

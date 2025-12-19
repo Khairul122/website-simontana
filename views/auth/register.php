@@ -4,202 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - SIMONTA BENCANA</title>
-
-    <!-- Bootstrap 5.0.2 CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary-color: #2563eb;
-            --primary-hover: #1d4ed8;
-            --primary-light: #dbeafe;
-            --secondary-color: #64748b;
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --danger-color: #ef4444;
-            --dark-color: #1e293b;
-            --gray-50: #f8fafc;
-            --gray-100: #f1f5f9;
-            --gray-200: #e2e8f0;
-            --gray-300: #cbd5e1;
-            --gray-400: #94a3b8;
-            --gray-500: #64748b;
-            --gray-600: #475569;
-            --gray-700: #334155;
-            --gray-800: #1e293b;
-            --gray-900: #0f172a;
-            --border-radius: 12px;
-            --border-radius-lg: 16px;
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-        }
-
-        /* Toast Notification System */
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            max-width: 400px;
-        }
-
-        .custom-toast {
-            background: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-xl);
-            margin-bottom: 10px;
-            padding: 16px;
-            border-left: 4px solid;
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            animation: slideInRight 0.3s ease-out;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .custom-toast.hiding {
-            animation: slideOutRight 0.3s ease-out;
-            opacity: 0;
-            transform: translateX(100%);
-        }
-
-        .custom-toast.success {
-            border-left-color: var(--success-color);
-            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-        }
-
-        .custom-toast.error {
-            border-left-color: var(--danger-color);
-            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-        }
-
-        .custom-toast.warning {
-            border-left-color: var(--warning-color);
-            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
-        }
-
-        .custom-toast.info {
-            border-left-color: var(--primary-color);
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-        }
-
-        .toast-icon {
-            flex-shrink: 0;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            color: white;
-            font-weight: 600;
-        }
-
-        .custom-toast.success .toast-icon {
-            background: var(--success-color);
-        }
-
-        .custom-toast.error .toast-icon {
-            background: var(--danger-color);
-        }
-
-        .custom-toast.warning .toast-icon {
-            background: var(--warning-color);
-        }
-
-        .custom-toast.info .toast-icon {
-            background: var(--primary-color);
-        }
-
-        .toast-content {
-            flex: 1;
-        }
-
-        .toast-title {
-            font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 4px;
-            color: var(--gray-900);
-        }
-
-        .toast-message {
-            font-size: 13px;
-            color: var(--gray-600);
-            line-height: 1.4;
-        }
-
-        .toast-close {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: none;
-            border: none;
-            font-size: 16px;
-            color: var(--gray-400);
-            cursor: pointer;
-            padding: 4px;
-            border-radius: 4px;
-            transition: all 0.2s;
-        }
-
-        .toast-close:hover {
-            color: var(--gray-600);
-            background: var(--gray-100);
-        }
-
-        @keyframes slideInRight {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideOutRight {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-        }
-
-        @keyframes progress {
-            from {
-                width: 100%;
-            }
-            to {
-                width: 0%;
-            }
-        }
-
-        .toast-progress {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            height: 3px;
-            background: currentColor;
-            opacity: 0.2;
-            animation: progress 5s linear forwards;
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -207,10 +15,8 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--gray-50);
-            color: var(--gray-900);
-            line-height: 1.6;
+            font-family: 'Inter', sans-serif;
+            background: #f8f9fa;
             min-height: 100vh;
             overflow-x: hidden;
         }
@@ -220,287 +26,259 @@
             min-height: 100vh;
         }
 
-        /* Sidebar - Modern 2.0 Design */
-        .sidebar {
-            width: 50%;
-            background: var(--white);
-            border-right: 1px solid var(--gray-200);
+        /* Left Branding Panel */
+        .brand-panel {
+            flex: 1;
+            background: #0d6efd;
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             position: relative;
             overflow: hidden;
         }
 
-        .sidebar-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 3rem 2rem;
+        .brand-content {
             text-align: center;
-        }
-
-        .brand-section {
-            margin-bottom: 3rem;
+            color: white;
+            z-index: 2;
+            padding: 3rem;
+            max-width: 500px;
         }
 
         .brand-logo {
-            width: 80px;
-            height: 80px;
-            background: var(--primary-color);
-            border-radius: var(--border-radius-lg);
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1.5rem;
-            box-shadow: var(--shadow-lg);
-            transition: all 0.3s ease;
-        }
-
-        .brand-logo:hover {
-            transform: scale(1.05);
-            box-shadow: var(--shadow-xl);
-        }
-
-        .brand-logo i {
-            font-size: 2rem;
-            color: var(--white);
+            margin: 0 auto 2rem;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            animation: float 6s ease-in-out infinite;
         }
 
         .brand-title {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--gray-900);
-            margin-bottom: 0.5rem;
-            letter-spacing: -0.025em;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
         }
 
         .brand-subtitle {
-            font-size: 1rem;
-            color: var(--gray-600);
-            font-weight: 500;
+            font-size: 1.125rem;
+            font-weight: 300;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            line-height: 1.6;
         }
 
-        .benefits-section {
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .benefit-item {
+        .role-badges {
             display: flex;
-            align-items: flex-start;
-            margin-bottom: 1.5rem;
-            text-align: left;
-            padding: 1rem;
-            border-radius: var(--border-radius);
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            justify-content: center;
+        }
+
+        .role-badge {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.875rem;
+            font-weight: 500;
             transition: all 0.3s ease;
-        }
-
-        .benefit-item:hover {
-            background: var(--gray-50);
-            transform: translateX(8px);
-        }
-
-        .benefit-icon {
-            width: 48px;
-            height: 48px;
-            background: var(--primary-light);
-            border-radius: var(--border-radius);
             display: flex;
             align-items: center;
-            justify-content: center;
-            margin-right: 1rem;
-            flex-shrink: 0;
+            gap: 0.5rem;
         }
 
-        .benefit-icon i {
-            font-size: 1.25rem;
-            color: var(--primary-color);
+        .role-badge:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
         }
 
-        .benefit-content h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--gray-900);
-            margin-bottom: 0.25rem;
+        /* Floating Elements Animation */
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
         }
 
-        .benefit-content p {
-            font-size: 0.875rem;
-            color: var(--gray-600);
-            margin: 0;
-            line-height: 1.5;
+        .floating-element {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: floatRandom 20s infinite linear;
         }
 
-        /* Main Content - Form Section */
-        .main-content {
-            width: 50%;
+        .floating-element:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            left: 10%;
+            top: 20%;
+            animation-delay: 0s;
+        }
+
+        .floating-element:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            right: 15%;
+            top: 60%;
+            animation-delay: 3s;
+        }
+
+        .floating-element:nth-child(3) {
+            width: 60px;
+            height: 60px;
+            left: 30%;
+            bottom: 30%;
+            animation-delay: 6s;
+        }
+
+        .floating-element:nth-child(4) {
+            width: 100px;
+            height: 100px;
+            right: 25%;
+            bottom: 20%;
+            animation-delay: 9s;
+        }
+
+        /* Register Panel */
+        .register-panel {
+            flex: 1;
+            background: white;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 2rem;
-            background: var(--white);
-            overflow-y: auto;
         }
 
-        .form-container {
+        .register-form-container {
             width: 100%;
-            max-width: 480px;
+            max-width: 450px;
         }
 
-        .form-header {
-            margin-bottom: 2rem;
+        .register-header {
             text-align: center;
+            margin-bottom: 2rem;
         }
 
-        .form-title {
+        .mobile-logo {
+            display: none;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            border-radius: 15px;
+            margin: 0 auto 1.5rem;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .register-title {
             font-size: 1.875rem;
             font-weight: 700;
-            color: var(--gray-900);
+            color: #1a202c;
             margin-bottom: 0.5rem;
         }
 
-        .form-subtitle {
+        .register-subtitle {
+            color: #718096;
             font-size: 1rem;
-            color: var(--gray-600);
+            font-weight: 400;
         }
 
-        .form-group {
+        .register-form {
+            margin-top: 2rem;
+        }
+
+        .form-floating {
             margin-bottom: 1.25rem;
         }
 
-        .form-label {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--gray-700);
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-
-        .input-group {
-            position: relative;
-        }
-
-        .form-control, .form-select {
-            width: 100%;
-            padding: 0.75rem 1rem 0.75rem 2.75rem;
-            border: 2px solid var(--gray-200);
-            border-radius: var(--border-radius);
-            font-size: 0.875rem;
+        .form-floating > .form-control,
+        .form-floating > .form-select {
+            height: 3.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 0.95rem;
             transition: all 0.3s ease;
-            background: var(--white);
+            background: #f8fafc;
         }
 
-        .form-control:focus, .form-select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        .form-floating > .form-control:focus,
+        .form-floating > .form-select:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+            background: white;
         }
 
-        .input-icon {
-            position: absolute;
-            left: 0.875rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray-400);
-            font-size: 0.875rem;
-            z-index: 10;
+        .form-floating > label {
+            color: #718096;
+            font-weight: 500;
+            padding: 0.75rem 1rem;
         }
 
-        .password-toggle {
-            position: absolute;
-            right: 0.875rem;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
+        .form-floating > .form-control:focus ~ label,
+        .form-floating > .form-select:focus ~ label,
+        .form-floating > .form-control:not(:placeholder-shown) ~ label,
+        .form-floating > .form-select:valid ~ label {
+            color: #0d6efd;
+        }
+
+        .input-group-text {
+            background: #f1f5f9;
+            border: 2px solid #e2e8f0;
+            border-right: none;
+            border-radius: 12px 0 0 12px;
+            color: #64748b;
+        }
+
+        .input-group .form-control {
+            border-left: none;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .btn-register {
+            background: #0d6efd;
             border: none;
-            color: var(--gray-400);
-            cursor: pointer;
-            padding: 0.25rem;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-            z-index: 10;
-        }
-
-        .password-toggle:hover {
-            color: var(--primary-color);
-            background: var(--primary-light);
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .form-check {
-            margin-bottom: 1.25rem;
-        }
-
-        .form-check-input {
-            width: 1.125rem;
-            height: 1.125rem;
-            border: 2px solid var(--gray-300);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .form-check-input:checked {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-
-        .form-check-label {
-            font-size: 0.875rem;
-            color: var(--gray-700);
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .btn-primary {
-            width: 100%;
-            padding: 0.875rem 1.5rem;
-            background: var(--primary-color);
-            border: none;
-            border-radius: var(--border-radius);
-            font-size: 0.875rem;
+            border-radius: 12px;
+            padding: 0.875rem 2rem;
+            font-size: 1rem;
             font-weight: 600;
-            color: var(--white);
-            cursor: pointer;
+            color: white;
             transition: all 0.3s ease;
+            width: 100%;
+            height: 3.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
         }
 
-        .btn-primary:hover {
-            background: var(--primary-hover);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-lg);
+        .btn-register:hover {
+            background: #0b5ed7;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(13, 110, 253, 0.3);
         }
 
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
+        .btn-register:disabled {
+            background: #cbd5e0;
             transform: none;
-        }
-
-        .form-footer {
-            margin-top: 1.5rem;
-            text-align: center;
+            box-shadow: none;
+            cursor: not-allowed;
         }
 
         .divider {
-            position: relative;
             text-align: center;
-            margin: 1.5rem 0;
+            margin: 2rem 0;
+            position: relative;
         }
 
         .divider::before {
@@ -510,814 +288,881 @@
             left: 0;
             right: 0;
             height: 1px;
-            background: var(--gray-200);
+            background: #e2e8f0;
         }
 
         .divider span {
-            background: var(--white);
+            background: white;
             padding: 0 1rem;
-            font-size: 0.875rem;
-            color: var(--gray-500);
-            position: relative;
-        }
-
-        .btn-outline {
-            width: 100%;
-            padding: 0.75rem 1.5rem;
-            background: transparent;
-            border: 2px solid var(--gray-200);
-            border-radius: var(--border-radius);
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--gray-700);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .btn-outline:hover {
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-            background: var(--primary-light);
-            transform: translateY(-1px);
-        }
-
-        /* Password Strength */
-        .password-strength {
-            margin-top: 0.5rem;
-            font-size: 0.75rem;
-        }
-
-        .progress {
-            height: 4px;
-            border-radius: 2px;
-            margin-bottom: 0.25rem;
-        }
-
-        .progress-bar {
-            transition: width 0.3s ease, background-color 0.3s ease;
-        }
-
-        .bg-danger { background-color: var(--danger-color); }
-        .bg-warning { background-color: var(--warning-color); }
-        .bg-info { background-color: var(--secondary-color); }
-        .bg-success { background-color: var(--success-color); }
-
-        /* Alert Styles */
-        .alert {
-            border-radius: var(--border-radius);
-            border: none;
-            padding: 0.875rem 1rem;
-            margin-bottom: 1.25rem;
+            color: #718096;
             font-size: 0.875rem;
             font-weight: 500;
-            animation: slideInDown 0.3s ease-out;
         }
 
-        .alert-success {
-            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-            color: #065f46;
-            border-left: 4px solid var(--success-color);
+        .login-link {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .login-link a {
+            color: #0d6efd;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .login-link a:hover {
+            color: #0b5ed7;
+            text-decoration: underline;
+        }
+
+        .alert {
+            border-radius: 12px;
+            border: none;
+            font-size: 0.875rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .alert-danger {
-            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-            color: #991b1b;
-            border-left: 4px solid var(--danger-color);
+            background: #fef2f2;
+            color: #dc2626;
+            border-left: 4px solid #dc2626;
         }
 
-        .alert-warning {
-            background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%);
-            color: #92400e;
-            border-left: 4px solid var(--warning-color);
+        .alert-success {
+            background: #f0fdf4;
+            color: #16a34a;
+            border-left: 4px solid #16a34a;
         }
 
-        /* Loading Spinner */
-        .spinner-border-sm {
-            width: 0.875rem;
-            height: 0.875rem;
-            border-width: 0.15em;
-        }
-
-        /* Validation States */
-        .is-invalid {
-            border-color: var(--danger-color);
-            background-color: rgba(239, 68, 68, 0.05);
-        }
-
-        .is-valid {
-            border-color: var(--success-color);
-            background-color: rgba(16, 185, 129, 0.05);
-        }
-
-        /* Animations */
-        @keyframes slideInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        .form-container {
-            animation: fadeIn 0.6s ease-out;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 1024px) {
-            .sidebar {
-                width: 45%;
-            }
-
-            .main-content {
-                width: 55%;
-            }
-        }
-
+        /* Mobile Responsive */
         @media (max-width: 768px) {
             .register-container {
                 flex-direction: column;
             }
 
-            .sidebar {
-                width: 100%;
-                min-height: auto;
-                border-right: none;
-                border-bottom: 1px solid var(--gray-200);
-                padding: 2rem 1.5rem;
-            }
-
-            .sidebar-content {
-                padding: 0;
-            }
-
-            .brand-section {
-                margin-bottom: 2rem;
-            }
-
-            .benefits-section {
+            .brand-panel {
                 display: none;
             }
 
-            .main-content {
-                width: 100%;
-                padding: 1.5rem;
+            .mobile-logo {
+                display: flex;
             }
 
-            .form-row {
-                grid-template-columns: 1fr;
-                gap: 0;
-            }
-
-            .brand-title {
-                font-size: 1.5rem;
-            }
-
-            .form-title {
-                font-size: 1.5rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .sidebar {
-                padding: 1.5rem 1rem;
-            }
-
-            .main-content {
+            .register-panel {
                 padding: 1rem;
             }
 
-            .brand-logo {
-                width: 60px;
-                height: 60px;
-            }
-
-            .brand-logo i {
-                font-size: 1.5rem;
+            .brand-content {
+                padding: 2rem;
             }
 
             .brand-title {
-                font-size: 1.25rem;
+                font-size: 2rem;
             }
 
-            .form-title {
-                font-size: 1.25rem;
-            }
-
-            .form-container {
-                max-width: 100%;
+            .register-title {
+                font-size: 1.5rem;
             }
         }
 
-        /* Modern focus states */
-        .form-control:focus + .input-icon,
-        .form-select:focus + .input-icon {
-            color: var(--primary-color);
+        /* Animations */
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
         }
 
-        /* Security note */
-        .security-note {
-            text-align: center;
-            color: var(--gray-500);
-            font-size: 0.75rem;
-            margin-top: 1rem;
-        }
-
-        .security-note i {
-            color: var(--success-color);
-            margin-right: 0.25rem;
-        }
-
-        /* Form text helper */
-        .form-text {
-            font-size: 0.75rem;
-            color: var(--gray-500);
-            margin-top: 0.25rem;
+        @keyframes floatRandom {
+            0%, 100% {
+                transform: translateY(0px) translateX(0px) rotate(0deg);
+                opacity: 0.1;
+            }
+            25% {
+                transform: translateY(-30px) translateX(20px) rotate(90deg);
+                opacity: 0.3;
+            }
+            50% {
+                transform: translateY(20px) translateX(-15px) rotate(180deg);
+                opacity: 0.2;
+            }
+            75% {
+                transform: translateY(-15px) translateX(25px) rotate(270deg);
+                opacity: 0.4;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Toast Container -->
-    <div class="toast-container" id="toastContainer">
-        <?php if (isset($success)): ?>
-            <div class="custom-toast success" id="initialToast">
-                <div class="toast-icon">
-                    <i class="fas fa-check"></i>
-                </div>
-                <div class="toast-content">
-                    <div class="toast-title">Berhasil!</div>
-                    <div class="toast-message"><?php echo htmlspecialchars($success); ?></div>
-                </div>
-                <button class="toast-close" onclick="hideToast('initialToast')">
-                    <i class="fas fa-times"></i>
-                </button>
-                <div class="toast-progress"></div>
-            </div>
-        <?php endif; ?>
-
-        <?php if (isset($error)): ?>
-            <div class="custom-toast error" id="initialToast">
-                <div class="toast-icon">
-                    <i class="fas fa-exclamation"></i>
-                </div>
-                <div class="toast-content">
-                    <div class="toast-title">Error!</div>
-                    <div class="toast-message"><?php echo htmlspecialchars($error); ?></div>
-                </div>
-                <button class="toast-close" onclick="hideToast('initialToast')">
-                    <i class="fas fa-times"></i>
-                </button>
-                <div class="toast-progress"></div>
-            </div>
-        <?php endif; ?>
-
-        <?php if (isset($errors) && is_array($errors)): ?>
-            <div class="custom-toast warning" id="initialToast">
-                <div class="toast-icon">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
-                <div class="toast-content">
-                    <div class="toast-title">Validasi Gagal!</div>
-                    <div class="toast-message">
-                        <ul style="margin: 0; padding-left: 15px;">
-                            <?php foreach ($errors as $error): ?>
-                                <li><?php echo htmlspecialchars($error); ?></li>
-                            <?php endforeach; ?>
-                        </ul>
-                    </div>
-                </div>
-                <button class="toast-close" onclick="hideToast('initialToast')">
-                    <i class="fas fa-times"></i>
-                </button>
-                <div class="toast-progress"></div>
-            </div>
-        <?php endif; ?>
-    </div>
-
     <div class="register-container">
-        <!-- Sidebar Section -->
-        <div class="sidebar">
-            <div class="sidebar-content">
-                <div class="brand-section">
-                    <div class="brand-logo">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <h1 class="brand-title">SIMONTA</h1>
-                    <p class="brand-subtitle">Bergabung dengan Sistem Monitoring Penanganan Bencana</p>
+        <!-- Left Branding Panel -->
+        <div class="brand-panel">
+            <div class="floating-elements">
+                <div class="floating-element"></div>
+                <div class="floating-element"></div>
+                <div class="floating-element"></div>
+                <div class="floating-element"></div>
+            </div>
+
+            <div class="brand-content">
+                <div class="brand-logo">
+                    <i class="fas fa-shield-alt fa-3x"></i>
                 </div>
 
-                <div class="benefits-section">
-                    <div class="benefit-item">
-                        <div class="benefit-icon">
-                            <i class="fas fa-user-shield"></i>
-                        </div>
-                        <div class="benefit-content">
-                            <h3>Akun Terlindungi</h3>
-                            <p>Data pribadi Anda aman dengan enkripsi end-to-end</p>
-                        </div>
-                    </div>
+                <h1 class="brand-title">SIMONTA BENCANA</h1>
+                <p class="brand-subtitle">
+                    Sistem Informasi Monitoring dan Penanganan Bencana yang terintegrasi untuk Indonesia yang lebih siap menghadapi bencana
+                </p>
 
-                    <div class="benefit-item">
-                        <div class="benefit-icon">
-                            <i class="fas fa-bell"></i>
-                        </div>
-                        <div class="benefit-content">
-                            <h3>Notifikasi Real-time</h3>
-                            <p>Dapatkan info bencana terkini langsung di perangkat Anda</p>
-                        </div>
+                <div class="role-badges">
+                    <div class="role-badge">
+                        <i class="fas fa-user-shield"></i>
+                        <span>Admin</span>
                     </div>
-
-                    <div class="benefit-item">
-                        <div class="benefit-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="benefit-content">
-                            <h3>Komunitas Responsif</h3>
-                            <p>Bergabung dengan jaringan petugas bencana terpercaya</p>
-                        </div>
+                    <div class="role-badge">
+                        <i class="fas fa-user-tie"></i>
+                        <span>Petugas BPBD</span>
                     </div>
-
-                    <div class="benefit-item">
-                        <div class="benefit-icon">
-                            <i class="fas fa-chart-bar"></i>
-                        </div>
-                        <div class="benefit-content">
-                            <h3>Analisis Data</h3>
-                            <p>Akses statistik dan laporan penanganan bencana</p>
-                        </div>
+                    <div class="role-badge">
+                        <i class="fas fa-user-check"></i>
+                        <span>Operator Desa</span>
+                    </div>
+                    <div class="role-badge">
+                        <i class="fas fa-user"></i>
+                        <span>Warga</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Main Content Section -->
-        <div class="main-content">
-            <div class="form-container">
-                <!-- Alert Container -->
-                <div id="alertContainer"></div>
+        <!-- Register Panel -->
+        <div class="register-panel">
+            <div class="register-form-container">
+                <div class="register-header">
+                    <div class="mobile-logo">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
 
-                <div class="form-header">
-                    <h2 class="form-title">Buat Akun Baru</h2>
-                    <p class="form-subtitle">Daftar untuk mulai menggunakan SIMONTA</p>
+                    <h2 class="register-title">Buat Akun Baru</h2>
+                    <p class="register-subtitle">Bergabung dengan sistem monitoring bencana terpadu</p>
                 </div>
 
-                <form action="#" method="POST" id="registerForm">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="nama" class="form-label">Nama Lengkap</label>
-                            <div class="input-group">
-                                <i class="fas fa-user input-icon"></i>
-                                <input type="text" class="form-control" id="nama" name="nama" required
-                                       value="<?php echo htmlspecialchars($old_data['nama'] ?? ''); ?>">
+                <?php if (isset($error)): ?>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <?php echo htmlspecialchars($error); ?>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                <?php endif; ?>
+
+                <?php if (!empty($errors)): ?>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Perbaiki kesalahan berikut:</strong>
+                        <ul class="mb-0 mt-2">
+                            <?php foreach ($errors as $field => $message): ?>
+                                <li><?php echo htmlspecialchars($message); ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                <?php endif; ?>
+
+                <form method="POST" action="index.php?controller=auth&action=register" id="registerForm" class="register-form">
+                    <!-- Row 1: Name and Username -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="name" name="name"
+                                       placeholder="Nama Lengkap" required
+                                       value="<?php echo isset($_POST['name']) ? htmlspecialchars($_POST['name']) : ''; ?>">
+                                <label for="name">
+                                    <i class="fas fa-user me-2"></i>Nama Lengkap
+                                </label>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label for="username" class="form-label">Username</label>
-                            <div class="input-group">
-                                <i class="fas fa-user-circle input-icon"></i>
-                                <input type="text" class="form-control" id="username" name="username" required
-                                       value="<?php echo htmlspecialchars($old_data['username'] ?? ''); ?>">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="username" name="username"
+                                       placeholder="Username" required
+                                       value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>">
+                                <label for="username">
+                                    <i class="fas fa-at me-2"></i>Username
+                                </label>
                             </div>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="email" class="form-label">Email</label>
-                        <div class="input-group">
-                            <i class="fas fa-envelope input-icon"></i>
-                            <input type="email" class="form-control" id="email" name="email" required
-                                   value="<?php echo htmlspecialchars($old_data['email'] ?? ''); ?>">
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="password" class="form-label">Password</label>
-                            <div class="input-group">
-                                <i class="fas fa-lock input-icon"></i>
-                                <input type="password" class="form-control" id="password" name="password" required
-                                       autocomplete="new-password">
-                                <button type="button" class="password-toggle" id="togglePassword">
-                                    <i class="fas fa-eye" id="eyeIcon"></i>
-                                </button>
-                            </div>
-                            <small class="text-muted">Minimal 4 karakter (semakin kuat semakin baik)</small>
-                            <div class="password-strength">
-                                <div class="progress" id="passwordStrengthBar">
-                                    <div class="progress-bar" id="passwordStrengthProgress"></div>
-                                </div>
-                                <small id="passwordStrengthText" class="form-text">Kekuatan password: </small>
+                    <!-- Row 2: Email and Phone -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="email" class="form-control" id="email" name="email"
+                                       placeholder="Email" required
+                                       value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
+                                <label for="email">
+                                    <i class="fas fa-envelope me-2"></i>Email
+                                </label>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label for="password_confirmation" class="form-label">Konfirmasi Password</label>
-                            <div class="input-group">
-                                <i class="fas fa-lock input-icon"></i>
-                                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required
-                                       autocomplete="new-password">
-                                <button type="button" class="password-toggle" id="toggleConfirmPassword">
-                                    <i class="fas fa-eye" id="eyeIconConfirm"></i>
-                                </button>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="tel" class="form-control" id="phone" name="phone"
+                                       placeholder="Nomor Telepon"
+                                       value="<?php echo isset($_POST['phone']) ? htmlspecialchars($_POST['phone']) : ''; ?>">
+                                <label for="phone">
+                                    <i class="fas fa-phone me-2"></i>Nomor Telepon
+                                </label>
                             </div>
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="role" class="form-label">Role</label>
-                            <div class="input-group">
-                                <i class="fas fa-user-tag input-icon"></i>
-                                <select class="form-select" id="role" name="role" required>
-                                    <option value="">-- Pilih Role --</option>
-                                    <option value="PetugasBPBD" <?php echo ($old_data['role'] ?? '') === 'PetugasBPBD' ? 'selected' : ''; ?>>Petugas BPBD</option>
-                                    <option value="OperatorDesa" <?php echo ($old_data['role'] ?? '') === 'OperatorDesa' ? 'selected' : ''; ?>>Operator Desa</option>
-                                </select>
+                    <!-- Row 3: Password and Confirmation -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="password" class="form-control" id="password" name="password"
+                                       placeholder="Password" required>
+                                <label for="password">
+                                    <i class="fas fa-lock me-2"></i>Password
+                                </label>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label for="no_telepon" class="form-label">Telepon</label>
-                            <div class="input-group">
-                                <i class="fas fa-phone input-icon"></i>
-                                <input type="tel" class="form-control" id="no_telepon" name="no_telepon" placeholder="+62"
-                                       value="<?php echo htmlspecialchars($old_data['no_telepon'] ?? ''); ?>">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation"
+                                       placeholder="Konfirmasi Password" required>
+                                <label for="password_confirmation">
+                                    <i class="fas fa-lock me-2"></i>Konfirmasi Password
+                                </label>
                             </div>
-                            <small class="form-text">Opsional</small>
                         </div>
                     </div>
 
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="terms" name="terms" required>
-                        <label class="form-check-label" for="terms">
-                            Saya menyetujui <a href="#" class="text-primary">syarat dan ketentuan</a> yang berlaku
+                    <!-- Role Selection -->
+                    <div class="form-floating">
+                        <select class="form-select" id="role" name="role" required>
+                            <option value="">Pilih Peran</option>
+                            <option value="warga" <?php echo (isset($_POST['role']) && $_POST['role'] == 'warga') ? 'selected' : ''; ?>>Warga</option>
+                            <option value="operator" <?php echo (isset($_POST['role']) && $_POST['role'] == 'operator') ? 'selected' : ''; ?>>Operator Desa</option>
+                            <option value="petugas" <?php echo (isset($_POST['role']) && $_POST['role'] == 'petugas') ? 'selected' : ''; ?>>Petugas BPBD</option>
+                            <option value="admin" <?php echo (isset($_POST['role']) && $_POST['role'] == 'admin') ? 'selected' : ''; ?>>Admin</option>
+                        </select>
+                        <label for="role">
+                            <i class="fas fa-user-tag me-2"></i>Peran
                         </label>
                     </div>
 
-                    <button type="submit" class="btn btn-primary" id="registerBtn">
+                    <!-- Address -->
+                    <div class="form-floating">
+                        <textarea class="form-control" id="address" name="address" rows="2"
+                                  placeholder="Alamat Lengkap" style="height: 80px;"><?php echo isset($_POST['address']) ? htmlspecialchars($_POST['address']) : ''; ?></textarea>
+                        <label for="address">
+                            <i class="fas fa-map-marker-alt me-2"></i>Alamat Lengkap
+                        </label>
+                    </div>
+
+                    <!-- Region Information -->
+                    <div class="mb-4">
+                        <h6 class="mb-3 text-muted">
+                            <i class="fas fa-map me-2"></i>Informasi Wilayah
+                        </h6>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <select class="form-select" id="provinsi_id" name="provinsi_id">
+                                        <option value="">Pilih Provinsi</option>
+                                    </select>
+                                    <label for="provinsi_id">Provinsi</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <select class="form-select" id="kabupaten_id" name="kabupaten_id" disabled>
+                                        <option value="">Pilih Kabupaten</option>
+                                    </select>
+                                    <label for="kabupaten_id">Kabupaten/Kota</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <select class="form-select" id="kecamatan_id" name="kecamatan_id" disabled>
+                                        <option value="">Pilih Kecamatan</option>
+                                    </select>
+                                    <label for="kecamatan_id">Kecamatan</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <select class="form-select" id="desa_id" name="desa_id" disabled>
+                                        <option value="">Pilih Desa</option>
+                                    </select>
+                                    <label for="desa_id">Desa/Kelurahan</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-register">
                         <i class="fas fa-user-plus"></i>
-                        <span id="registerBtnText">Daftar Sekarang</span>
-                        <span class="spinner-border spinner-border-sm d-none" id="registerSpinner"></span>
+                        <span>Daftar Sekarang</span>
                     </button>
                 </form>
 
-                <div class="form-footer">
-                    <div class="divider">
-                        <span>atau</span>
-                    </div>
-                    <p>Sudah punya akun?</p>
-                    <a href="index.php?controller=auth&action=login" class="btn btn-outline">
-                        <i class="fas fa-sign-in-alt"></i>
-                        Masuk di sini
-                    </a>
+                <div class="login-link">
+                    <p class="text-muted mb-0">
+                        Sudah punya akun?
+                        <a href="index.php?controller=auth&action=login">Masuk di sini</a>
+                    </p>
                 </div>
-
-                <div class="security-note">
-                    <i class="fas fa-shield-alt"></i>
-                    Data Anda aman dan terenkripsi
-                </div>
-
-                 </div>
+            </div>
         </div>
     </div>
 
-    <!-- Bootstrap 5.0.2 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Toast Management Functions
-        function showToast(message, type = 'info', title = null) {
-            const toastContainer = document.getElementById('toastContainer');
-
-            // Auto-generate title based on type if not provided
-            if (!title) {
-                switch(type) {
-                    case 'success':
-                        title = 'Berhasil!';
-                        break;
-                    case 'error':
-                        title = 'Error!';
-                        break;
-                    case 'warning':
-                        title = 'Peringatan!';
-                        break;
-                    default:
-                        title = 'Informasi';
-                }
+        class ModernAuthNotifier {
+            constructor() {
+                this.toastContainer = this.createToastContainer();
             }
 
-            const toastId = 'toast-' + Date.now();
-
-            const iconMap = {
-                'success': 'fa-check',
-                'error': 'fa-exclamation',
-                'warning': 'fa-exclamation-triangle',
-                'info': 'fa-info-circle'
-            };
-
-            const toastHtml = `
-                <div class="custom-toast ${type}" id="${toastId}">
-                    <div class="toast-icon">
-                        <i class="fas ${iconMap[type]}"></i>
-                    </div>
-                    <div class="toast-content">
-                        <div class="toast-title">${title}</div>
-                        <div class="toast-message">${message}</div>
-                    </div>
-                    <button class="toast-close" onclick="hideToast('${toastId}')">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <div class="toast-progress"></div>
-                </div>
-            `;
-
-            toastContainer.insertAdjacentHTML('beforeend', toastHtml);
-
-            // Auto-hide after 5 seconds
-            setTimeout(() => {
-                hideToast(toastId);
-            }, 5000);
-        }
-
-        function hideToast(toastId) {
-            const toast = document.getElementById(toastId);
-            if (toast) {
-                toast.classList.add('hiding');
-                setTimeout(() => {
-                    toast.remove();
-                }, 300);
+            createToastContainer() {
+                const container = document.createElement('div');
+                container.id = 'toast-container';
+                container.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    z-index: 9999;
+                `;
+                document.body.appendChild(container);
+                return container;
             }
-        }
 
-        // Auto-hide initial toasts after 5 seconds
-        document.addEventListener('DOMContentLoaded', function() {
-            // Auto-hide initial toasts from PHP
-            const initialToasts = document.querySelectorAll('#initialToast');
-            initialToasts.forEach((toast, index) => {
-                setTimeout(() => {
-                    hideToast('initialToast');
-                }, 5000 + (index * 100)); // Stagger auto-hide
-            });
+            log(message, data = null) {
+                console.log(`[MODERN REGISTER] ${message}`, data || '');
+            }
 
-            // Toggle password visibility for password field
-            const togglePassword = document.getElementById('togglePassword');
-            const password = document.getElementById('password');
-            const eyeIcon = document.getElementById('eyeIcon');
+            error(message, data = null) {
+                console.error(`[MODERN REGISTER ERROR] ${message}`, data || '');
+                this.showToast(message, 'danger');
+            }
 
-            togglePassword.addEventListener('click', function() {
-                const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-                password.setAttribute('type', type);
-                eyeIcon.className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
-            });
+            success(message, data = null) {
+                console.log(`[MODERN REGISTER SUCCESS] ${message}`, data || '');
+                this.showToast(message, 'success');
+            }
 
-            // Toggle password visibility for confirm password field
-            const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
-            const confirmPassword = document.getElementById('password_confirmation');
-            const eyeIconConfirm = document.getElementById('eyeIconConfirm');
+            warning(message, data = null) {
+                console.warn(`[MODERN REGISTER WARNING] ${message}`, data || '');
+                this.showToast(message, 'warning');
+            }
 
-            toggleConfirmPassword.addEventListener('click', function() {
-                const type = confirmPassword.getAttribute('type') === 'password' ? 'text' : 'password';
-                confirmPassword.setAttribute('type', type);
-                eyeIconConfirm.className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
-            });
+            info(message, data = null) {
+                console.info(`[MODERN REGISTER INFO] ${message}`, data || '');
+                this.showToast(message, 'info');
+            }
 
-            // Password strength checker
-            function checkPasswordStrength(password) {
-                let strength = 0;
-                const feedback = [];
+            showToast(message, type = 'info') {
+                const toastId = 'toast-' + Date.now();
+                const toastHtml = `
+                    <div id="${toastId}" class="toast align-items-center text-white bg-${type} border-0 mb-2" role="alert">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                ${this.getToastIcon(type)} ${message}
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                        </div>
+                    </div>
+                `;
 
-                if (password.length >= 4) strength++;
-                else feedback.push('minimal 4 karakter');
+                this.toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+                const toastElement = document.getElementById(toastId);
+                const toast = new bootstrap.Toast(toastElement, { delay: 5000 });
 
-                if (password.length >= 6) strength++;
-                if (/[a-z]/.test(password)) strength++;
-                if (/[A-Z]/.test(password)) strength++;
-                if (/[0-9]/.test(password)) strength++;
-                if (/[^a-zA-Z0-9]/.test(password)) strength++;
+                toastElement.addEventListener('hidden.bs.toast', () => {
+                    toastElement.remove();
+                });
 
-                return {
-                    score: Math.min(strength, 4),
-                    maxScore: 4,
-                    percentage: (Math.min(strength, 4) / 4) * 100,
-                    feedback: feedback
+                toast.show();
+                this.log(`Toast shown: ${type} - ${message}`);
+            }
+
+            getToastIcon(type) {
+                const icons = {
+                    success: '<i class="fas fa-check-circle me-2"></i>',
+                    danger: '<i class="fas fa-exclamation-triangle me-2"></i>',
+                    warning: '<i class="fas fa-exclamation-circle me-2"></i>',
+                    info: '<i class="fas fa-info-circle me-2"></i>'
                 };
+                return icons[type] || icons.info;
+            }
+        }
+
+        class ModernRegisterHandler {
+            constructor() {
+                this.notifier = new ModernAuthNotifier();
+                this.form = document.getElementById('registerForm');
+                this.submitBtn = this.form.querySelector('button[type="submit"]');
+                this.init();
             }
 
-            // Password strength indicator
-            const passwordInput = document.getElementById('password');
-            const strengthBar = document.getElementById('passwordStrengthBar');
-            const strengthProgress = document.getElementById('passwordStrengthProgress');
-            const strengthText = document.getElementById('passwordStrengthText');
+            init() {
+                this.notifier.log('Modern register handler initialized');
+                this.setupEventListeners();
+                this.checkExistingMessages();
 
-            passwordInput.addEventListener('input', function() {
-                const strength = checkPasswordStrength(this.value);
-                const strengthTexts = ['Sangat Lemah', 'Lemah', 'Sedang', 'Kuat', 'Sangat Kuat'];
-                const strengthClasses = ['bg-danger', 'bg-warning', 'bg-info', 'bg-success', 'bg-success'];
+                this.notifier.log('=== BEFORE LOADING PROVINCES ===');
+                this.notifier.log('Document ready state:', document.readyState);
 
-                strengthProgress.style.width = strength.percentage + '%';
-                strengthProgress.className = 'progress-bar ' + strengthClasses[strength.score];
-                strengthText.innerHTML = 'Kekuatan password: <span class="text-' +
-                    ['danger', 'warning', 'info', 'success', 'success'][strength.score] + '">' +
-                    strengthTexts[strength.score] + '</span>';
-            });
+                // Try to load provinsi after a short delay to ensure DOM is ready
+                setTimeout(() => {
+                    this.notifier.log('=== STARTING PROVINCES LOAD ===');
+                    this.loadProvinsi();
+                }, 100);
 
-            // Real-time validation
-            const usernameInput = document.getElementById('username');
-            const emailInput = document.getElementById('email');
-            const phoneInput = document.getElementById('no_telepon');
+                this.notifier.log('=== MODERN REGISTER PAGE LOADED ===');
+                this.notifier.log('Page URL:', window.location.href);
+                this.notifier.log('User Agent:', navigator.userAgent);
+                this.notifier.log('Screen Resolution:', `${screen.width}x${screen.height}`);
+                this.notifier.log('Viewport Size:', `${window.innerWidth}x${window.innerHeight}`);
+            }
 
-            // Username validation
-            usernameInput.addEventListener('blur', function() {
-                if (this.value.length < 4) {
-                    this.classList.add('is-invalid');
-                    this.classList.remove('is-valid');
-                    showAlert('Username minimal 4 karakter', 'warning', false);
-                } else {
-                    this.classList.remove('is-invalid');
-                    this.classList.add('is-valid');
+            setupEventListeners() {
+                this.form.addEventListener('submit', (e) => this.handleRegister(e));
+                this.form.addEventListener('input', (e) => this.handleInput(e));
+                this.form.addEventListener('focusin', (e) => this.handleFieldFocus(e));
+                this.form.addEventListener('focusout', (e) => this.handleFieldBlur(e));
+
+                document.getElementById('provinsi_id').addEventListener('change', () => this.loadKabupaten());
+                document.getElementById('kabupaten_id').addEventListener('change', () => this.loadKecamatan());
+                document.getElementById('kecamatan_id').addEventListener('change', () => this.loadDesa());
+            }
+
+            checkExistingMessages() {
+                const errorAlert = document.querySelector('.alert-danger');
+                const successAlert = document.querySelector('.alert-success');
+
+                if (errorAlert) {
+                    const errorMsg = errorAlert.textContent.trim();
+                    this.notifier.error(errorMsg);
                 }
-            });
 
-            // Email validation
-            emailInput.addEventListener('blur', function() {
+                if (successAlert) {
+                    const successMsg = successAlert.textContent.trim();
+                    this.notifier.success(successMsg);
+                }
+            }
+
+            handleInput(e) {
+                const input = e.target;
+                if (input.type === 'text' || input.type === 'email' || input.type === 'tel' || input.type === 'password' || input.tagName === 'TEXTAREA') {
+                    this.notifier.log(`User typing in ${input.name}`, {
+                        field: input.name,
+                        fieldType: input.type,
+                        valueLength: input.value.length,
+                        hasValue: input.value.length > 0
+                    });
+                }
+
+                if (input.id === 'password' || input.id === 'password_confirmation') {
+                    this.validatePasswords();
+                }
+
+                if (input.id === 'email') {
+                    this.validateEmail(input.value);
+                }
+            }
+
+            handleFieldFocus(e) {
+                const input = e.target;
+                if (input.tagName === 'INPUT' || input.tagName === 'TEXTAREA' || input.tagName === 'SELECT') {
+                    this.notifier.log(`Field focused: ${input.name || input.id}`, {
+                        fieldType: input.type,
+                        placeholder: input.placeholder,
+                        required: input.required
+                    });
+                }
+            }
+
+            handleFieldBlur(e) {
+                const input = e.target;
+                if (input.tagName === 'INPUT' || input.tagName === 'TEXTAREA') {
+                    this.notifier.log(`Field blurred: ${input.name || input.id}`, {
+                        valueLength: input.value.length,
+                        isEmpty: input.value.length === 0,
+                        isValid: input.checkValidity()
+                    });
+                }
+            }
+
+            validateEmail(email) {
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(this.value)) {
-                    this.classList.add('is-invalid');
-                    this.classList.remove('is-valid');
-                    showAlert('Format email tidak valid', 'warning', false);
-                } else {
-                    this.classList.remove('is-invalid');
-                    this.classList.add('is-valid');
+                if (email && !emailRegex.test(email)) {
+                    this.notifier.warning('Format email tidak valid');
+                } else if (email && emailRegex.test(email)) {
+                    this.notifier.success('Email format valid');
                 }
-            });
+            }
 
-            // Phone validation
-            phoneInput.addEventListener('blur', function() {
-                if (this.value) {
-                    const cleaned = this.value.replace(/\D/g, '');
-                    if (!/^[0-9]{10,13}$/.test(cleaned)) {
-                        this.classList.add('is-invalid');
-                        this.classList.remove('is-valid');
-                        showAlert('Format nomor telepon tidak valid', 'warning', false);
-                    } else {
-                        this.classList.remove('is-invalid');
-                        this.classList.add('is-valid');
-                    }
+            validatePasswords() {
+                const password = document.getElementById('password').value;
+                const passwordConfirm = document.getElementById('password_confirmation').value;
+
+                if (passwordConfirm && password !== passwordConfirm) {
+                    this.notifier.warning('Password dan konfirmasi password tidak cocok');
+                } else if (passwordConfirm && password === passwordConfirm) {
+                    this.notifier.success('Password cocok');
                 }
-            });
 
-            // Form submission
-            const registerForm = document.getElementById('registerForm');
-            const registerBtn = document.getElementById('registerBtn');
-            const registerBtnText = document.getElementById('registerBtnText');
-            const registerSpinner = document.getElementById('registerSpinner');
+                if (password.length > 0 && password.length < 8) {
+                    this.notifier.warning('Password sebaiknya minimal 8 karakter untuk keamanan');
+                } else if (password.length >= 8) {
+                    this.notifier.success('Password strength adequate');
+                }
+            }
 
-            registerForm.addEventListener('submit', function(e) {
+            async handleRegister(e) {
                 e.preventDefault();
 
-                console.log("=== Form Submission Started ===");
+                const formData = new FormData(this.form);
+                const registerData = Object.fromEntries(formData.entries());
 
-                // Clear previous alerts
-                document.getElementById('alertContainer').innerHTML = '';
+                this.notifier.log('=== REGISTRATION ATTEMPT STARTED ===');
+                this.notifier.log('Form data collected:', {
+                    fields: Object.keys(registerData),
+                    data: registerData,
+                    totalFields: Object.keys(registerData).length
+                });
 
-                // Validation
-                const nama = document.getElementById('nama').value.trim();
-                const username = document.getElementById('username').value.trim();
-                const email = document.getElementById('email').value.trim();
-                const password = document.getElementById('password').value;
-                const passwordConfirmation = document.getElementById('password_confirmation').value;
-                const role = document.getElementById('role').value;
-                const terms = document.getElementById('terms').checked;
-
-                if (!nama || !username || !email || !password || !passwordConfirmation || !role) {
-                    showAlert('Semua field wajib diisi kecuali telepon', 'danger');
+                if (registerData.password !== registerData.password_confirmation) {
+                    this.notifier.error('Password dan konfirmasi password tidak cocok!');
                     return;
                 }
 
-                if (username.length < 4) {
-                    showAlert('Username minimal 4 karakter', 'danger');
-                    return;
-                }
+                this.setLoadingState(true);
 
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(email)) {
-                    showAlert('Format email tidak valid', 'danger');
-                    return;
-                }
+                try {
+                    this.notifier.log('Sending registration request to server...');
+                    const response = await fetch('index.php?controller=auth&action=register', {
+                        method: 'POST',
+                        body: formData
+                    });
 
-                if (password.length < 4) {
-                    showAlert('Password minimal 4 karakter', 'danger');
-                    return;
-                }
+                    this.notifier.log('=== REGISTRATION RESPONSE RECEIVED ===');
+                    this.notifier.log('Response details:', {
+                        status: response.status,
+                        statusText: response.statusText,
+                        url: response.url,
+                        headers: Object.fromEntries(response.headers.entries()),
+                        ok: response.ok,
+                        redirected: response.redirected,
+                        type: response.type
+                    });
 
-                if (password !== passwordConfirmation) {
-                    showAlert('Konfirmasi password tidak cocok', 'danger');
-                    return;
-                }
+                    const responseText = await response.text();
 
-                if (!terms) {
-                    showAlert('Anda harus menyetujui syarat dan ketentuan', 'danger');
-                    return;
-                }
+                    this.notifier.log('=== REGISTRATION RESPONSE ANALYSIS ===');
+                    this.notifier.log('Response analysis:', {
+                        responseLength: responseText.length,
+                        containsError: responseText.includes('alert-danger'),
+                        containsSuccess: responseText.includes('alert-success'),
+                        containsFormValidation: responseText.includes('Perbaiki kesalahan'),
+                        isRedirect: response.redirected,
+                        finalUrl: response.url,
+                        contentType: response.headers.get('content-type')
+                    });
 
-                // Show loading
-                registerBtn.disabled = true;
-                registerBtnText.textContent = 'Mendaftar...';
-                registerSpinner.classList.remove('d-none');
-
-                console.log("Submitting registration to API...");
-
-                // Prepare form data for API
-                const formData = new FormData();
-                formData.append('nama', nama);
-                formData.append('username', username);
-                formData.append('email', email);
-                formData.append('password', password);
-                formData.append('password_confirmation', passwordConfirmation);
-                formData.append('role', role);
-
-                const noTelepon = document.getElementById('no_telepon').value.trim();
-                if (noTelepon) {
-                    formData.append('no_telepon', noTelepon);
-                }
-
-                // Send registration request to backend API
-                fetch('http://127.0.0.1:8000/api/auth/register', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
+                    let jsonData = null;
+                    try {
+                        jsonData = JSON.parse(responseText);
+                        this.notifier.log('Response parsed as JSON:', jsonData);
+                    } catch (jsonError) {
+                        this.notifier.log('Response is HTML, not JSON');
+                        this.notifier.log('HTML response preview:', responseText.substring(0, 200));
                     }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Registration response:', data);
 
-                    if (data.success) {
-                        showAlert('Registrasi berhasil! Mengalihkan ke halaman login...', 'success');
+                    if (response.ok && !responseText.includes('alert-danger') && !responseText.includes('Perbaiki kesalahan')) {
+                        this.notifier.success('Registrasi berhasil! Mengarahkan ke halaman login...');
+                        this.notifier.log('=== REGISTRATION SUCCESSFUL ===');
+                        this.notifier.log('Registration successful details:', {
+                            redirectUrl: response.url,
+                            hasJsonData: jsonData !== null,
+                            responseData: jsonData,
+                            responseHeaders: Object.fromEntries(response.headers.entries())
+                        });
 
-                        // Redirect to login after successful registration
                         setTimeout(() => {
-                            window.location.href = 'index.php?controller=auth&action=index';
+                            this.notifier.log('Redirecting to login page...');
+                            window.location.href = 'index.php?controller=auth&action=login';
                         }, 2000);
                     } else {
-                        // Handle validation errors
-                        let errorMessage = data.message || 'Registrasi gagal';
+                        this.notifier.log('=== REGISTRATION FAILED ===');
+                        const errorMatch = responseText.match(/alert-danger[^>]*>([^<]+)/);
+                        const validationMatch = responseText.match(/<li>([^<]+)<\/li>/g);
 
-                        if (data.errors) {
-                            const errorMessages = Object.values(data.errors).flat();
-                            errorMessage = errorMessages.join(', ');
+                        let errorMessage = 'Registrasi gagal. Periksa kembali data Anda.';
+                        if (errorMatch) {
+                            errorMessage = errorMatch[1].trim();
+                        } else if (validationMatch) {
+                            errorMessage = validationMatch.map(item => item.replace(/<[^>]*>/g, '')).join(', ');
                         }
 
-                        showAlert(errorMessage, 'danger');
+                        this.notifier.error(errorMessage);
+                        this.notifier.log('Registration failure details:', {
+                            status: response.status,
+                            statusText: response.statusText,
+                            responseHeaders: Object.fromEntries(response.headers.entries()),
+                            responseText: responseText.substring(0, 1000),
+                            fullResponseLength: responseText.length,
+                            jsonData: jsonData,
+                            errorMessage: errorMessage
+                        });
                     }
-                })
-                .catch(error => {
-                    console.error('Registration error:', error);
-                    showAlert('Terjadi kesalahan saat registrasi. Silakan coba lagi.', 'danger');
-                })
-                .finally(() => {
-                    // Hide loading
-                    registerBtn.disabled = false;
-                    registerBtnText.textContent = 'Daftar Sekarang';
-                    registerSpinner.classList.add('d-none');
-                });
-            });
+                } catch (error) {
+                    this.notifier.log('=== REGISTRATION NETWORK ERROR ===');
+                    this.notifier.error('Terjadi gangguan koneksi. Silakan coba lagi.');
+                    this.notifier.error('Network error details:', {
+                        message: error.message,
+                        name: error.name,
+                        stack: error.stack
+                    });
+                    this.notifier.log('Registration network error analysis:', {
+                        errorType: error.constructor.name,
+                        isNetworkError: error instanceof TypeError || error instanceof NetworkError,
+                        errorMessage: error.message,
+                        onlineStatus: navigator.onLine,
+                        connectionType: navigator.connection ? navigator.connection.effectiveType : 'unknown'
+                    });
+                } finally {
+                    this.setLoadingState(false);
+                    this.notifier.log('=== REGISTRATION ATTEMPT COMPLETED ===');
+                }
+            }
 
-            function showAlert(message, type = 'info', autoDismiss = true) {
-                // Convert Bootstrap alert types to toast types
-                let toastType = type;
-                if (type === 'danger') {
-                    toastType = 'error';
+            async loadProvinsi() {
+                this.notifier.log('=== LOADING PROVINCES DATA ===');
+                alert('loadProvinsi called!');
+                try {
+                    this.notifier.log('Making API request to: index.php?controller=wilayah&action=getProvinsi');
+
+                    const response = await fetch('index.php?controller=wilayah&action=getProvinsi', {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    this.notifier.log('Provinces API response:', {
+                        status: response.status,
+                        statusText: response.statusText,
+                        ok: response.ok,
+                        url: response.url,
+                        headers: Object.fromEntries(response.headers.entries())
+                    });
+
+                    const responseText = await response.text();
+                    this.notifier.log('Raw response text:', responseText.substring(0, 500));
+
+                    let data;
+                    try {
+                        data = JSON.parse(responseText);
+                    } catch (jsonError) {
+                        this.notifier.error('Failed to parse JSON response:', jsonError.message);
+                        return;
+                    }
+
+                    this.notifier.log('Provinces data analysis:', {
+                        success: data.success,
+                        count: data.data ? data.data.length : 0,
+                        message: data.message,
+                        hasData: !!data.data,
+                        dataType: typeof data.data
+                    });
+
+                    const select = document.getElementById('provinsi_id');
+                    if (!select) {
+                        this.notifier.error('Provinsi select element not found!');
+                        return;
+                    }
+
+                    select.innerHTML = '<option value="">Pilih Provinsi</option>';
+
+                    if (data.success && data.data && Array.isArray(data.data)) {
+                        data.data.forEach((provinsi, index) => {
+                            const option = document.createElement('option');
+                            option.value = provinsi.id;
+                            option.textContent = provinsi.nama;
+                            select.appendChild(option);
+                        });
+                        this.notifier.success(`${data.data.length} provinsi berhasil dimuat`);
+                        this.notifier.log('Provinces options created successfully:', {
+                            count: data.data.length,
+                            firstProvince: data.data[0],
+                            lastProvince: data.data[data.data.length - 1]
+                        });
+                    } else {
+                        this.notifier.warning('Gagal memuat data provinsi');
+                        this.notifier.log('Provinces API unexpected response:', data);
+                    }
+                } catch (error) {
+                    this.notifier.error('Gagal menghubungi server untuk data provinsi');
+                    this.notifier.error('Provinces API error:', {
+                        message: error.message,
+                        name: error.name,
+                        stack: error.stack
+                    });
+                }
+            }
+
+            async loadKabupaten() {
+                const provinsiId = document.getElementById('provinsi_id').value;
+                const select = document.getElementById('kabupaten_id');
+                const kecamatanSelect = document.getElementById('kecamatan_id');
+                const desaSelect = document.getElementById('desa_id');
+
+                if (!provinsiId) {
+                    select.disabled = true;
+                    kecamatanSelect.disabled = true;
+                    desaSelect.disabled = true;
+                    return;
                 }
 
-                showToast(message, toastType);
-            }
+                this.notifier.log(`=== LOADING KABUPATEN FOR PROVINCE: ${provinsiId} ===`);
 
-            // Auto-focus on nama field
-            document.getElementById('nama').focus();
+                try {
+                    const response = await fetch(`index.php?controller=wilayah&action=getKabupaten&id=${provinsiId}`);
+                    const data = await response.json();
 
-            // Prevent form resubmission on page refresh
-            if (window.history.replaceState) {
-                window.history.replaceState(null, null, window.location.href);
-            }
-
+                    this.notifier.log('Kabupaten API response:', {
+                        status: response.status,
+                        success: data.success,
+                        count: data.data ? data.data.length : 0
                     });
+
+                    select.disabled = false;
+                    kecamatanSelect.disabled = true;
+                    desaSelect.disabled = true;
+                    select.innerHTML = '<option value="">Pilih Kabupaten</option>';
+
+                    if (data.success && data.data && Array.isArray(data.data)) {
+                        data.data.forEach(kabupaten => {
+                            const option = document.createElement('option');
+                            option.value = kabupaten.id;
+                            option.textContent = kabupaten.nama;
+                            select.appendChild(option);
+                        });
+                        this.notifier.success(`${data.data.length} kabupaten berhasil dimuat`);
+                    } else {
+                        this.notifier.warning('Gagal memuat data kabupaten');
+                    }
+                } catch (error) {
+                    this.notifier.error('Gagal menghubungi server untuk data kabupaten');
+                    this.notifier.error('Kabupaten API error:', error);
+                }
+            }
+
+            async loadKecamatan() {
+                const kabupatenId = document.getElementById('kabupaten_id').value;
+                const select = document.getElementById('kecamatan_id');
+                const desaSelect = document.getElementById('desa_id');
+
+                if (!kabupatenId) {
+                    select.disabled = true;
+                    desaSelect.disabled = true;
+                    return;
+                }
+
+                this.notifier.log(`=== LOADING KECAMATAN FOR KABUPATEN: ${kabupatenId} ===`);
+
+                try {
+                    const response = await fetch(`index.php?controller=wilayah&action=getKecamatan&id=${kabupatenId}`);
+                    const data = await response.json();
+
+                    select.disabled = false;
+                    desaSelect.disabled = true;
+                    select.innerHTML = '<option value="">Pilih Kecamatan</option>';
+
+                    if (data.success && data.data && Array.isArray(data.data)) {
+                        data.data.forEach(kecamatan => {
+                            const option = document.createElement('option');
+                            option.value = kecamatan.id;
+                            option.textContent = kecamatan.nama;
+                            select.appendChild(option);
+                        });
+                        this.notifier.success(`${data.data.length} kecamatan berhasil dimuat`);
+                    } else {
+                        this.notifier.warning('Gagal memuat data kecamatan');
+                    }
+                } catch (error) {
+                    this.notifier.error('Gagal menghubungi server untuk data kecamatan');
+                    this.notifier.error('Kecamatan API error:', error);
+                }
+            }
+
+            async loadDesa() {
+                const kecamatanId = document.getElementById('kecamatan_id').value;
+                const select = document.getElementById('desa_id');
+
+                if (!kecamatanId) {
+                    select.disabled = true;
+                    return;
+                }
+
+                this.notifier.log(`=== LOADING DESA FOR KECAMATAN: ${kecamatanId} ===`);
+
+                try {
+                    const response = await fetch(`index.php?controller=wilayah&action=getDesa&id=${kecamatanId}`);
+                    const data = await response.json();
+
+                    select.disabled = false;
+                    select.innerHTML = '<option value="">Pilih Desa</option>';
+
+                    if (data.success && data.data && Array.isArray(data.data)) {
+                        data.data.forEach(desa => {
+                            const option = document.createElement('option');
+                            option.value = desa.id;
+                            option.textContent = desa.nama;
+                            select.appendChild(option);
+                        });
+                        this.notifier.success(`${data.data.length} desa berhasil dimuat`);
+                    } else {
+                        this.notifier.warning('Gagal memuat data desa');
+                    }
+                } catch (error) {
+                    this.notifier.error('Gagal menghubungi server untuk data desa');
+                    this.notifier.error('Desa API error:', error);
+                }
+            }
+
+            setLoadingState(loading) {
+                if (loading) {
+                    this.submitBtn.disabled = true;
+                    this.submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Mendaftar...';
+                    this.notifier.info('Sedang memproses pendaftaran...');
+                    this.notifier.log('Loading state activated');
+                } else {
+                    this.submitBtn.disabled = false;
+                    this.submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> <span>Daftar Sekarang</span>';
+                    this.notifier.log('Loading state cleared');
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const modernRegister = new ModernRegisterHandler();
+            modernRegister.notifier.log('=== MODERN REGISTER PAGE FULLY LOADED ===');
+        });
     </script>
 </body>
 </html>
