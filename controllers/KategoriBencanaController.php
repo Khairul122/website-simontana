@@ -150,20 +150,10 @@ class KategoriBencanaController
         $response = $this->service->create($data);
 
         if ($response['success']) {
-            $_SESSION['toast_message'] = [
-                'type' => 'success',
-                'title' => 'Berhasil',
-                'message' => 'Kategori bencana berhasil ditambahkan'
-            ];
+            header('Location: index.php?controller=KategoriBencana&action=index&success=' . urlencode('Kategori bencana berhasil ditambahkan'));
         } else {
-            $_SESSION['toast_message'] = [
-                'type' => 'error',
-                'title' => 'Error',
-                'message' => $response['message'] ?? 'Gagal menambahkan kategori bencana'
-            ];
+            header('Location: index.php?controller=KategoriBencana&action=index&error=' . urlencode($response['message'] ?? 'Gagal menambahkan kategori bencana'));
         }
-
-        header('Location: index.php?controller=KategoriBencana&action=index');
         exit();
     }
 
@@ -215,20 +205,10 @@ class KategoriBencanaController
         $response = $this->service->update($id, $data);
 
         if ($response['success']) {
-            $_SESSION['toast_message'] = [
-                'type' => 'success',
-                'title' => 'Berhasil',
-                'message' => 'Kategori bencana berhasil diperbarui'
-            ];
+            header('Location: index.php?controller=KategoriBencana&action=index&success=' . urlencode('Kategori bencana berhasil diperbarui'));
         } else {
-            $_SESSION['toast_message'] = [
-                'type' => 'error',
-                'title' => 'Error',
-                'message' => $response['message'] ?? 'Gagal memperbarui kategori bencana'
-            ];
+            header('Location: index.php?controller=KategoriBencana&action=index&error=' . urlencode($response['message'] ?? 'Gagal memperbarui kategori bencana'));
         }
-
-        header('Location: index.php?controller=KategoriBencana&action=index');
         exit();
     }
 
@@ -257,20 +237,10 @@ class KategoriBencanaController
         $response = $this->service->delete($id);
 
         if ($response['success']) {
-            $_SESSION['toast_message'] = [
-                'type' => 'success',
-                'title' => 'Berhasil',
-                'message' => 'Kategori bencana berhasil dihapus'
-            ];
+            header('Location: index.php?controller=KategoriBencana&action=index&success=' . urlencode('Kategori bencana berhasil dihapus'));
         } else {
-            $_SESSION['toast_message'] = [
-                'type' => 'error',
-                'title' => 'Error',
-                'message' => $response['message'] ?? 'Gagal menghapus kategori bencana'
-            ];
+            header('Location: index.php?controller=KategoriBencana&action=index&error=' . urlencode($response['message'] ?? 'Gagal menghapus kategori bencana'));
         }
-
-        header('Location: index.php?controller=KategoriBencana&action=index');
         exit();
     }
 }

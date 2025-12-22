@@ -145,6 +145,42 @@ unset($_SESSION['server_response_edit']);
       <?php unset($_SESSION['toast_message']); ?>
     <?php endif; ?>
   </script>
+
+  <!-- Server Response Toast Notifications -->
+  <script>
+    // Show toast for server responses
+    function showServerResponseToast(icon, title, message) {
+      if (typeof Swal !== 'undefined') {
+        Swal.fire({
+          icon: icon,
+          title: title,
+          text: message,
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        });
+      } else {
+        // Fallback to native alert if Swal is not available
+        alert(`${title}: ${message}`);
+      }
+    }
+
+    // Handle success responses
+    <?php if (isset($_GET['success'])): ?>
+      showServerResponseToast('success', 'Berhasil', '<?php echo htmlspecialchars(urldecode($_GET['success'])); ?>');
+    <?php endif; ?>
+
+    // Handle error responses
+    <?php if (isset($_GET['error'])): ?>
+      showServerResponseToast('error', 'Gagal', '<?php echo htmlspecialchars(urldecode($_GET['error'])); ?>');
+    <?php endif; ?>
+  </script>
 </body>
 
 </html>
