@@ -10,9 +10,9 @@
 
     <!-- User Management -->
     <li class="nav-item">
-      <a class="nav-link" href="index.php?controller=user&action=index">
+      <a class="nav-link" href="index.php?controller=KategoriBencana&action=index">
         <i class="mdi mdi-account-group menu-icon"></i>
-        <span class="menu-title">Manajemen User</span>
+        <span class="menu-title">Manajemen Kategori Bencana</span>
       </a>
     </li>
 
@@ -48,13 +48,13 @@
       <div class="collapse" id="kategori-menu">
         <ul class="nav flex-column sub-menu">
           <li class="nav-item">
-            <a class="nav-link" href="index.php?controller=kategori&action=index">Daftar Kategori</a>
+            <a class="nav-link" href="index.php?controller=KategoriBencana&action=index">Daftar Kategori</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="index.php?controller=kategori&action=form">Tambah Kategori</a>
+            <a class="nav-link" href="index.php?controller=KategoriBencana&action=create">Tambah Kategori</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="index.php?controller=kategori&action=statistics">Statistik Kategori</a>
+            <a class="nav-link" href="index.php?controller=KategoriBencana&action=statistics">Statistik Kategori</a>
           </li>
         </ul>
       </div>

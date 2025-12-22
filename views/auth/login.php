@@ -1,635 +1,483 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - SIMONTA BENCANA</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title><?= $title ?></title>
+  <link rel="stylesheet" href="assets/vendors/feather/feather.css" />
+  <link rel="stylesheet" href="assets/vendors/mdi/css/materialdesignicons.min.css" />
+  <link rel="stylesheet" href="assets/vendors/ti-icons/css/themify-icons.css" />
+  <link rel="stylesheet" href="assets/vendors/typicons/typicons.css" />
+  <link rel="stylesheet" href="assets/vendors/simple-line-icons/css/simple-line-icons.css" />
+  <link rel="stylesheet" href="assets/vendors/css/vendor.bundle.base.css" />
+  <link rel="stylesheet" href="assets/css/vertical-layout-light/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="assets/vendors/datatables.net-bs4/dataTables.bootstrap4.css" />
+  <link rel="stylesheet" type="text/css" href="assets/js/select.dataTables.min.css" />
+  <link rel="shortcut icon" href="assets/images/favicon.png" />
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f8f9fa;
+    }
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            height: 100vh;
-            overflow: hidden;
-        }
+    .login-container {
+      display: flex;
+      min-height: 100vh;
+    }
 
-        .login-container {
-            display: flex;
-            height: 100vh;
-            position: relative;
-        }
+    .login-left {
+      flex: 1;
+      background-color: #4051b5;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
 
-        /* Left Panel - Branding */
-        .brand-panel {
-            flex: 1;
-            background: #0d6efd;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 3rem;
-            position: relative;
-            overflow: hidden;
-        }
+    .login-right {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      background-color: white;
+    }
 
-        .brand-panel::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: float 20s infinite ease-in-out;
-        }
+    .login-card {
+      width: 100%;
+      max-width: 400px;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(180deg); }
-        }
+    .logo-section {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
 
-        .brand-content {
-            text-align: center;
-            z-index: 2;
-            max-width: 400px;
-        }
+    .logo-section h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      color: #4051b5;
+    }
 
-        .brand-logo {
-            width: 120px;
-            height: 120px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 2rem;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
+    .logo-section p {
+      color: #6c757d;
+      margin: 0;
+    }
 
-        .brand-logo i {
-            font-size: 3rem;
-            color: white;
-        }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
 
-        .brand-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            letter-spacing: -0.025em;
-        }
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #495057;
+    }
 
-        .brand-subtitle {
-            font-size: 1.1rem;
-            opacity: 0.9;
-            margin-bottom: 2rem;
-            line-height: 1.6;
-        }
+    .form-control {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid #ced4da;
+      border-radius: 5px;
+      font-size: 1rem;
+      transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
 
-        .brand-features {
-            text-align: left;
-            margin-top: 3rem;
-        }
+    .form-control:focus {
+      border-color: #4051b5;
+      box-shadow: 0 0 0 0.2rem rgba(64, 81, 181, 0.25);
+      outline: 0;
+    }
 
-        .feature-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
-            opacity: 0.9;
-        }
+    .input-group {
+      position: relative;
+    }
 
-        .feature-item i {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 1rem;
-            font-size: 1.1rem;
-        }
+    .input-group-text {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      color: #6c757d;
+      z-index: 10;
+    }
 
-        /* Right Panel - Login Form */
-        .login-panel {
-            flex: 1;
-            background: #ffffff;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
+    .input-with-icon {
+      padding-left: 3rem;
+    }
 
-        .login-header {
-            padding: 3rem 3rem 1rem;
-            text-align: center;
-        }
+    .btn {
+      padding: 0.75rem 1rem;
+      border-radius: 5px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
 
-        .login-header h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 0.5rem;
-            letter-spacing: -0.025em;
-        }
+    .btn-primary {
+      background-color: #4051b5;
+      border: none;
+      color: white;
+      width: 100%;
+    }
 
-        .login-header p {
-            color: #6b7280;
-            font-size: 1rem;
-            margin: 0;
-        }
+    .btn-primary:hover {
+      background-color: #34418c;
+    }
 
-        .login-form-container {
-            flex: 1;
-            padding: 0 3rem 2rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
+    .auth-link {
+      text-align: center;
+      display: block;
+      margin-top: 1rem;
+      color: #4051b5;
+      text-decoration: none;
+    }
 
-        .form-floating {
-            margin-bottom: 1.5rem;
-        }
+    .auth-link:hover {
+      text-decoration: underline;
+    }
 
-        .form-floating > label {
-            color: #9ca3af;
-            padding: 1rem 0.75rem;
-        }
+    .features {
+      text-align: center;
+      margin-top: 2rem;
+    }
 
-        .form-floating > .form-control:focus ~ label,
-        .form-floating > .form-control:not(:placeholder-shown) ~ label {
-            color: #0d6efd;
-        }
+    .features h4 {
+      color: white;
+      margin-bottom: 1rem;
+    }
 
-        .form-control {
-            border: 2px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 1rem 0.75rem;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            height: auto;
-        }
+    .features ul {
+      list-style: none;
+      padding: 0;
+    }
 
-        .form-control:focus {
-            border-color: #0d6efd;
-            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
-        }
+    .features li {
+      padding: 0.5rem 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-        .btn-login {
-            background: #0d6efd;
-            border: none;
-            border-radius: 12px;
-            padding: 1rem;
-            font-size: 1rem;
-            font-weight: 600;
-            color: white;
-            transition: all 0.3s ease;
-            margin-top: 1rem;
-        }
+    .features i {
+      margin-right: 0.5rem;
+      color: #4ade80;
+    }
 
-        .btn-login:hover {
-            background: #0b5ed7;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(13, 110, 253, 0.3);
-        }
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      max-width: 400px;
+    }
 
-        .btn-login:disabled {
-            opacity: 0.7;
-            transform: none;
-            box-shadow: none;
-        }
+    .custom-toast {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      margin-bottom: 10px;
+      padding: 16px;
+      border-left: 4px solid;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      animation: slideInRight 0.3s ease-out;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
 
-        .alert {
-            border-radius: 12px;
-            border: none;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-        }
+    .custom-toast.hiding {
+      animation: slideOutRight 0.3s ease-out;
+      opacity: 0;
+      transform: translateX(100%);
+    }
 
-        .divider {
-            display: flex;
-            align-items: center;
-            margin: 1.5rem 0;
-            color: #9ca3af;
-            font-size: 0.875rem;
-        }
+    .custom-toast.success {
+      border-left-color: #10b981;
+      background-color: #f0fdf4;
+    }
 
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: #e5e7eb;
-        }
+    .custom-toast.error {
+      border-left-color: #ef4444;
+      background-color: #fef2f2;
+    }
 
-        .divider span {
-            padding: 0 1rem;
-        }
+    .custom-toast.warning {
+      border-left-color: #f59e0b;
+      background-color: #fffbeb;
+    }
 
-        .register-link {
-            text-align: center;
-            margin-top: 2rem;
-            color: #6b7280;
-        }
+    .custom-toast.info {
+      border-left-color: #3b82f6;
+      background-color: #eff6ff;
+    }
 
-        .register-link a {
-            color: #0d6efd;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
+    .toast-icon {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: white;
+      font-weight: 600;
+    }
 
-        .register-link a:hover {
-            color: #0b5ed7;
-        }
+    .custom-toast.success .toast-icon { background: #10b981; }
+    .custom-toast.error .toast-icon { background: #ef4444; }
+    .custom-toast.warning .toast-icon { background: #f59e0b; }
+    .custom-toast.info .toast-icon { background: #3b82f6; }
 
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .brand-panel {
-                display: none;
-            }
+    .toast-content {
+      flex: 1;
+    }
 
-            .login-panel {
-                flex: 1;
-            }
+    .toast-title {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 4px;
+      color: #1f2937;
+    }
 
-            .login-header {
-                padding: 2rem 1.5rem 1rem;
-            }
+    .toast-message {
+      font-size: 13px;
+      color: #64748b;
+      line-height: 1.4;
+    }
 
-            .login-form-container {
-                padding: 0 1.5rem 2rem;
-            }
-        }
+    .toast-close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: none;
+      border: none;
+      font-size: 16px;
+      color: #9ca3af;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
 
-        /* Toast Container */
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-        }
+    .toast-close:hover {
+      color: #64748b;
+      background: #e5e7eb;
+    }
 
-        .toast {
-            border-radius: 12px;
-            border: none;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-    </style>
+    .toast-progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      background: currentColor;
+      opacity: 0.2;
+      animation: progress 5s linear forwards;
+    }
+
+    @keyframes slideInRight {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes slideOutRight {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(100%); opacity: 0; }
+    }
+
+    @keyframes progress {
+      from { width: 100%; }
+      to { width: 0%; }
+    }
+
+    @media (max-width: 991px) {
+      .login-container {
+        flex-direction: column;
+      }
+
+      .login-left {
+        padding: 1rem;
+      }
+
+      .login-right {
+        padding: 1rem;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="login-container">
-        <!-- Left Panel - Branding -->
-        <div class="brand-panel">
-            <div class="brand-content">
-                <div class="brand-logo">
-                    <i class="fas fa-hand-holding-medical"></i>
-                </div>
-                <h1 class="brand-title">SIMONTA BENCANA</h1>
-                <p class="brand-subtitle">
-                    Sistem Informasi Monitoring dan Penanganan Bencana Terintegrasi
-                </p>
-
-                <div class="brand-features">
-                    <div class="feature-item">
-                        <i class="fas fa-shield-alt"></i>
-                        <div>
-                            <strong>Real-time Monitoring</strong>
-                            <div class="small">Pantau kondisi bencana 24/7</div>
-                        </div>
-                    </div>
-                    <div class="feature-item">
-                        <i class="fas fa-users"></i>
-                        <div>
-                            <strong>Multi-Role Access</strong>
-                            <div class="small">Admin, Petugas, Operator, Warga</div>
-                        </div>
-                    </div>
-                    <div class="feature-item">
-                        <i class="fas fa-cloud-sun"></i>
-                        <div>
-                            <strong>BMKG Integration</strong>
-                            <div class="small">Data cuaca dan peringatan dini</div>
-                        </div>
-                    </div>
-                    <div class="feature-item">
-                        <i class="fas fa-map-marked-alt"></i>
-                        <div>
-                            <strong>Geo-tagging</strong>
-                            <div class="small">Lokasi presisi laporan bencana</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <div class="login-container">
+    <div class="login-left">
+      <div class="text-center">
+        <h2 class="mb-4">SIMONTA BENCANA</h2>
+        <p class="mb-5">Sistem Informasi Monitoring dan Pelaporan Bencana</p>
+        <div class="features">
+          <h4>Alur Pelaporan</h4>
+          <ul class="text-left">
+            <li><i class="fas fa-check-circle"></i> Melapor</li>
+            <li><i class="fas fa-check-circle"></i> Verifikasi</li>
+            <li><i class="fas fa-check-circle"></i> Penanganan</li>
+            <li><i class="fas fa-check-circle"></i> Penyelesaian</li>
+          </ul>
         </div>
-
-        <!-- Right Panel - Login Form -->
-        <div class="login-panel">
-            <div class="login-header">
-                <h1>Selamat Datang Kembali</h1>
-                <p>Masuk ke dashboard SIMONTA BENCANA Anda</p>
-            </div>
-
-            <div class="login-form-container">
-                <?php if (isset($error)): ?>
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <i class="fas fa-exclamation-circle me-2"></i>
-                        <?php echo htmlspecialchars($error); ?>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                <?php endif; ?>
-
-                <?php if (isset($success)): ?>
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <i class="fas fa-check-circle me-2"></i>
-                        <?php echo htmlspecialchars($success); ?>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                <?php endif; ?>
-
-                <form method="POST" action="index.php?controller=auth&action=login">
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="username" name="username"
-                               placeholder="name@example.com" required>
-                        <label for="username">Username</label>
-                    </div>
-
-                    <div class="form-floating mb-3">
-                        <input type="password" class="form-control" id="password" name="password"
-                               placeholder="Password" required>
-                        <label for="password">Password</label>
-                    </div>
-
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-login">
-                            Masuk ke Dashboard
-                        </button>
-                    </div>
-                </form>
-
-                
-                <div class="register-link">
-                    Belum punya akun? <a href="index.php?controller=auth&action=register">Daftar sekarang</a>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
 
-    <!-- Include the existing JavaScript code for logging and authentication -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        class AuthNotifier {
-            constructor() {
-                this.toastContainer = this.createToastContainer();
-            }
+    <div class="login-right">
+      <div class="login-card">
+        <div class="logo-section">
+          <h1>SIMONTA</h1>
+          <p>Sistem Informasi Monitoring dan Pelaporan Bencana</p>
+        </div>
 
-            createToastContainer() {
-                const container = document.createElement('div');
-                container.id = 'toast-container';
-                container.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    z-index: 9999;
-                `;
-                document.body.appendChild(container);
-                return container;
-            }
+        <form method="POST" action="index.php?controller=Auth&action=processLogin">
+          <div class="form-group">
+            <label for="username" class="form-label">Username atau Email</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-user"></i></span>
+              <input type="text" class="form-control input-with-icon" id="username" name="username" placeholder="Masukkan username atau email" required>
+            </div>
+          </div>
 
-            log(message, data = null) {
-                console.log(`[AUTH] ${message}`, data || '');
-            }
+          <div class="form-group">
+            <label for="password" class="form-label">Kata Sandi</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-lock"></i></span>
+              <input type="password" class="form-control input-with-icon" id="password" name="password" placeholder="Masukkan kata sandi" required>
+            </div>
+          </div>
 
-            error(message, data = null) {
-                console.error(`[AUTH ERROR] ${message}`, data || '');
-                this.showToast(message, 'danger');
-            }
+          <button type="submit" class="btn btn-primary">MASUK</button>
 
-            success(message, data = null) {
-                console.log(`[AUTH SUCCESS] ${message}`, data || '');
-                this.showToast(message, 'success');
-            }
+          <a href="index.php?controller=Auth&action=register" class="auth-link">Buat akun baru</a>
+        </form>
+      </div>
+    </div>
+  </div>
 
-            warning(message, data = null) {
-                console.warn(`[AUTH WARNING] ${message}`, data || '');
-                this.showToast(message, 'warning');
-            }
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
 
-            info(message, data = null) {
-                console.info(`[AUTH INFO] ${message}`, data || '');
-                this.showToast(message, 'info');
-            }
+  <script src="assets/vendors/js/vendor.bundle.base.js"></script>
+  <script src="assets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
+  <script src="assets/js/off-canvas.js"></script>
+  <script src="assets/js/hoverable-collapse.js"></script>
+  <script src="assets/js/template.js"></script>
+  <script src="assets/js/settings.js"></script>
+  <script src="assets/js/todolist.js"></script>
 
-            showToast(message, type = 'info') {
-                const toastId = 'toast-' + Date.now();
-                const toastHtml = `
-                    <div id="${toastId}" class="toast align-items-center text-white bg-${type} border-0 mb-2" role="alert">
-                        <div class="d-flex">
-                            <div class="toast-body">
-                                ${this.getToastIcon(type)} ${message}
-                            </div>
-                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                        </div>
-                    </div>
-                `;
+  <script>
+    // Fungsi untuk menampilkan toast notification
+    function showToast(type, title, message) {
+      const toastContainer = document.getElementById('toastContainer');
 
-                this.toastContainer.insertAdjacentHTML('beforeend', toastHtml);
-                const toastElement = document.getElementById(toastId);
-                const toast = new bootstrap.Toast(toastElement, { delay: 5000 });
+      const toast = document.createElement('div');
+      toast.className = `custom-toast ${type}`;
 
-                toastElement.addEventListener('hidden.bs.toast', () => {
-                    toastElement.remove();
-                });
+      toast.innerHTML = `
+        <div class="toast-icon">${type === 'success' ? '✓' : '!'}</div>
+        <div class="toast-content">
+          <div class="toast-title">${title}</div>
+          <div class="toast-message">${message}</div>
+        </div>
+        <button class="toast-close">&times;</button>
+        <div class="toast-progress"></div>
+      `;
 
-                toast.show();
-                this.log(`Toast shown: ${type} - ${message}`);
-            }
+      toastContainer.appendChild(toast);
 
-            getToastIcon(type) {
-                const icons = {
-                    success: '<i class="fas fa-check-circle me-2"></i>',
-                    danger: '<i class="fas fa-exclamation-triangle me-2"></i>',
-                    warning: '<i class="fas fa-exclamation-circle me-2"></i>',
-                    info: '<i class="fas fa-info-circle me-2"></i>'
-                };
-                return icons[type] || icons.info;
-            }
+      // Tambahkan event listener untuk tombol close
+      const closeBtn = toast.querySelector('.toast-close');
+      closeBtn.addEventListener('click', function() {
+        toast.classList.add('hiding');
+        setTimeout(() => {
+          toast.remove();
+        }, 300);
+      });
+
+      // Hapus toast setelah 5 detik
+      setTimeout(() => {
+        if (!toast.classList.contains('hiding')) {
+          toast.classList.add('hiding');
+          setTimeout(() => {
+            toast.remove();
+          }, 300);
+        }
+      }, 5000);
+
+      return toast;
+    }
+
+    // Tampilkan toast jika ada dari session
+    <?php if (isset($_SESSION['toast'])): ?>
+    document.addEventListener('DOMContentLoaded', function() {
+      const toast = showToast(
+        '<?php echo addslashes($_SESSION['toast']['type']); ?>',
+        '<?php echo addslashes($_SESSION['toast']['title']); ?>',
+        '<?php echo addslashes($_SESSION['toast']['message']); ?>'
+      );
+      <?php unset($_SESSION['toast']); ?>
+
+      // Jika redirect diperlukan setelah toast ditampilkan
+      <?php if (isset($should_redirect) && $should_redirect): ?>
+      setTimeout(() => {
+        // Redirect ke dashboard berdasarkan role
+        const role = '<?php echo $_SESSION['user_role'] ?? 'Warga'; ?>';
+        let redirectUrl = 'index.php?controller=Beranda&action=index'; // Default untuk Warga
+
+        switch(role) {
+          case 'Admin':
+          case 'PetugasBPBD':
+          case 'OperatorDesa':
+            redirectUrl = 'index.php?controller=Dashboard&action=index';
+            break;
+          default:
+            redirectUrl = 'index.php?controller=Beranda&action=index';
+            break;
         }
 
-        class AuthHandler {
-            constructor() {
-                this.notifier = new AuthNotifier();
-                this.form = document.querySelector('form');
-                this.submitBtn = this.form.querySelector('button[type="submit"]');
-                this.init();
-            }
+        window.location.href = redirectUrl;
+      }, 2000); // Tunggu 2 detik agar toast terlihat sebelum redirect
+      <?php endif; ?>
+    });
+    <?php endif; ?>
 
-            init() {
-                this.notifier.log('Modern Auth handler initialized');
-                this.setupEventListeners();
-                this.checkExistingMessages();
-            }
+    // Jika tidak ada toast tapi redirect diperlukan
+    <?php if (isset($should_redirect) && $should_redirect && !isset($_SESSION['toast'])): ?>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Redirect ke dashboard berdasarkan role
+      const role = '<?php echo $_SESSION['user_role'] ?? 'Warga'; ?>';
+      let redirectUrl = 'index.php?controller=Beranda&action=index'; // Default untuk Warga
 
-            setupEventListeners() {
-                this.form.addEventListener('submit', (e) => this.handleLogin(e));
-                this.form.addEventListener('input', (e) => this.handleInput(e));
-            }
+      switch(role) {
+        case 'Admin':
+        case 'PetugasBPBD':
+        case 'OperatorDesa':
+          redirectUrl = 'index.php?controller=Dashboard&action=index';
+          break;
+        default:
+          redirectUrl = 'index.php?controller=Beranda&action=index';
+          break;
+      }
 
-            checkExistingMessages() {
-                const errorAlert = document.querySelector('.alert-danger');
-                const successAlert = document.querySelector('.alert-success');
-
-                if (errorAlert) {
-                    const errorMsg = errorAlert.textContent.trim();
-                    this.notifier.error(errorMsg);
-                }
-
-                if (successAlert) {
-                    const successMsg = successAlert.textContent.trim();
-                    this.notifier.success(successMsg);
-                }
-            }
-
-            handleInput(e) {
-                const input = e.target;
-                if (input.type === 'text' || input.type === 'password') {
-                    this.notifier.log(`User typing in ${input.name}`, {
-                        field: input.name,
-                        valueLength: input.value.length
-                    });
-                }
-            }
-
-            async handleLogin(e) {
-                e.preventDefault();
-
-                const formData = new FormData(this.form);
-                const loginData = {
-                    username: formData.get('username'),
-                    password: formData.get('password')
-                };
-
-                this.notifier.log('Modern login attempt started', loginData);
-                this.setLoadingState(true);
-
-                try {
-                    const response = await fetch('index.php?controller=auth&action=login', {
-                        method: 'POST',
-                        body: formData
-                    });
-
-                    this.notifier.log('Modern login response received', {
-                        status: response.status,
-                        statusText: response.statusText,
-                        url: response.url,
-                        headers: Object.fromEntries(response.headers.entries()),
-                        ok: response.ok,
-                        redirected: response.redirected
-                    });
-
-                    const responseText = await response.text();
-
-                    this.notifier.log('Modern API Response Details', {
-                        responseLength: responseText.length,
-                        containsError: responseText.includes('alert-danger'),
-                        containsSuccess: responseText.includes('alert-success') || responseText.includes('dashboard'),
-                        isRedirect: response.redirected,
-                        finalUrl: response.url
-                    });
-
-                    // Try to parse as JSON if possible
-                    let jsonData = null;
-                    try {
-                        jsonData = JSON.parse(responseText);
-                        this.notifier.log('Modern API Response JSON', jsonData);
-                    } catch (jsonError) {
-                        this.notifier.log('Modern response is not JSON, treating as HTML');
-                    }
-
-                    if (response.ok && !responseText.includes('alert-danger')) {
-                        this.notifier.success('Login berhasil! Mengarahkan ke dashboard...');
-                        this.notifier.log('Modern login successful', {
-                            redirectUrl: response.url,
-                            hasJsonData: jsonData !== null,
-                            jsonData: jsonData
-                        });
-
-                        setTimeout(() => {
-                            window.location.href = response.url || 'index.php';
-                        }, 1500);
-                    } else {
-                        const errorMatch = responseText.match(/alert-danger[^>]*>([^<]+)/);
-                        const errorMessage = errorMatch ? errorMatch[1].trim() : 'Login gagal. Periksa kembali username dan password.';
-
-                        this.notifier.error(errorMessage);
-                        this.notifier.log('Modern login failed', {
-                            status: response.status,
-                            statusText: response.statusText,
-                            responseHeaders: Object.fromEntries(response.headers.entries()),
-                            responseText: responseText.substring(0, 500),
-                            fullResponseLength: responseText.length,
-                            jsonData: jsonData
-                        });
-                    }
-                } catch (error) {
-                    this.notifier.error('Terjadi gangguan koneksi. Silakan coba lagi.');
-                    this.notifier.error('Modern network error', {
-                        message: error.message,
-                        name: error.name,
-                        stack: error.stack
-                    });
-                    this.notifier.log('Modern network error details', {
-                        errorType: error.constructor.name,
-                        isNetworkError: error instanceof TypeError || error instanceof NetworkError,
-                        errorMessage: error.message
-                    });
-                } finally {
-                    this.setLoadingState(false);
-                }
-            }
-
-            setLoadingState(loading) {
-                if (loading) {
-                    this.submitBtn.disabled = true;
-                    this.submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Memproses...';
-                    this.notifier.info('Sedang memproses login...');
-                } else {
-                    this.submitBtn.disabled = false;
-                    this.submitBtn.innerHTML = 'Masuk ke Dashboard';
-                    this.notifier.log('Loading state cleared');
-                }
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('[MODERN AUTH] Modern login page loaded');
-            console.log('[MODERN AUTH] Design: Vertical half layout with modern aesthetics');
-            console.log('[MODERN AUTH] Features: Clean, minimal, practical');
-
-            // Add modern UX enhancements
-            const inputs = document.querySelectorAll('input[type="text"], input[type="password"]');
-            inputs.forEach(input => {
-                input.addEventListener('focus', function() {
-                    this.parentElement.classList.add('focused');
-                });
-                input.addEventListener('blur', function() {
-                    this.parentElement.classList.remove('focused');
-                });
-            });
-
-            // Initialize modern authentication handler
-            new AuthHandler();
-        });
-    </script>
+      window.location.href = redirectUrl;
+    });
+    <?php endif; ?>
+  </script>
 </body>
 </html>

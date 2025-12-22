@@ -8,6 +8,6 @@
 <script src="assets/js/settings.js"></script>
 <script src="assets/js/todolist.js"></script>
 <script src="assets/js/jquery.cookie.js" type="text/javascript"></script>
-<script src="assets/js/dashboard.js"></script>
-<script src="assets/js/proBanner.js"></script>
+<!-- <script src="assets/js/dashboard.js"></script> commented out to prevent canvas conflicts -->
+<!-- <script src="assets/js/proBanner.js"></script> commented out to prevent template ads errors -->
 

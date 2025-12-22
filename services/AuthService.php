@@ -1,105 +1,121 @@
 <?php
+require_once 'config/koneksi.php';
 
 class AuthService {
-    private $apiClient;
 
-    public function __construct($apiClient) {
-        $this->apiClient = $apiClient;
-    }
+    public function login($username, $password) {
+        $data = [
+            'username' => $username,
+            'password' => $password
+        ];
 
-    public function authenticate($username, $password) {
-        try {
-            $response = $this->apiClient->login($username, $password);
+        // Tidak perlu header otentikasi untuk login
+        $response = apiRequest(API_LOGIN, 'POST', $data);
 
-            return [
-                'success' => $response['success'] ?? false,
-                'data' => $response['data'] ?? null,
-                'message' => $response['message'] ?? ($response['success'] ? 'Login berhasil' : 'Login gagal')
-            ];
-        } catch (Exception $e) {
-            return [
-                'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
-            ];
+        if ($response['success']) {
+            // Simpan token dan data pengguna ke session
+            if (isset($response['data']['token'])) {
+                $_SESSION['token'] = $response['data']['token'];
+            }
+
+            if (isset($response['data']['user'])) {
+                $_SESSION['user'] = $response['data']['user'];
+            }
         }
+
+        return $response;
     }
 
     public function register($userData) {
-        try {
-            $response = $this->apiClient->register($userData);
+        // Tidak perlu header otentikasi untuk register
+        $response = apiRequest(API_REGISTER, 'POST', $userData);
 
-            return [
-                'success' => $response['success'] ?? false,
-                'data' => $response['data'] ?? null,
-                'message' => $response['message'] ?? ($response['success'] ? 'Registrasi berhasil' : 'Registrasi gagal'),
-                'errors' => $response['errors'] ?? []
-            ];
-        } catch (Exception $e) {
-            return [
-                'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
-                'errors' => []
-            ];
+        if ($response['success']) {
+            // Jika registrasi berhasil, simpan token jika sudah dikembalikan
+            if (isset($response['data']['token'])) {
+                $_SESSION['token'] = $response['data']['token'];
+            }
+
+            if (isset($response['data']['user'])) {
+                $_SESSION['user'] = $response['data']['user'];
+            }
         }
+
+        return $response;
     }
 
     public function logout() {
-        try {
-            $this->apiClient->logout();
-            return true;
-        } catch (Exception $e) {
-            return false;
-        }
-    }
+        if (isset($_SESSION['token'])) {
+            $headers = getAuthHeaders($_SESSION['token']);
+            $response = apiRequest(API_LOGOUT, 'POST', null, $headers);
 
-    public function getProfile() {
-        try {
-            $response = $this->apiClient->getProfile();
+            // Hapus session lokal terlepas dari apakah API logout sukses atau tidak
+            session_destroy();
 
+            return $response;
+        } else {
+            session_destroy();
             return [
-                'success' => $response['success'] ?? false,
-                'data' => $response['data'] ?? null,
-                'message' => $response['message'] ?? ($response['success'] ? 'Profile berhasil diambil' : 'Gagal mengambil profile')
-            ];
-        } catch (Exception $e) {
-            return [
-                'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'success' => true,
+                'message' => 'Berhasil logout',
+                'data' => null
             ];
         }
     }
 
-    public function updateProfile($profileData) {
-        try {
-            $response = $this->apiClient->put('auth/profile', $profileData);
+    public function getCurrentUser() {
+        if (isset($_SESSION['token']) && isset($_SESSION['user'])) {
+            // Kembalikan data user dari session
+            return [
+                'success' => true,
+                'message' => 'Data user ditemukan',
+                'data' => $_SESSION['user']
+            ];
+        } else {
+            // Coba panggil API untuk mendapatkan data user
+            if (isset($_SESSION['token'])) {
+                $headers = getAuthHeaders($_SESSION['token']);
+                $response = apiRequest(API_ME, 'GET', null, $headers);
 
-            return [
-                'success' => $response['success'] ?? false,
-                'data' => $response['data'] ?? null,
-                'message' => $response['message'] ?? ($response['success'] ? 'Profile berhasil diperbarui' : 'Gagal memperbarui profile')
-            ];
-        } catch (Exception $e) {
-            return [
-                'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
-            ];
+                if ($response['success']) {
+                    $_SESSION['user'] = $response['data'];
+                    return $response;
+                } else {
+                    // Jika API gagal, hapus session
+                    unset($_SESSION['token']);
+                    unset($_SESSION['user']);
+                    return [
+                        'success' => false,
+                        'message' => 'Token tidak valid',
+                        'data' => null
+                    ];
+                }
+            } else {
+                return [
+                    'success' => false,
+                    'message' => 'User tidak login',
+                    'data' => null
+                ];
+            }
         }
     }
 
-    public function changePassword($passwordData) {
-        try {
-            $response = $this->apiClient->put('auth/change-password', $passwordData);
+    public function refreshToken() {
+        if (isset($_SESSION['token'])) {
+            $headers = getAuthHeaders($_SESSION['token']);
+            $response = apiRequest(API_REFRESH, 'POST', null, $headers);
 
-            return [
-                'success' => $response['success'] ?? false,
-                'message' => $response['message'] ?? ($response['success'] ? 'Password berhasil diubah' : 'Gagal mengubah password')
-            ];
-        } catch (Exception $e) {
+            if ($response['success'] && isset($response['data']['token'])) {
+                $_SESSION['token'] = $response['data']['token'];
+            }
+
+            return $response;
+        } else {
             return [
                 'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'message' => 'Token tidak ditemukan',
+                'data' => null
             ];
         }
     }
 }
-?>

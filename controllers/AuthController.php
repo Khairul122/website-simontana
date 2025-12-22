@@ -1,120 +1,200 @@
 <?php
-
-require_once __DIR__ . '/../services/AuthService.php';
-require_once __DIR__ . '/../config/globals.php';
+require_once 'services/AuthService.php';
 
 class AuthController {
     private $authService;
-    private $globalEnv;
-
+    
     public function __construct() {
-        $this->globalEnv = globalEnv();
-        $this->authService = new AuthService($this->globalEnv->getAPIClient());
+        $this->authService = new AuthService();
     }
-
-    public function index() {
-        if ($this->globalEnv->isLoggedIn()) {
-            $this->globalEnv->redirectBasedOnRole();
-            return;
-        }
-
-        header('Location: index.php?controller=auth&action=login');
-        exit;
-    }
-
+    
     public function login() {
-        if ($this->globalEnv->isLoggedIn()) {
-            $this->globalEnv->redirectBasedOnRole();
+        // Jika user sudah login, redirect ke dashboard
+        $currentUser = $this->authService->getCurrentUser();
+        if ($currentUser['success']) {
+            $this->redirectToDashboard($currentUser['data']['role']);
             return;
         }
 
+        // Jika ada redirect setelah login berhasil
+        if (isset($_SESSION['redirect_after_login']) && $_SESSION['redirect_after_login']) {
+            $role = $_SESSION['user_role'] ?? 'Warga';
+            unset($_SESSION['redirect_after_login']);
+            unset($_SESSION['user_role']);
+
+            // Tampilkan halaman login dengan toast dan redirect script
+            $title = "Login - SIMONTA BENCANA";
+            $should_redirect = true;
+            include 'views/auth/login.php';
+            return;
+        }
+
+        // Tampilkan halaman login
+        $title = "Login - SIMONTA BENCANA";
+        $should_redirect = false;
+        include 'views/auth/login.php';
+    }
+    
+    public function processLogin() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $username = $_POST['username'] ?? '';
             $password = $_POST['password'] ?? '';
-
-            $result = $this->authService->authenticate($username, $password);
-
-            if ($result['success']) {
-                $this->globalEnv->login($result['data']['token']);
-                $this->globalEnv->redirectBasedOnRole();
-            } else {
-                $error = $result['message'];
-                require __DIR__ . '/../views/auth/login.php';
+            
+            if (empty($username) || empty($password)) {
+                $_SESSION['toast'] = [
+                    'type' => 'error',
+                    'title' => 'Gagal',
+                    'message' => 'Username dan password harus diisi'
+                ];
+                header('Location: index.php?controller=Auth&action=login');
+                return;
             }
-        } else {
-            require __DIR__ . '/../views/auth/login.php';
-        }
-    }
+            
+            $response = $this->authService->login($username, $password);
 
+            if ($response['success']) {
+                // Login berhasil, simpan informasi redirect ke session
+                $_SESSION['redirect_after_login'] = true;
+                $_SESSION['user_role'] = $response['data']['user']['role'];
+                $_SESSION['toast'] = [
+                    'type' => 'success',
+                    'title' => 'Berhasil',
+                    'message' => 'Login berhasil'
+                ];
+                header('Location: index.php?controller=Auth&action=login');
+                return;
+            } else {
+                // Login gagal
+                $_SESSION['toast'] = [
+                    'type' => 'error',
+                    'title' => 'Gagal',
+                    'message' => $response['message'] ?? 'Login gagal'
+                ];
+                header('Location: index.php?controller=Auth&action=login');
+                return;
+            }
+        }
+        
+        header('Location: index.php?controller=Auth&action=login');
+    }
+    
     public function register() {
-        if ($this->globalEnv->isLoggedIn()) {
-            $this->globalEnv->redirectBasedOnRole();
-            return;
-        }
-
+        // Tampilkan halaman register
+        $title = "Register - SIMONTA BENCANA";
+        include 'views/auth/register.php';
+    }
+    
+    public function processRegister() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $nama = $_POST['nama'] ?? '';
+            $username = $_POST['username'] ?? '';
+            $email = $_POST['email'] ?? '';
+            $password = $_POST['password'] ?? '';
+            $password_confirmation = $_POST['password_confirmation'] ?? '';
+            $role = $_POST['role'] ?? 'Warga';
+            $no_telepon = $_POST['no_telepon'] ?? '';
+            $alamat = $_POST['alamat'] ?? '';
+            $id_desa = $_POST['id_desa'] ?? '';
+            
+            // Validasi input
+            if (empty($nama) || empty($username) || empty($email) || empty($password)) {
+                $_SESSION['toast'] = [
+                    'type' => 'error',
+                    'title' => 'Gagal',
+                    'message' => 'Semua field wajib diisi'
+                ];
+                header('Location: index.php?controller=Auth&action=register');
+                return;
+            }
+            
+            if ($password !== $password_confirmation) {
+                $_SESSION['toast'] = [
+                    'type' => 'error',
+                    'title' => 'Gagal',
+                    'message' => 'Konfirmasi password tidak sesuai'
+                ];
+                header('Location: index.php?controller=Auth&action=register');
+                return;
+            }
+            
             $userData = [
-                'name' => $_POST['name'] ?? '',
-                'username' => $_POST['username'] ?? '',
-                'email' => $_POST['email'] ?? '',
-                'password' => $_POST['password'] ?? '',
-                'password_confirmation' => $_POST['password_confirmation'] ?? '',
-                'role' => $_POST['role'] ?? 'warga',
-                'phone' => $_POST['phone'] ?? '',
-                'address' => $_POST['address'] ?? '',
-                'provinsi_id' => $_POST['provinsi_id'] ?? '',
-                'kabupaten_id' => $_POST['kabupaten_id'] ?? '',
-                'kecamatan_id' => $_POST['kecamatan_id'] ?? '',
-                'desa_id' => $_POST['desa_id'] ?? ''
+                'nama' => $nama,
+                'username' => $username,
+                'email' => $email,
+                'password' => $password,
+                'password_confirmation' => $password_confirmation,
+                'role' => $role,
+                'no_telepon' => $no_telepon,
+                'alamat' => $alamat,
+                'id_desa' => $id_desa
             ];
+            
+            $response = $this->authService->register($userData);
 
-            $result = $this->authService->register($userData);
-
-            if ($result['success']) {
-                $success = 'Registrasi berhasil! Silakan login dengan akun Anda.';
-                require __DIR__ . '/../views/auth/login.php';
+            if ($response['success']) {
+                // Register berhasil, tampilkan pesan dan arahkan ke login
+                $_SESSION['toast'] = [
+                    'type' => 'success',
+                    'title' => 'Berhasil',
+                    'message' => 'Registrasi berhasil. Silakan login'
+                ];
+                header('Location: index.php?controller=Auth&action=login');
+                return;
             } else {
-                $error = $result['message'];
-                $errors = $result['errors'] ?? [];
-                require __DIR__ . '/../views/auth/register.php';
-            }
-        } else {
-            require __DIR__ . '/../views/auth/register.php';
-        }
-    }
+                // Register gagal
+                $message = $response['message'] ?? 'Registrasi gagal';
+                if (isset($response['data']['errors'])) {
+                    $errors = $response['data']['errors'];
+                    $errorMessages = [];
+                    foreach ($errors as $field => $error) {
+                        $errorMessages[] = is_array($error) ? $error[0] : $error;
+                    }
+                    $message = implode(', ', $errorMessages);
+                }
 
+                $_SESSION['toast'] = [
+                    'type' => 'error',
+                    'title' => 'Gagal',
+                    'message' => $message
+                ];
+                header('Location: index.php?controller=Auth&action=register');
+                return;
+            }
+        }
+        
+        header('Location: index.php?controller=Auth&action=register');
+    }
+    
     public function logout() {
-        $this->globalEnv->logout();
-        header('Location: index.php?controller=auth&action=login');
-        exit;
+        $this->authService->logout();
+        
+        $_SESSION['toast'] = [
+            'type' => 'success',
+            'title' => 'Berhasil',
+            'message' => 'Berhasil logout'
+        ];
+        
+        header('Location: index.php?controller=Auth&action=login');
     }
-
-    public function profile() {
-        if (!$this->globalEnv->isLoggedIn()) {
-            header('Location: index.php?controller=auth&action=login');
-            exit;
+    
+    private function redirectToDashboard($role) {
+        // Redirect berdasarkan role pengguna
+        switch ($role) {
+            case 'Admin':
+                header('Location: index.php?controller=Dashboard&action=admin');
+                break;
+            case 'PetugasBPBD':
+                header('Location: index.php?controller=Dashboard&action=petugas');
+                break;
+            case 'OperatorDesa':
+                header('Location: index.php?controller=Dashboard&action=operator');
+                break;
+            case 'Warga':
+                header('Location: index.php?controller=Beranda&action=index');
+                break;
+            default:
+                header('Location: index.php?controller=Beranda&action=index');
+                break;
         }
-
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $profileData = [
-                'name' => $_POST['name'] ?? '',
-                'email' => $_POST['email'] ?? '',
-                'phone' => $_POST['phone'] ?? '',
-                'address' => $_POST['address'] ?? ''
-            ];
-
-            $result = $this->globalEnv->getAPIClient()->put('auth/profile', $profileData);
-
-            if ($result['success']) {
-                $success = 'Profil berhasil diperbarui!';
-                $this->globalEnv->refreshCurrentUser();
-            } else {
-                $error = $result['message'];
-            }
-        }
-
-        $userData = $this->globalEnv->getCurrentUser();
-        require __DIR__ . '/../views/auth/profile.php';
     }
 }
-?>
