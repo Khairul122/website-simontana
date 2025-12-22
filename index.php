@@ -36,24 +36,8 @@ if (file_exists($controllerFile)) {
         $controllerObj = new $controllerClass();
 
         if (method_exists($controllerObj, $action)) {
-            // Tangani parameter untuk method yang memerlukan parameter
-            $id = $_GET['id'] ?? null;
-
-            // Jika method memerlukan parameter, kita sesuaikan
-            if ($action === 'edit' && $id !== null) {
-                $controllerObj->$action($id);
-            } else if ($action === 'update' && $id !== null) {
-                $controllerObj->$action($id);
-            } else if ($action === 'delete' && $id !== null) {
-                $controllerObj->$action($id);
-            } else if ($action === 'edit' || $action === 'update' || $action === 'delete') {
-                // Jika method memerlukan id tapi tidak diberikan
-                header('HTTP/1.1 400 Bad Request');
-                echo '400 - ID parameter diperlukan untuk action ini';
-            } else {
-                // Untuk method tanpa parameter
-                $controllerObj->$action();
-            }
+            // Method sekarang mengambil parameter dari $_GET, jadi panggil tanpa parameter
+            $controllerObj->$action();
         } else {
             header('HTTP/1.1 404 Not Found');
             echo '404 - Action tidak ditemukan';

@@ -3,11 +3,12 @@
 require_once dirname(__DIR__) . '/config/koneksi.php';
 require_once dirname(__DIR__) . '/services/KategoriBencanaService.php';
 
-class KategoriBencanaController 
+class KategoriBencanaController
 {
+
     private $service;
 
-    public function __construct() 
+    public function __construct()
     {
         $this->service = new KategoriBencanaService();
     }
@@ -15,7 +16,7 @@ class KategoriBencanaController
     /**
      * Cek role user, hanya Admin yang bisa akses
      */
-    private function checkRole() 
+    private function checkRole()
     {
         if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'Admin') {
             header('Location: ../login.php');
@@ -26,15 +27,15 @@ class KategoriBencanaController
     /**
      * Tampilkan halaman index (daftar kategori bencana)
      */
-    public function index() 
+    public function index()
     {
         $this->checkRole();
-        
+
         $response = $this->service->getAll();
-        
+
         // Set session untuk debugging
         $_SESSION['server_response'] = $response;
-        
+
         // Load view
         include __DIR__ . '/../views/kategori-bencana/index.php';
     }
@@ -42,13 +43,13 @@ class KategoriBencanaController
     /**
      * Tampilkan form create
      */
-    public function create() 
+    public function create()
     {
         $this->checkRole();
-        
+
         $isEdit = false;
         $kategori = null;
-        
+
         include __DIR__ . '/../views/kategori-bencana/form.php';
     }
 
@@ -64,13 +65,35 @@ class KategoriBencanaController
 
         // Validasi ID
         if (!$id) {
+            $_SESSION['toast_message'] = [
+                'type' => 'error',
+                'title' => 'Error',
+                'message' => 'ID tidak ditemukan'
+            ];
             header('Location: index.php?controller=KategoriBencana&action=index');
             exit;
         }
 
         $response = $this->service->getById($id);
 
-        if (!$response['success'] || empty($response['data']['data'])) {
+        if (!$response['success']) {
+            $_SESSION['toast_message'] = [
+                'type' => 'error',
+                'title' => 'Error',
+                'message' => $response['message'] ?? 'Gagal mengambil data kategori bencana'
+            ];
+            header('Location: index.php?controller=KategoriBencana&action=index');
+            exit();
+        }
+
+        // Cek struktur data yang dikembalikan API - bisa saja langsung berisi data atau dalam nested array
+        if (isset($response['data']['data'])) {
+            // Format biasanya untuk response list, tapi mungkin juga untuk single
+            $kategori = $response['data']['data'];
+        } elseif (isset($response['data']) && !empty($response['data'])) {
+            // Format untuk response single item
+            $kategori = $response['data'];
+        } else {
             $_SESSION['toast_message'] = [
                 'type' => 'error',
                 'title' => 'Error',
@@ -80,7 +103,6 @@ class KategoriBencanaController
             exit();
         }
 
-        $kategori = $response['data']['data'];
         $isEdit = true;
 
         // Set session untuk debugging saat edit
@@ -92,10 +114,10 @@ class KategoriBencanaController
     /**
      * Simpan data baru
      */
-    public function store() 
+    public function store()
     {
         $this->checkRole();
-        
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: index.php?controller=KategoriBencana&action=index');
             exit();
@@ -148,10 +170,19 @@ class KategoriBencanaController
     /**
      * Update data
      */
-    public function update($id) 
+    public function update()
     {
         $this->checkRole();
-        
+
+        // Ambil ID dari query string
+        $id = $_GET['id'] ?? null;
+
+        // Validasi ID
+        if (!$id) {
+            header('Location: index.php?controller=KategoriBencana&action=index');
+            exit;
+        }
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: index.php?controller=KategoriBencana&action=index');
             exit();
@@ -204,10 +235,19 @@ class KategoriBencanaController
     /**
      * Hapus data
      */
-    public function delete($id) 
+    public function delete()
     {
         $this->checkRole();
-        
+
+        // Ambil ID dari query string
+        $id = $_GET['id'] ?? null;
+
+        // Validasi ID
+        if (!$id) {
+            header('Location: index.php?controller=KategoriBencana&action=index');
+            exit;
+        }
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: index.php?controller=KategoriBencana&action=index');
             exit();
@@ -234,4 +274,3 @@ class KategoriBencanaController
         exit();
     }
 }
-

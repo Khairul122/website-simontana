@@ -34,6 +34,20 @@ unset($_SESSION['server_response']);
                     </a>
                   </div>
                   
+                  <?php if ($serverLog && !$serverLog['success']): ?>
+                    <div class="alert alert-danger" role="alert">
+                      <h4 class="alert-heading">Error!</h4>
+                      <p><?php echo htmlspecialchars($serverLog['message'] ?? 'Terjadi kesalahan saat mengambil data'); ?></p>
+                      <?php if (isset($serverLog['data']) && is_array($serverLog['data']) && !empty($serverLog['data'])): ?>
+                        <ul class="mb-0">
+                          <?php foreach ($serverLog['data'] as $error): ?>
+                            <li><?php echo htmlspecialchars(is_array($error) ? json_encode($error) : $error); ?></li>
+                          <?php endforeach; ?>
+                        </ul>
+                      <?php endif; ?>
+                    </div>
+                  <?php endif; ?>
+
                   <div class="table-responsive">
                     <table class="table table-striped">
                       <thead>
@@ -41,7 +55,7 @@ unset($_SESSION['server_response']);
                           <th>No</th>
                           <th>Nama Kategori</th>
                           <th>Deskripsi</th>
-                          <th>Level Bahaya</th>
+                          <th>Icon</th>
                           <th>Aksi</th>
                         </tr>
                       </thead>
@@ -54,25 +68,11 @@ unset($_SESSION['server_response']);
                               <td><?php echo htmlspecialchars($kategori['nama_kategori'] ?? $kategori['nama'] ?? '-'); ?></td>
                               <td><?php echo htmlspecialchars($kategori['deskripsi'] ?? '-'); ?></td>
                               <td>
-                                <?php 
-                                $level = $kategori['level_bahaya'] ?? $kategori['tingkat_keparahan'] ?? '-';
-                                $badgeClass = '';
-                                
-                                switch(strtolower($level)) {
-                                  case 'rendah':
-                                    $badgeClass = 'badge badge-success';
-                                    break;
-                                  case 'sedang':
-                                    $badgeClass = 'badge badge-warning';
-                                    break;
-                                  case 'tinggi':
-                                    $badgeClass = 'badge badge-danger';
-                                    break;
-                                  default:
-                                    $badgeClass = 'badge badge-secondary';
-                                }
-                                ?>
-                                <label class="<?php echo $badgeClass; ?>"><?php echo $level; ?></label>
+                                <?php if (!empty($kategori['icon'])): ?>
+                                  <span class="badge badge-info"><?php echo htmlspecialchars($kategori['icon']); ?></span>
+                                <?php else: ?>
+                                  <span class="badge badge-secondary">-</span>
+                                <?php endif; ?>
                               </td>
                               <td>
                                 <a href="index.php?controller=KategoriBencana&action=edit&id=<?php echo $kategori['id']; ?>"
@@ -90,7 +90,13 @@ unset($_SESSION['server_response']);
                           <?php endforeach; ?>
                         <?php else: ?>
                           <tr>
-                            <td colspan="5" class="text-center">Tidak ada data kategori bencana</td>
+                            <td colspan="5" class="text-center">
+                              <?php if ($serverLog && $serverLog['success']): ?>
+                                Tidak ada data kategori bencana
+                              <?php else: ?>
+                                Tidak ada data yang dapat ditampilkan
+                              <?php endif; ?>
+                            </td>
                           </tr>
                         <?php endif; ?>
                       </tbody>

@@ -30,11 +30,32 @@ unset($_SESSION['server_response_edit']);
           <div class="row mt-4">
             <div class="col-12">
               <div class="card">
+                <?php if ($isEdit && isset($serverLog) && $serverLog && !$serverLog['success']): ?>
+                  <div class="alert alert-danger m-3" role="alert">
+                    <h4 class="alert-heading">Error!</h4>
+                    <p><?php echo htmlspecialchars($serverLog['message'] ?? 'Terjadi kesalahan saat mengambil data kategori'); ?></p>
+                    <?php if (isset($serverLog['data']) && is_array($serverLog['data']) && !empty($serverLog['data'])): ?>
+                      <ul class="mb-0">
+                        <?php foreach ($serverLog['data'] as $error): ?>
+                          <li><?php echo htmlspecialchars(is_array($error) ? json_encode($error) : $error); ?></li>
+                        <?php endforeach; ?>
+                      </ul>
+                    <?php endif; ?>
+                  </div>
+                <?php endif; ?>
+
+                <?php if ($isEdit && (!$kategori || (isset($serverLog) && $serverLog && !$serverLog['success']))): ?>
+                  <div class="alert alert-warning m-3" role="alert">
+                    <h4 class="alert-heading">Peringatan!</h4>
+                    <p>Data kategori tidak ditemukan atau terjadi kesalahan.</p>
+                    <a href="index.php?controller=KategoriBencana&action=index" class="btn btn-primary">Kembali ke Daftar</a>
+                  </div>
+                <?php else: ?>
                 <div class="card-body">
                   <h4 class="card-title">
                     <?php echo $isEdit ? 'Edit Kategori Bencana' : 'Form Tambah Kategori Bencana'; ?>
                   </h4>
-                  
+
                   <form method="POST"
                         action="index.php?controller=KategoriBencana&action=<?php echo $isEdit ? 'update&id=' . $kategori['id'] : 'store'; ?>">
                     <div class="form-group">
@@ -67,7 +88,7 @@ unset($_SESSION['server_response_edit']);
                              value="<?php echo htmlspecialchars($kategori['icon'] ?? ''); ?>">
                       <small class="form-text text-muted">Nama atau kode icon untuk kategori ini</small>
                     </div>
-                    
+
                     <div class="d-flex justify-content-between">
                       <a href="index.php?controller=KategoriBencana&action=index" class="btn btn-secondary">
                         <i class="mdi mdi-arrow-left"></i> Kembali
@@ -80,6 +101,7 @@ unset($_SESSION['server_response_edit']);
                     </div>
                   </form>
                 </div>
+                <?php endif; ?>
               </div>
             </div>
           </div>
@@ -87,7 +109,7 @@ unset($_SESSION['server_response_edit']);
       </div>
     </div>
   </div>
-  
+
   <?php include 'template/script.php'; ?>
 
   <!-- Console Log untuk debugging saat edit -->
@@ -101,7 +123,7 @@ unset($_SESSION['server_response_edit']);
   <script>
     <?php if (isset($_SESSION['toast_message'])): ?>
       const toastData = <?php echo json_encode($_SESSION['toast_message']); ?>;
-      
+
       // Show toast notification
       if (typeof Swal !== 'undefined') {
         Swal.fire({
@@ -119,7 +141,7 @@ unset($_SESSION['server_response_edit']);
           }
         });
       }
-      
+
       <?php unset($_SESSION['toast_message']); ?>
     <?php endif; ?>
   </script>
