@@ -40,6 +40,10 @@ define('API_KATEGORI_BENCANA_BY_ID', API_BASE_URL . '/kategori-bencana/{id}');
 // === LAPORAN BENCANA ENDPOINTS ===
 define('API_LAPORANS', API_BASE_URL . '/laporans');
 define('API_LAPORANS_BY_ID', API_BASE_URL . '/laporans/{id}');
+define('API_LAPORANS_STATISTICS', API_BASE_URL . '/laporans/statistics');
+define('API_LAPORANS_VERIFIKASI', API_BASE_URL . '/laporans/{id}/verifikasi');
+define('API_LAPORANS_PROSES', API_BASE_URL . '/laporans/{id}/proses');
+define('API_LAPORANS_RIWAYAT', API_BASE_URL . '/laporans/{id}/riwayat');
 
 // === TINDAK LANJUT ENDPOINTS ===
 define('API_TINDAK_LANJUT', API_BASE_URL . '/tindak-lanjut');
@@ -52,6 +56,9 @@ define('API_RIWAYAT_TINDAKAN_BY_ID', API_BASE_URL . '/riwayat-tindakan/{id}');
 // === MONITORING ENDPOINTS ===
 define('API_MONITORING', API_BASE_URL . '/monitoring');
 define('API_MONITORING_BY_ID', API_BASE_URL . '/monitoring/{id}');
+
+// === WILAYAH ENDPOINTS ===
+define('API_DESA', API_BASE_URL . '/desa');
 
 // === BMKG INTEGRATION ENDPOINTS ===
 define('API_BMKG_ALL', API_BASE_URL . '/bmkg');
@@ -116,6 +123,18 @@ function buildApiUrlKategoriBencanaById($id) {
 
 function buildApiUrlLaporansById($id) {
     return str_replace('{id}', $id, API_LAPORANS_BY_ID);
+}
+
+function buildApiUrlLaporansVerifikasiById($id) {
+    return str_replace('{id}', $id, API_LAPORANS_VERIFIKASI);
+}
+
+function buildApiUrlLaporansProsesById($id) {
+    return str_replace('{id}', $id, API_LAPORANS_PROSES);
+}
+
+function buildApiUrlLaporansRiwayatById($id) {
+    return str_replace('{id}', $id, API_LAPORANS_RIWAYAT);
 }
 
 function buildApiUrlTindakLanjutById($id) {

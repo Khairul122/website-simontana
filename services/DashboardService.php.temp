@@ -103,7 +103,7 @@ class DashboardService {
     public function getBmkgData() {
         try {
             // Endpoint BMKG public (tidak perlu authentication)
-            $response = apiRequest(API_BMKG_GEMPATERBARU, 'GET', null, []);
+            $response = apiRequest(API_BMKG_GEMPA_TERBARU, 'GET', null, []);
 
             if ($response['success'] && isset($response['data'])) {
                 return [
@@ -179,7 +179,7 @@ class DashboardService {
     // Fungsi untuk memeriksa apakah API endpoint tersedia
     public function checkAPIConnection() {
         $headers = $this->getAuthHeaders();
-        $response = apiRequest(API_AUTH_ME, 'GET', null, $headers);
+        $response = apiRequest(API_ME, 'GET', null, $headers);
 
         return [
             'connected' => $response['success'],
@@ -251,7 +251,7 @@ class DashboardService {
     public function getUserStatistics() {
         $headers = $this->getAuthHeaders();
 
-        $response = apiRequest(API_USERS_STATISTICS, 'GET', null, $headers);
+        $response = apiRequest(API_USER_STATISTICS, 'GET', null, $headers);
 
         // Format ulang respons untuk konsistensi
         return [
