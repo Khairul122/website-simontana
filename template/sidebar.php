@@ -16,11 +16,36 @@
       </a>
     </li>
 
-        <li class="nav-item">
+    <li class="nav-item">
       <a class="nav-link" href="index.php?controller=User&action=index">
         <i class="mdi mdi-account-group menu-icon"></i>
         <span class="menu-title">Manajemen User</span>
       </a>
+    </li>
+
+      <!-- Wilayah Management -->
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="collapse" href="#wilayah-menu" aria-expanded="false" aria-controls="wilayah-menu">
+        <i class="mdi mdi-map menu-icon"></i>
+        <span class="menu-title">Manajemen Wilayah</span>
+        <i class="menu-arrow"></i>
+      </a>
+      <div class="collapse" id="wilayah-menu">
+        <ul class="nav flex-column sub-menu">
+          <li class="nav-item">
+            <a class="nav-link" href="index.php?controller=Wilayah&action=indexProvinsi">Daftar Provinsi</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="index.php?controller=Wilayah&action=indexKabupaten">Daftar Kabupaten</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="index.php?controller=Wilayah&action=indexKecamatan">Daftar Kecamatan</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="index.php?controller=Wilayah&action=index">Daftar Desa</a>
+          </li>
+        </ul>
+      </div>
     </li>
 
     <!-- Desa Management -->

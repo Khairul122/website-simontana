@@ -136,7 +136,7 @@ unset($_SESSION['server_response_edit']);
                                  class="form-control"
                                  id="password"
                                  name="password"
-                                 <?php if (!$isEdit): echo 'required'; ?>>
+                                 <?php if (!$isEdit) { echo 'required'; } ?>>
                           <?php if ($isEdit): ?>
                             <small class="form-text text-muted">Kosongkan jika tidak ingin mengganti password</small>
                           <?php else: ?>
@@ -233,8 +233,6 @@ unset($_SESSION['server_response_edit']);
       </div>
     </div>
   </div>
-
-  <?php endif; ?>
 
   <?php include 'template/script.php'; ?>
 

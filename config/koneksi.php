@@ -29,11 +29,18 @@ define('API_USERS_STATISTICS', API_BASE_URL . '/users/statistics');
 
 // === WILAYAH (Administrative Areas) ENDPOINTS ===
 define('API_WILAYAH_ALL', API_BASE_URL . '/wilayah');
+define('API_WILAYAH_BY_ID', API_BASE_URL . '/wilayah/{id}'); // GET/PUT/DELETE detail wilayah by ID
 define('API_WILAYAH_PROVINSI', API_BASE_URL . '/wilayah/provinsi');
 define('API_WILAYAH_PROVINSI_BY_ID', API_BASE_URL . '/wilayah/provinsi/{id}');
-define('API_WILAYAH_KABUPATEN', API_BASE_URL . '/wilayah/kabupaten/{provinsi_id}');
-define('API_WILAYAH_KECAMATAN', API_BASE_URL . '/wilayah/kecamatan/{kabupaten_id}');
+define('API_WILAYAH_KABUPATEN', API_BASE_URL . '/wilayah/kabupaten/{provinsi_id}'); // GET by provinsi
+define('API_WILAYAH_KABUPATEN_CREATE', API_BASE_URL . '/wilayah/kabupaten'); // POST create kabupaten
+define('API_WILAYAH_KABUPATEN_BY_ID', API_BASE_URL . '/wilayah/kabupaten/{id}'); // PUT update kabupaten
+define('API_WILAYAH_KECAMATAN', API_BASE_URL . '/wilayah/kecamatan/{kabupaten_id}'); // GET by kabupaten
+define('API_WILAYAH_KECAMATAN_CREATE', API_BASE_URL . '/wilayah/kecamatan'); // POST create kecamatan
+define('API_WILAYAH_KECAMATAN_BY_ID', API_BASE_URL . '/wilayah/kecamatan/{id}'); // PUT update kecamatan
 define('API_WILAYAH_DESA', API_BASE_URL . '/wilayah/desa/{kecamatan_id}');
+define('API_WILAYAH_DESA_CREATE', API_BASE_URL . '/wilayah/desa'); // POST create desa
+define('API_WILAYAH_DESA_BY_ID', API_BASE_URL . '/wilayah/desa/{id}'); // PUT update desa
 define('API_WILAYAH_DETAIL', API_BASE_URL . '/wilayah/detail/{desa_id}');
 define('API_WILAYAH_HIERARCHY', API_BASE_URL . '/wilayah/hierarchy/{desa_id}');
 define('API_WILAYAH_SEARCH', API_BASE_URL . '/wilayah/search');
@@ -613,6 +620,10 @@ function buildApiUrl(string $baseUrl, array $params = []): string {
 /**
  * Specific functions for building wilayah URLs
  */
+function buildApiUrlWilayahById(int $id): string {
+    return str_replace('{id}', $id, API_WILAYAH_BY_ID);
+}
+
 function buildApiUrlProvinsiById(int $id): string {
     return str_replace('{id}', $id, API_WILAYAH_PROVINSI_BY_ID);
 }
@@ -621,8 +632,16 @@ function buildApiUrlKabupatenByProvinsiId(int $provinsiId): string {
     return str_replace('{provinsi_id}', $provinsiId, API_WILAYAH_KABUPATEN);
 }
 
+function buildApiUrlKabupatenById(int $id): string {
+    return str_replace('{id}', $id, API_WILAYAH_KABUPATEN_BY_ID);
+}
+
 function buildApiUrlKecamatanByKabupatenId(int $kabupatenId): string {
     return str_replace('{kabupaten_id}', $kabupatenId, API_WILAYAH_KECAMATAN);
+}
+
+function buildApiUrlKecamatanById(int $id): string {
+    return str_replace('{id}', $id, API_WILAYAH_KECAMATAN_BY_ID);
 }
 
 function buildApiUrlDesaByKecamatanId(int $kecamatanId): string {
