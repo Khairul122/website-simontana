@@ -39,7 +39,6 @@ class WilayahController
             return;
         }
 
-        // Kita perlu mengakses endpoint wilayah yang benar
         $response = $this->service->getKabupatenByProvinsi($provinsiId);
 
         header('Content-Type: application/json');
@@ -110,5 +109,13 @@ class WilayahController
 
         header('Content-Type: application/json');
         echo json_encode($response);
+    }
+
+    /**
+     * Alias untuk getWilayahDetailByDesa untuk kompatibilitas
+     */
+    public function getWilayahDetailByDesaId()
+    {
+        $this->getWilayahDetailByDesa();
     }
 }

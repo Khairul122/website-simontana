@@ -3,11 +3,11 @@
 require_once dirname(__DIR__) . '/config/koneksi.php';
 require_once dirname(__DIR__) . '/services/UserService.php';
 
-class UserController 
+class UserController
 {
     private $service;
 
-    public function __construct() 
+    public function __construct()
     {
         $this->service = new UserService();
     }
@@ -15,7 +15,7 @@ class UserController
     /**
      * Cek role user, hanya Admin yang bisa akses
      */
-    private function checkRole() 
+    private function checkRole()
     {
         if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'Admin') {
             header('Location: index.php?controller=dashboard&action=admin');
@@ -24,17 +24,53 @@ class UserController
     }
 
     /**
+     * Handle unauthorized response - clear session and redirect to login
+     */
+    private function handleUnauthorized()
+    {
+        // Clear all session data
+        session_destroy();
+
+        // Set flash message for user
+        $_SESSION['toast_message'] = [
+            'type' => 'error',
+            'title' => 'Sesi Habis',
+            'message' => 'Sesi Anda telah berakhir, silakan login kembali.'
+        ];
+
+        // Redirect to login page
+        header('Location: index.php?controller=Auth&action=login');
+        exit();
+    }
+
+    /**
+     * Check if response indicates unauthorized access
+     */
+    private function isUnauthorized($response)
+    {
+        return ($response['http_code'] === 401 ||
+                (isset($response['message']) &&
+                 (stripos($response['message'], 'unauthorized') !== false ||
+                  stripos($response['message'], 'token') !== false)));
+    }
+
+    /**
      * Tampilkan halaman index (daftar pengguna)
      */
-    public function index() 
+    public function index()
     {
         $this->checkRole();
-        
+
         $response = $this->service->getAll();
-        
-        // Set session untuk debugging
+
+        // Handle unauthorized response
+        if ($this->isUnauthorized($response)) {
+            $this->handleUnauthorized();
+        }
+
+        // Set session for debugging
         $_SESSION['server_response'] = $response;
-        
+
         // Load view
         include dirname(__DIR__) . '/views/user/index.php';
     }
@@ -42,13 +78,13 @@ class UserController
     /**
      * Tampilkan form create
      */
-    public function create() 
+    public function create()
     {
         $this->checkRole();
-        
+
         $isEdit = false;
         $user = null;
-        
+
         include dirname(__DIR__) . '/views/user/form.php';
     }
 
@@ -70,6 +106,11 @@ class UserController
 
         $response = $this->service->getById($id);
 
+        // Handle unauthorized response
+        if ($this->isUnauthorized($response)) {
+            $this->handleUnauthorized();
+        }
+
         if (!$response['success'] || empty($response['data'])) {
             $_SESSION['toast_message'] = [
                 'type' => 'error',
@@ -89,7 +130,7 @@ class UserController
             $user['desa'] = $this->getWilayahDetail($user['id_desa']);
         }
 
-        // Set session untuk debugging saat edit
+        // Set session for debugging during edit
         $_SESSION['server_response_edit'] = $response;
 
         include dirname(__DIR__) . '/views/user/form.php';
@@ -115,10 +156,10 @@ class UserController
     /**
      * Simpan data baru
      */
-    public function store() 
+    public function store()
     {
         $this->checkRole();
-        
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: index.php?controller=User&action=index');
             exit();
@@ -161,6 +202,11 @@ class UserController
         // Panggil service
         $response = $this->service->create($data);
 
+        // Handle unauthorized response
+        if ($this->isUnauthorized($response)) {
+            $this->handleUnauthorized();
+        }
+
         if ($response['success']) {
             header('Location: index.php?controller=User&action=index&success=' . urlencode('Pengguna berhasil ditambahkan'));
         } else {
@@ -175,10 +221,10 @@ class UserController
     public function update()
     {
         $this->checkRole();
-        
+
         // Ambil ID dari query string
         $id = $_GET['id'] ?? null;
-        
+
         // Validasi ID
         if (!$id) {
             header('Location: index.php?controller=User&action=index');
@@ -231,6 +277,11 @@ class UserController
         // Panggil service
         $response = $this->service->update($id, $data);
 
+        // Handle unauthorized response
+        if ($this->isUnauthorized($response)) {
+            $this->handleUnauthorized();
+        }
+
         if ($response['success']) {
             header('Location: index.php?controller=User&action=index&success=' . urlencode('Pengguna berhasil diperbarui'));
         } else {
@@ -245,10 +296,10 @@ class UserController
     public function delete()
     {
         $this->checkRole();
-        
+
         // Ambil ID dari query string
         $id = $_GET['id'] ?? null;
-        
+
         // Validasi ID
         if (!$id) {
             header('Location: index.php?controller=User&action=index');
@@ -262,6 +313,11 @@ class UserController
 
         // Panggil service
         $response = $this->service->delete($id);
+
+        // Handle unauthorized response
+        if ($this->isUnauthorized($response)) {
+            $this->handleUnauthorized();
+        }
 
         if ($response['success']) {
             header('Location: index.php?controller=User&action=index&success=' . urlencode('Pengguna berhasil dihapus'));

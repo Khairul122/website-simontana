@@ -19,7 +19,7 @@ class WilayahService
      */
     public function getAllProvinsi()
     {
-        $url = API_PROVINSI;
+        $url = API_WILAYAH_PROVINSI;
         $headers = $this->getHeaders();
 
         return apiRequest($url, 'GET', null, $headers);
@@ -30,7 +30,7 @@ class WilayahService
      */
     public function getProvinsiById($id)
     {
-        $url = API_PROVINSI . '/' . $id;
+        $url = buildApiUrlProvinsiById($id);
         $headers = $this->getHeaders();
 
         return apiRequest($url, 'GET', null, $headers);
@@ -41,7 +41,7 @@ class WilayahService
      */
     public function getKabupatenByProvinsi($provinsiId)
     {
-        $url = API_KABUPATEN . '/' . $provinsiId;
+        $url = buildApiUrlKabupatenByProvinsiId($provinsiId);
         $headers = $this->getHeaders();
 
         return apiRequest($url, 'GET', null, $headers);
@@ -52,7 +52,7 @@ class WilayahService
      */
     public function getKecamatanByKabupaten($kabupatenId)
     {
-        $url = API_KECAMATAN . '/' . $kabupatenId;
+        $url = buildApiUrlKecamatanByKabupatenId($kabupatenId);
         $headers = $this->getHeaders();
 
         return apiRequest($url, 'GET', null, $headers);
@@ -63,7 +63,7 @@ class WilayahService
      */
     public function getDesaByKecamatan($kecamatanId)
     {
-        $url = API_DESA . '/' . $kecamatanId;
+        $url = buildApiUrlDesaByKecamatanId($kecamatanId);
         $headers = $this->getHeaders();
 
         return apiRequest($url, 'GET', null, $headers);
@@ -74,42 +74,10 @@ class WilayahService
      */
     public function getWilayahDetailByDesa($desaId)
     {
-        // Ambil data desa
-        $desaResponse = $this->getDesaById($desaId);
-        if (!$desaResponse['success'] || empty($desaResponse['data'])) {
-            return $desaResponse;
-        }
+        $url = buildApiUrlWilayahDetailByDesaId($desaId);
+        $headers = $this->getHeaders();
 
-        $desa = $desaResponse['data'];
-
-        // Ambil data kecamatan jika belum ada dan ada id_kecamatan
-        if (!isset($desa['kecamatan']) && !empty($desa['id_kecamatan'])) {
-            $kecamatanResponse = $this->getKecamatanById($desa['id_kecamatan']);
-            if ($kecamatanResponse['success'] && !empty($kecamatanResponse['data'])) {
-                $desa['kecamatan'] = $kecamatanResponse['data'];
-
-                // Ambil data kabupaten jika belum ada dan ada id_kabupaten
-                if (!isset($desa['kecamatan']['kabupaten']) && !empty($desa['kecamatan']['id_kabupaten'])) {
-                    $kabupatenResponse = $this->getKabupatenById($desa['kecamatan']['id_kabupaten']);
-                    if ($kabupatenResponse['success'] && !empty($kabupatenResponse['data'])) {
-                        $desa['kecamatan']['kabupaten'] = $kabupatenResponse['data'];
-
-                        // Ambil data provinsi jika belum ada dan ada id_provinsi
-                        if (!isset($desa['kecamatan']['kabupaten']['provinsi']) && !empty($desa['kecamatan']['kabupaten']['id_provinsi'])) {
-                            $provinsiResponse = $this->getProvinsiById($desa['kecamatan']['kabupaten']['id_provinsi']);
-                            if ($provinsiResponse['success'] && !empty($provinsiResponse['data'])) {
-                                $desa['kecamatan']['kabupaten']['provinsi'] = $provinsiResponse['data'];
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return [
-            'success' => true,
-            'data' => $desa
-        ];
+        return apiRequest($url, 'GET', null, $headers);
     }
 
     /**
@@ -117,7 +85,7 @@ class WilayahService
      */
     private function getDesaById($id)
     {
-        $url = API_DESA . '/' . $id;
+        $url = buildApiUrlDesaByKecamatanId($id); // Using the correct endpoint
         $headers = $this->getHeaders();
         return apiRequest($url, 'GET', null, $headers);
     }
@@ -127,7 +95,7 @@ class WilayahService
      */
     private function getKecamatanById($id)
     {
-        $url = API_KECAMATAN . '/' . $id;
+        $url = API_KECAMATAN . '/' . $id; // Using the correct endpoint
         $headers = $this->getHeaders();
         return apiRequest($url, 'GET', null, $headers);
     }
@@ -137,7 +105,7 @@ class WilayahService
      */
     private function getKabupatenById($id)
     {
-        $url = API_KABUPATEN . '/' . $id;
+        $url = API_KABUPATEN . '/' . $id; // Using the correct endpoint
         $headers = $this->getHeaders();
         return apiRequest($url, 'GET', null, $headers);
     }

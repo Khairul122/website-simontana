@@ -1,4 +1,4 @@
-<?php 
+<?php
 include('template/header.php');
 
 // Ambil server response dari session jika sedang dalam mode edit
@@ -43,7 +43,7 @@ unset($_SESSION['server_response_edit']);
                     <?php endif; ?>
                   </div>
                 <?php endif; ?>
-                
+
                 <?php if ($isEdit && (!$user || (isset($serverLog) && $serverLog && !$serverLog['success']))): ?>
                   <div class="alert alert-warning m-3" role="alert">
                     <h4 class="alert-heading">Peringatan!</h4>
@@ -55,7 +55,7 @@ unset($_SESSION['server_response_edit']);
                   <h4 class="card-title">
                     <?php echo $isEdit ? 'Edit Pengguna' : 'Form Tambah Pengguna'; ?>
                   </h4>
-                  
+
                   <form method="POST"
                         action="index.php?controller=User&action=<?php echo $isEdit ? 'update&id=' . $user['id'] : 'store'; ?>">
                     <div class="row">
@@ -70,7 +70,7 @@ unset($_SESSION['server_response_edit']);
                                  required>
                           <small class="form-text text-muted">Nama lengkap pengguna</small>
                         </div>
-                        
+
                         <div class="form-group">
                           <label for="username">Username *</label>
                           <input type="text"
@@ -81,7 +81,7 @@ unset($_SESSION['server_response_edit']);
                                  required>
                           <small class="form-text text-muted">Username unik untuk login</small>
                         </div>
-                        
+
                         <div class="form-group">
                           <label for="email">Email</label>
                           <input type="email"
@@ -92,7 +92,7 @@ unset($_SESSION['server_response_edit']);
                           <small class="form-text text-muted">Alamat email pengguna</small>
                         </div>
                       </div>
-                      
+
                       <div class="col-md-6">
                         <div class="form-group">
                           <label for="no_telepon">No Telepon</label>
@@ -103,31 +103,31 @@ unset($_SESSION['server_response_edit']);
                                  value="<?php echo htmlspecialchars($user['no_telepon'] ?? ''); ?>">
                           <small class="form-text text-muted">Nomor telepon pengguna</small>
                         </div>
-                        
+
                         <div class="form-group">
                           <label for="role">Role *</label>
                           <select class="form-control" id="role" name="role" required>
                             <option value="">Pilih Role</option>
-                            <option value="Admin" 
+                            <option value="Admin"
                                     <?php echo (isset($user['role']) && $user['role'] === 'Admin') ? 'selected' : ''; ?>>
                               Admin
                             </option>
-                            <option value="PetugasBPBD" 
+                            <option value="PetugasBPBD"
                                     <?php echo (isset($user['role']) && $user['role'] === 'PetugasBPBD') ? 'selected' : ''; ?>>
                               Petugas BPBD
                             </option>
-                            <option value="OperatorDesa" 
+                            <option value="OperatorDesa"
                                     <?php echo (isset($user['role']) && $user['role'] === 'OperatorDesa') ? 'selected' : ''; ?>>
                               Operator Desa
                             </option>
-                            <option value="Warga" 
+                            <option value="Warga"
                                     <?php echo (isset($user['role']) && $user['role'] === 'Warga') ? 'selected' : ''; ?>>
                               Warga
                             </option>
                           </select>
                           <small class="form-text text-muted">Hak akses pengguna dalam sistem</small>
                         </div>
-                        
+
                         <div class="form-group">
                           <label for="password">
                             <?php echo $isEdit ? 'Password (Kosongkan jika tidak ingin mengganti)' : 'Password *'; ?>
@@ -145,7 +145,7 @@ unset($_SESSION['server_response_edit']);
                         </div>
                       </div>
                     </div>
-                    
+
                     <div class="form-group">
                       <label for="alamat">Alamat</label>
                       <textarea class="form-control"
@@ -213,7 +213,6 @@ unset($_SESSION['server_response_edit']);
                       </div>
                     </div>
 
-                    <?php if (!$isEdit): ?>
                     <div class="d-flex justify-content-between">
                       <a href="index.php?controller=User&action=index" class="btn btn-secondary">
                         <i class="mdi mdi-arrow-left"></i> Kembali
@@ -224,7 +223,6 @@ unset($_SESSION['server_response_edit']);
                         <?php echo $isEdit ? 'Update' : 'Simpan'; ?>
                       </button>
                     </div>
-                    <?php endif; ?>
                   </form>
                 </div>
                 <?php endif; ?>
@@ -251,7 +249,7 @@ unset($_SESSION['server_response_edit']);
   <script>
     <?php if (isset($_SESSION['toast_message'])): ?>
       const toastData = <?php echo json_encode($_SESSION['toast_message']); ?>;
-      
+
       // Show toast notification
       if (typeof Swal !== 'undefined') {
         Swal.fire({
@@ -269,11 +267,11 @@ unset($_SESSION['server_response_edit']);
           }
         });
       }
-      
+
       <?php unset($_SESSION['toast_message']); ?>
     <?php endif; ?>
   </script>
-  
+
   <!-- Server Response Toast Notifications -->
   <script>
     // Show toast for server responses
@@ -298,49 +296,293 @@ unset($_SESSION['server_response_edit']);
         alert(`${title}: ${message}`);
       }
     }
-    
+
     // Handle success responses
     <?php if (isset($_GET['success'])): ?>
       showServerResponseToast('success', 'Berhasil', '<?php echo htmlspecialchars(urldecode($_GET['success'])); ?>');
     <?php endif; ?>
-    
+
     // Handle error responses
     <?php if (isset($_GET['error'])): ?>
       showServerResponseToast('error', 'Gagal', '<?php echo htmlspecialchars(urldecode($_GET['error'])); ?>');
     <?php endif; ?>
 
-    // Cascading dropdown wilayah
+    // Cascading dropdown wilayah (PROXY PATTERN - Using local controller as proxy)
     $(document).ready(function() {
-        // Ambil token dari session PHP
-        const token = '<?php echo $_SESSION['token'] ?? ''; ?>';
+        // Ambil informasi apakah ini mode edit
+        const isEditMode = <?php echo json_encode($isEdit ?? false); ?>;
+        const currentDesaId = <?php echo json_encode($user['id_desa'] ?? null); ?>;
 
-        // Function untuk load provinsi
-        function loadProvinsi() {
-            $.ajax({
-                url: 'http://localhost:8000/api/wilayah/provinsi',
-                method: 'GET',
-                headers: {
-                    'Authorization': 'Bearer ' + token
-                },
-                success: function(response) {
-                    if (response.success) {
-                        const provinsiSelect = $('#provinsi_id');
-                        provinsiSelect.empty();
-                        provinsiSelect.append('<option value="">-- Pilih Provinsi --</option>');
-
-                        response.data.forEach(function(provinsi) {
-                            provinsiSelect.append('<option value="' + provinsi.id + '">' + provinsi.nama + '</option>');
-                        });
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error loading provinsi:', error);
-                }
-            });
+        // Function untuk menampilkan loading di dropdown
+        function showLoadingInSelect(selector, text = 'Memuat...') {
+            const select = $(selector);
+            select.empty().append(`<option value="">${text}</option>`);
+            select.prop('disabled', true);
         }
 
-        // Load provinsi saat halaman dimuat
-        loadProvinsi();
+        // Function untuk menyembunyikan loading di dropdown
+        function hideLoadingInSelect(selector) {
+            $(selector).prop('disabled', false);
+        }
+
+        // Function async untuk load provinsi
+        async function loadProvinsi(selectedId = null) {
+            showLoadingInSelect('#provinsi_id', 'Memuat provinsi...');
+
+            try {
+                const response = await $.ajax({
+                    url: 'index.php?controller=Wilayah&action=getAllProvinsi',
+                    method: 'GET',
+                    dataType: 'json'
+                });
+
+                if (response.success) {
+                    const provinsiSelect = $('#provinsi_id');
+                    provinsiSelect.empty();
+                    provinsiSelect.append('<option value="">-- Pilih Provinsi --</option>');
+
+                    (response.data || []).forEach(function(provinsi) {
+                        const isSelected = selectedId && provinsi.id == selectedId;
+                        provinsiSelect.append(`<option value="${provinsi.id}" ${isSelected ? 'selected' : ''}>${provinsi.nama}</option>`);
+                    });
+                } else if (response.http_code === 401) {
+                    // Handle unauthorized error
+                    alert("Sesi habis atau tidak valid. Silakan login ulang.");
+                    window.location.href = 'index.php?controller=Auth&action=logout';
+                } else {
+                    console.error('Gagal mengambil data provinsi:', response.message);
+                    $('#provinsi_id').empty().append('<option value="">-- Gagal memuat data provinsi --</option>');
+                }
+            } catch (error) {
+                console.error('Error loading provinsi:', error);
+                if (error.status === 401) {
+                    // Handle unauthorized error
+                    alert("Sesi habis atau tidak valid. Silakan login ulang.");
+                    window.location.href = 'index.php?controller=Auth&action=logout';
+                } else {
+                    $('#provinsi_id').empty().append('<option value="">-- Error memuat provinsi --</option>');
+                    showServerResponseToast('error', 'Error', 'Gagal memuat data provinsi: ' + error.message);
+                }
+            } finally {
+                hideLoadingInSelect('#provinsi_id');
+            }
+        }
+
+        // Function async untuk load kabupaten berdasarkan provinsi
+        async function loadKabupatenByProvinsi(provinsiId, selectedId = null) {
+            if (!provinsiId) {
+                $('#kabupaten_id').empty().append('<option value="">-- Pilih Kabupaten/Kota --</option>');
+                return;
+            }
+
+            showLoadingInSelect('#kabupaten_id', 'Memuat kabupaten...');
+
+            try {
+                const response = await $.ajax({
+                    url: 'index.php?controller=Wilayah&action=getKabupatenByProvinsi',
+                    method: 'GET',
+                    data: { provinsi_id: provinsiId },
+                    dataType: 'json'
+                });
+
+                if (response.success) {
+                    const kabupatenSelect = $('#kabupaten_id');
+                    kabupatenSelect.empty();
+                    kabupatenSelect.append('<option value="">-- Pilih Kabupaten/Kota --</option>');
+
+                    (response.data || []).forEach(function(kabupaten) {
+                        const isSelected = selectedId && kabupaten.id == selectedId;
+                        kabupatenSelect.append(`<option value="${kabupaten.id}" ${isSelected ? 'selected' : ''}>${kabupaten.nama}</option>`);
+                    });
+                } else if (response.http_code === 401) {
+                    // Handle unauthorized error
+                    alert("Sesi habis atau tidak valid. Silakan login ulang.");
+                    window.location.href = 'index.php?controller=Auth&action=logout';
+                } else {
+                    console.error('Gagal mengambil data kabupaten:', response.message);
+                    $('#kabupaten_id').empty().append('<option value="">-- Gagal memuat data kabupaten --</option>');
+                }
+            } catch (error) {
+                console.error('Error loading kabupaten:', error);
+                if (error.status === 401) {
+                    // Handle unauthorized error
+                    alert("Sesi habis atau tidak valid. Silakan login ulang.");
+                    window.location.href = 'index.php?controller=Auth&action=logout';
+                } else {
+                    $('#kabupaten_id').empty().append('<option value="">-- Error memuat kabupaten --</option>');
+                    showServerResponseToast('error', 'Error', 'Gagal memuat data kabupaten: ' + error.message);
+                }
+            } finally {
+                hideLoadingInSelect('#kabupaten_id');
+            }
+        }
+
+        // Function async untuk load kecamatan berdasarkan kabupaten
+        async function loadKecamatanByKabupaten(kabupatenId, selectedId = null) {
+            if (!kabupatenId) {
+                $('#kecamatan_id').empty().append('<option value="">-- Pilih Kecamatan --</option>');
+                return;
+            }
+
+            showLoadingInSelect('#kecamatan_id', 'Memuat kecamatan...');
+
+            try {
+                const response = await $.ajax({
+                    url: 'index.php?controller=Wilayah&action=getKecamatanByKabupaten',
+                    method: 'GET',
+                    data: { kabupaten_id: kabupatenId },
+                    dataType: 'json'
+                });
+
+                if (response.success) {
+                    const kecamatanSelect = $('#kecamatan_id');
+                    kecamatanSelect.empty();
+                    kecamatanSelect.append('<option value="">-- Pilih Kecamatan --</option>');
+
+                    (response.data || []).forEach(function(kecamatan) {
+                        const isSelected = selectedId && kecamatan.id == selectedId;
+                        kecamatanSelect.append(`<option value="${kecamatan.id}" ${isSelected ? 'selected' : ''}>${kecamatan.nama}</option>`);
+                    });
+                } else if (response.http_code === 401) {
+                    // Handle unauthorized error
+                    alert("Sesi habis atau tidak valid. Silakan login ulang.");
+                    window.location.href = 'index.php?controller=Auth&action=logout';
+                } else {
+                    console.error('Gagal mengambil data kecamatan:', response.message);
+                    $('#kecamatan_id').empty().append('<option value="">-- Gagal memuat data kecamatan --</option>');
+                }
+            } catch (error) {
+                console.error('Error loading kecamatan:', error);
+                if (error.status === 401) {
+                    // Handle unauthorized error
+                    alert("Sesi habis atau tidak valid. Silakan login ulang.");
+                    window.location.href = 'index.php?controller=Auth&action=logout';
+                } else {
+                    $('#kecamatan_id').empty().append('<option value="">-- Error memuat kecamatan --</option>');
+                    showServerResponseToast('error', 'Error', 'Gagal memuat data kecamatan: ' + error.message);
+                }
+            } finally {
+                hideLoadingInSelect('#kecamatan_id');
+            }
+        }
+
+        // Function async untuk load desa berdasarkan kecamatan
+        async function loadDesaByKecamatan(kecamatanId, selectedId = null) {
+            if (!kecamatanId) {
+                $('#desa_id').empty().append('<option value="">-- Pilih Desa/Kelurahan --</option>');
+                return;
+            }
+
+            showLoadingInSelect('#desa_id', 'Memuat desa...');
+
+            try {
+                const response = await $.ajax({
+                    url: 'index.php?controller=Wilayah&action=getDesaByKecamatan',
+                    method: 'GET',
+                    data: { kecamatan_id: kecamatanId },
+                    dataType: 'json'
+                });
+
+                if (response.success) {
+                    const desaSelect = $('#desa_id');
+                    desaSelect.empty();
+                    desaSelect.append('<option value="">-- Pilih Desa/Kelurahan --</option>');
+
+                    (response.data || []).forEach(function(desa) {
+                        const isSelected = selectedId && desa.id == selectedId;
+                        desaSelect.append(`<option value="${desa.id}" ${isSelected ? 'selected' : ''}>${desa.nama}</option>`);
+                    });
+                } else if (response.http_code === 401) {
+                    // Handle unauthorized error
+                    alert("Sesi habis atau tidak valid. Silakan login ulang.");
+                    window.location.href = 'index.php?controller=Auth&action=logout';
+                } else {
+                    console.error('Gagal mengambil data desa:', response.message);
+                    $('#desa_id').empty().append('<option value="">-- Gagal memuat data desa --</option>');
+                }
+            } catch (error) {
+                console.error('Error loading desa:', error);
+                if (error.status === 401) {
+                    // Handle unauthorized error
+                    alert("Sesi habis atau tidak valid. Silakan login ulang.");
+                    window.location.href = 'index.php?controller=Auth&action=logout';
+                } else {
+                    $('#desa_id').empty().append('<option value="">-- Error memuat desa --</option>');
+                    showServerResponseToast('error', 'Error', 'Gagal memuat data desa: ' + error.message);
+                }
+            } finally {
+                hideLoadingInSelect('#desa_id');
+            }
+        }
+
+        // Function async untuk memuat data wilayah lengkap saat edit mode
+        async function loadWilayahForEdit(desaId) {
+            if (!desaId) return;
+
+            try {
+                // Ambil detail hierarki wilayah
+                const detailResponse = await $.ajax({
+                    url: 'index.php?controller=Wilayah&action=getWilayahDetailByDesa',
+                    method: 'GET',
+                    data: { desa_id: desaId },
+                    dataType: 'json'
+                });
+
+                if (detailResponse.http_code === 401) {
+                    // Handle unauthorized error
+                    alert("Sesi habis atau tidak valid. Silakan login ulang.");
+                    window.location.href = 'index.php?controller=Auth&action=logout';
+                    return;
+                }
+
+                if (!detailResponse.success || !detailResponse.data) {
+                    throw new Error(detailResponse.message || 'Data wilayah tidak ditemukan');
+                }
+
+                const desa = detailResponse.data;
+                const kecamatan = detailResponse.data.kecamatan;
+                const kabupaten = detailResponse.data.kecamatan?.kabupaten;
+                const provinsi = detailResponse.data.kecamatan?.kabupaten?.provinsi;
+
+                // Load provinsi dan tunggu selesai
+                await loadProvinsi(provinsi?.id);
+                $('#provinsi_id').val(provinsi?.id);
+
+                // Load kabupaten berdasarkan provinsi dan tunggu selesai
+                await loadKabupatenByProvinsi(provinsi?.id, kabupaten?.id);
+                $('#kabupaten_id').val(kabupaten?.id);
+
+                // Load kecamatan berdasarkan kabupaten dan tunggu selesai
+                await loadKecamatanByKabupaten(kabupaten?.id, kecamatan?.id);
+                $('#kecamatan_id').val(kecamatan?.id);
+
+                // Load desa berdasarkan kecamatan dan set value
+                await loadDesaByKecamatan(kecamatan?.id, desa?.id);
+                $('#desa_id').val(desa?.id);
+
+            } catch (error) {
+                console.error('Error loading wilayah hierarchy for edit mode:', error);
+                if (error.status === 401 || (error.responseJSON && error.responseJSON.http_code === 401)) {
+                    // Handle unauthorized error
+                    alert("Sesi habis atau tidak valid. Silakan login ulang.");
+                    window.location.href = 'index.php?controller=Auth&action=logout';
+                } else {
+                    showServerResponseToast('error', 'Gagal', 'Gagal mengambil data wilayah: ' + error.message);
+                    // Redirect ke halaman index
+                    setTimeout(() => {
+                        window.location.href = 'index.php?controller=User&action=index';
+                    }, 2000);
+                }
+            }
+        }
+
+        // Init Edit Data - Jika mode edit, muat hirarki wilayah secara berurutan
+        if (isEditMode && currentDesaId) {
+            loadWilayahForEdit(currentDesaId);
+        } else {
+            // Mode create - Load provinsi saja
+            loadProvinsi();
+        }
 
         // Event handler untuk perubahan provinsi
         $('#provinsi_id').change(function() {
@@ -353,27 +595,7 @@ unset($_SESSION['server_response_edit']);
 
             if (provinsiId) {
                 // Load kabupaten berdasarkan provinsi
-                $.ajax({
-                    url: 'http://localhost:8000/api/wilayah/kabupaten/' + provinsiId,
-                    method: 'GET',
-                    headers: {
-                        'Authorization': 'Bearer ' + token
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            const kabupatenSelect = $('#kabupaten_id');
-                            kabupatenSelect.empty();
-                            kabupatenSelect.append('<option value="">-- Pilih Kabupaten/Kota --</option>');
-
-                            response.data.forEach(function(kabupaten) {
-                                kabupatenSelect.append('<option value="' + kabupaten.id + '">' + kabupaten.nama + '</option>');
-                            });
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error loading kabupaten:', error);
-                    }
-                });
+                loadKabupatenByProvinsi(provinsiId);
             }
         });
 
@@ -387,27 +609,7 @@ unset($_SESSION['server_response_edit']);
 
             if (kabupatenId) {
                 // Load kecamatan berdasarkan kabupaten
-                $.ajax({
-                    url: 'http://localhost:8000/api/wilayah/kecamatan/' + kabupatenId,
-                    method: 'GET',
-                    headers: {
-                        'Authorization': 'Bearer ' + token
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            const kecamatanSelect = $('#kecamatan_id');
-                            kecamatanSelect.empty();
-                            kecamatanSelect.append('<option value="">-- Pilih Kecamatan --</option>');
-
-                            response.data.forEach(function(kecamatan) {
-                                kecamatanSelect.append('<option value="' + kecamatan.id + '">' + kecamatan.nama + '</option>');
-                            });
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error loading kecamatan:', error);
-                    }
-                });
+                loadKecamatanByKabupaten(kabupatenId);
             }
         });
 
@@ -420,25 +622,36 @@ unset($_SESSION['server_response_edit']);
 
             if (kecamatanId) {
                 // Load desa berdasarkan kecamatan
-                $.ajax({
-                    url: 'http://localhost:8000/api/wilayah/desa/' + kecamatanId,
-                    method: 'GET',
-                    headers: {
-                        'Authorization': 'Bearer ' + token
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            const desaSelect = $('#desa_id');
-                            desaSelect.empty();
-                            desaSelect.append('<option value="">-- Pilih Desa/Kelurahan --</option>');
+                loadDesaByKecamatan(kecamatanId);
+            }
+        });
 
-                            response.data.forEach(function(desa) {
-                                desaSelect.append('<option value="' + desa.id + '">' + desa.nama + '</option>');
-                            });
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error loading desa:', error);
+        // Form submission handler with validation and notifications
+        $('form').on('submit', function(e) {
+            const provinsiId = $('#provinsi_id').val();
+            const kabupatenId = $('#kabupaten_id').val();
+            const kecamatanId = $('#kecamatan_id').val();
+            const desaId = $('#desa_id').val();
+
+            // Validate wilayah selection
+            if (!provinsiId || !kabupatenId || !kecamatanId || !desaId) {
+                e.preventDefault();
+                showServerResponseToast('warning', 'Peringatan', 'Silakan lengkapi semua pilihan wilayah terlebih dahulu.');
+                return false;
+            }
+
+            // Show loading or confirmation before submit
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Konfirmasi',
+                    text: <?php echo $isEdit ? '"Apakah Anda yakin ingin memperbarui data pengguna ini?"' : '"Apakah Anda yakin ingin menyimpan data pengguna baru?"'; ?>,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, <?php echo $isEdit ? 'Perbarui' : 'Simpan'; ?>',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (!result.isConfirmed) {
+                        e.preventDefault();
                     }
                 });
             }

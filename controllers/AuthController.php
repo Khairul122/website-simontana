@@ -49,30 +49,27 @@ class AuthController {
                     'message' => 'Username dan password harus diisi'
                 ];
                 header('Location: index.php?controller=Auth&action=login');
-                return;
+                exit;
             }
 
             $response = $this->authService->login($username, $password);
 
             if ($response['success']) {
-                // Login berhasil, simpan informasi redirect ke session
-                $_SESSION['redirect_after_login'] = true;
-
-                // Ambil role dari struktur data yang benar
+                // Login berhasil - ambil role user dan redirect ke dashboard
                 $userData = $response['data']['data'] ?? $response['data'];
                 $userRole = $userData['user']['role'] ?? $userData['role'] ?? 'Warga';
-                $_SESSION['user_role'] = $userRole;
 
                 $_SESSION['toast'] = [
                     'type' => 'success',
                     'title' => 'Berhasil',
                     'message' => 'Login berhasil'
                 ];
-                header('Location: index.php?controller=Auth&action=login');
-                return;
+
+                $this->redirectToDashboard($userRole);
+                exit;
             } else {
-                // Login gagal
-                $errorMessage = $response['message'] ?? 'Login gagal';
+                // Login gagal - tampilkan pesan error
+                $errorMessage = $response['message'] ?? 'Username atau password salah';
 
                 // Jika ada detail error dari API, ambil pesan pertama
                 if (isset($response['data']) && is_array($response['data'])) {
@@ -80,7 +77,6 @@ class AuthController {
                     if (isset($errors['message'])) {
                         $errorMessage = $errors['message'];
                     } elseif (isset($errors['errors']) && is_array($errors['errors'])) {
-                        // Ambil pesan error pertama dari array errors
                         $firstError = reset($errors['errors']);
                         $errorMessage = is_array($firstError) ? $firstError[0] : $firstError;
                     }
@@ -88,15 +84,16 @@ class AuthController {
 
                 $_SESSION['toast'] = [
                     'type' => 'error',
-                    'title' => 'Gagal',
+                    'title' => 'Login Gagal',
                     'message' => $errorMessage
                 ];
                 header('Location: index.php?controller=Auth&action=login');
-                return;
+                exit;
             }
         }
 
         header('Location: index.php?controller=Auth&action=login');
+        exit;
     }
 
     public function register() {

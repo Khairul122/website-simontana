@@ -3,11 +3,11 @@
 // Require konfigurasi dan service otentikasi
 require_once dirname(__DIR__) . '/config/koneksi.php';
 
-class UserService 
+class UserService
 {
     private $apiEndpoint;
 
-    public function __construct() 
+    public function __construct()
     {
         // Gabungkan konstanta global + endpoint spesifik
         $this->apiEndpoint = API_BASE_URL . '/users';
@@ -16,9 +16,20 @@ class UserService
     /**
      * Mendapatkan headers otentikasi
      */
-    private function getHeaders() 
+    private function getHeaders()
     {
+        // Ensure session is started
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
         $token = $_SESSION['token'] ?? null;
+
+        // Return null if no token is found to prevent unauthorized requests
+        if (!$token) {
+            return null;
+        }
+
         return getAuthHeaders($token);
     }
 
@@ -27,9 +38,18 @@ class UserService
      */
     public function getAll()
     {
-        $url = $this->apiEndpoint;
         $headers = $this->getHeaders();
 
+        // Return error response if no headers (no token)
+        if (!$headers) {
+            return [
+                'success' => false,
+                'message' => 'Sesi login habis. Silakan login kembali.',
+                'http_code' => 401
+            ];
+        }
+
+        $url = $this->apiEndpoint;
         return apiRequest($url, 'GET', null, $headers);
     }
 
@@ -38,9 +58,18 @@ class UserService
      */
     public function getById($id)
     {
-        $url = $this->apiEndpoint . '/' . $id;
         $headers = $this->getHeaders();
 
+        // Return error response if no headers (no token)
+        if (!$headers) {
+            return [
+                'success' => false,
+                'message' => 'Sesi login habis. Silakan login kembali.',
+                'http_code' => 401
+            ];
+        }
+
+        $url = $this->apiEndpoint . '/' . $id;
         return apiRequest($url, 'GET', null, $headers);
     }
 
@@ -49,9 +78,18 @@ class UserService
      */
     public function create($data)
     {
-        $url = $this->apiEndpoint;
         $headers = $this->getHeaders();
 
+        // Return error response if no headers (no token)
+        if (!$headers) {
+            return [
+                'success' => false,
+                'message' => 'Sesi login habis. Silakan login kembali.',
+                'http_code' => 401
+            ];
+        }
+
+        $url = $this->apiEndpoint;
         return apiRequest($url, 'POST', $data, $headers);
     }
 
@@ -60,9 +98,18 @@ class UserService
      */
     public function update($id, $data)
     {
-        $url = $this->apiEndpoint . '/' . $id;
         $headers = $this->getHeaders();
 
+        // Return error response if no headers (no token)
+        if (!$headers) {
+            return [
+                'success' => false,
+                'message' => 'Sesi login habis. Silakan login kembali.',
+                'http_code' => 401
+            ];
+        }
+
+        $url = $this->apiEndpoint . '/' . $id;
         return apiRequest($url, 'PUT', $data, $headers);
     }
 
@@ -71,9 +118,18 @@ class UserService
      */
     public function delete($id)
     {
-        $url = $this->apiEndpoint . '/' . $id;
         $headers = $this->getHeaders();
 
+        // Return error response if no headers (no token)
+        if (!$headers) {
+            return [
+                'success' => false,
+                'message' => 'Sesi login habis. Silakan login kembali.',
+                'http_code' => 401
+            ];
+        }
+
+        $url = $this->apiEndpoint . '/' . $id;
         return apiRequest($url, 'DELETE', null, $headers);
     }
 }

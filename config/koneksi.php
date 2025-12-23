@@ -1,9 +1,14 @@
 <?php
 // Konfigurasi koneksi ke API backend SIMONTA BENCANA
 
-// Mode debugging - nonaktifkan untuk mencegah JavaScript error
+// Start session if not already started
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Mode debugging - nonaktifkan untuk production
 define('DEBUG_MODE', false);
-define('DEBUG_API', false); // Matikan debugging API
+define('DEBUG_API', false);  
 
 // URL utama API backend
 define('API_BASE_URL', 'http://localhost:8000/api');
@@ -57,9 +62,6 @@ define('API_RIWAYAT_TINDAKAN_BY_ID', API_BASE_URL . '/riwayat-tindakan/{id}');
 define('API_MONITORING', API_BASE_URL . '/monitoring');
 define('API_MONITORING_BY_ID', API_BASE_URL . '/monitoring/{id}');
 
-// === WILAYAH ENDPOINTS ===
-define('API_DESA', API_BASE_URL . '/desa');
-
 // === BMKG INTEGRATION ENDPOINTS ===
 define('API_BMKG_ALL', API_BASE_URL . '/bmkg');
 define('API_BMKG_GEMPATERBARU', API_BASE_URL . '/bmkg/gempa/terbaru');
@@ -70,94 +72,55 @@ define('API_BMKG_PRAKIRAAN_CUACA', API_BASE_URL . '/bmkg/prakiraan-cuaca');
 define('API_BMKG_CACHE_STATUS', API_BASE_URL . '/bmkg/cache/status');
 define('API_BMKG_CACHE_CLEAR', API_BASE_URL . '/bmkg/cache/clear');
 
-/**
- * Function to replace placeholders in URL with actual values
- */
-function buildApiUrl($baseUrl, $params = []) {
-    $url = $baseUrl;
+// === FILE UPLOAD PATH ===
+define('TEMP_UPLOAD_PATH', __DIR__ . '/../uploads/temp/');
 
-    foreach ($params as $placeholder => $value) {
-        $url = str_replace('{' . $placeholder . '}', $value, $url);
-    }
-
-    return $url;
-}
+// === AUTH HELPER ===
 
 /**
- * Specific functions for building wilayah URLs
+ * Save token and user data to session
  */
-function buildApiUrlProvinsiById($id) {
-    return str_replace('{id}', $id, API_WILAYAH_PROVINSI_BY_ID);
-}
-
-function buildApiUrlKabupatenByProvinsiId($provinsiId) {
-    return str_replace('{provinsi_id}', $provinsiId, API_WILAYAH_KABUPATEN);
-}
-
-function buildApiUrlKecamatanByKabupatenId($kabupatenId) {
-    return str_replace('{kabupaten_id}', $kabupatenId, API_WILAYAH_KECAMATAN);
-}
-
-function buildApiUrlDesaByKecamatanId($kecamatanId) {
-    return str_replace('{kecamatan_id}', $kecamatanId, API_WILAYAH_DESA);
-}
-
-function buildApiUrlWilayahDetailByDesaId($desaId) {
-    return str_replace('{desa_id}', $desaId, API_WILAYAH_DETAIL);
-}
-
-function buildApiUrlWilayahHierarchyByDesaId($desaId) {
-    return str_replace('{desa_id}', $desaId, API_WILAYAH_HIERARCHY);
+function saveToken(string $token, array $user): void {
+    $_SESSION['api_token'] = $token;
+    $_SESSION['user'] = $user;
+    $_SESSION['token_created_at'] = time();
 }
 
 /**
- * Functions for other dynamic endpoints with ID
+ * Get token from session
  */
-function buildApiUrlUsersById($id) {
-    return str_replace('{id}', $id, API_USERS_BY_ID);
+function getToken(): ?string {
+    return $_SESSION['api_token'] ?? null;
 }
 
-function buildApiUrlKategoriBencanaById($id) {
-    return str_replace('{id}', $id, API_KATEGORI_BENCANA_BY_ID);
+/**
+ * Check if user is logged in
+ */
+function isLoggedIn(): bool {
+    return isset($_SESSION['api_token']) && !empty($_SESSION['api_token']);
 }
 
-function buildApiUrlLaporansById($id) {
-    return str_replace('{id}', $id, API_LAPORANS_BY_ID);
+/**
+ * Clear user session data
+ */
+function clearSession(): void {
+    unset($_SESSION['api_token']);
+    unset($_SESSION['user']);
+    unset($_SESSION['token_created_at']);
 }
-
-function buildApiUrlLaporansVerifikasiById($id) {
-    return str_replace('{id}', $id, API_LAPORANS_VERIFIKASI);
-}
-
-function buildApiUrlLaporansProsesById($id) {
-    return str_replace('{id}', $id, API_LAPORANS_PROSES);
-}
-
-function buildApiUrlLaporansRiwayatById($id) {
-    return str_replace('{id}', $id, API_LAPORANS_RIWAYAT);
-}
-
-function buildApiUrlTindakLanjutById($id) {
-    return str_replace('{id}', $id, API_TINDAK_LANJUT_BY_ID);
-}
-
-function buildApiUrlRiwayatTindakanById($id) {
-    return str_replace('{id}', $id, API_RIWAYAT_TINDAKAN_BY_ID);
-}
-
-function buildApiUrlMonitoringById($id) {
-    return str_replace('{id}', $id, API_MONITORING_BY_ID);
-}
-
 
 /**
  * Get authentication headers
  */
-function getAuthHeaders($token = null) {
+function getAuthHeaders(?string $token = null): array {
     $headers = [
         'Content-Type: application/json',
         'Accept: application/json'
     ];
+
+    if ($token === null) {
+        $token = getToken();
+    }
 
     if ($token) {
         $headers[] = 'Authorization: Bearer ' . $token;
@@ -167,9 +130,14 @@ function getAuthHeaders($token = null) {
 }
 
 /**
- * Function to make API requests
+ * Function to make API requests with automatic token handling and error handling
  */
-function apiRequest($url, $method = 'GET', $data = null, $headers = []) {
+function apiRequest(string $url, string $method = 'GET', $data = null, array $headers = []): array {
+    // Add authentication headers if not already provided
+    if (empty($headers)) {
+        $headers = getAuthHeaders();
+    }
+
     $curl = curl_init();
 
     // Default cURL configuration
@@ -188,17 +156,30 @@ function apiRequest($url, $method = 'GET', $data = null, $headers = []) {
         case 'POST':
             $curlOptions[CURLOPT_POST] = true;
             if ($data) {
-                $curlOptions[CURLOPT_POSTFIELDS] = is_array($data) ? json_encode($data) : $data;
-                // Add Content-Type header if data is JSON and not already in headers
-                $hasContentType = false;
-                foreach ($headers as $header) {
-                    if (stripos($header, 'Content-Type:') !== false) {
-                        $hasContentType = true;
-                        break;
+                // For multipart form data (file uploads), don't encode as JSON
+                if (is_array($data) && isset($data['is_multipart']) && $data['is_multipart']) {
+                    $curlOptions[CURLOPT_POSTFIELDS] = $data['data'];
+                    // Remove Content-Type header for multipart data
+                    $newHeaders = [];
+                    foreach ($headers as $header) {
+                        if (stripos($header, 'Content-Type:') === false) {
+                            $newHeaders[] = $header;
+                        }
                     }
-                }
-                if (!$hasContentType && is_array($data)) {
-                    $curlOptions[CURLOPT_HTTPHEADER][] = 'Content-Type: application/json';
+                    $curlOptions[CURLOPT_HTTPHEADER] = $newHeaders;
+                } else {
+                    $curlOptions[CURLOPT_POSTFIELDS] = is_array($data) ? json_encode($data) : $data;
+                    // Add Content-Type header if data is JSON and not already in headers
+                    $hasContentType = false;
+                    foreach ($headers as $header) {
+                        if (stripos($header, 'Content-Type:') !== false) {
+                            $hasContentType = true;
+                            break;
+                        }
+                    }
+                    if (!$hasContentType && is_array($data)) {
+                        $curlOptions[CURLOPT_HTTPHEADER][] = 'Content-Type: application/json';
+                    }
                 }
             }
             break;
@@ -244,10 +225,25 @@ function apiRequest($url, $method = 'GET', $data = null, $headers = []) {
         ];
     }
 
+    // Handle 401 Unauthorized - automatically logout user
+    if ($httpCode === 401) {
+        clearSession();
+        return [
+            'success' => false,
+            'message' => 'Unauthorized. Please login again.',
+            'data' => null,
+            'http_code' => $httpCode,
+            'raw_response' => $response
+        ];
+    }
+
     $decodedResponse = json_decode($response, true);
 
     // If response is not valid JSON, return error
     if ($response !== '' && $decodedResponse === null && json_last_error() !== JSON_ERROR_NONE) {
+        if (DEBUG_API) {
+            error_log("Invalid JSON response from API: " . $response);
+        }
         return [
             'success' => false,
             'message' => 'Invalid JSON response from API: ' . $response,
@@ -269,12 +265,16 @@ function apiRequest($url, $method = 'GET', $data = null, $headers = []) {
 /**
  * Function to upload file to API
  */
-function uploadFileToAPI($endpoint, $filePath, $fieldName = 'file', $token = null) {
+function uploadFileToAPI(string $endpoint, string $filePath, string $fieldName = 'file', ?string $token = null): array {
     $curl = curl_init();
 
     $headers = [
         'Accept: application/json'
     ];
+
+    if ($token === null) {
+        $token = getToken();
+    }
 
     if ($token) {
         $headers[] = 'Authorization: Bearer ' . $token;
@@ -311,6 +311,18 @@ function uploadFileToAPI($endpoint, $filePath, $fieldName = 'file', $token = nul
         ];
     }
 
+    // Handle 401 Unauthorized - automatically logout user
+    if ($httpCode === 401) {
+        clearSession();
+        return [
+            'success' => false,
+            'message' => 'Unauthorized. Please login again.',
+            'data' => null,
+            'http_code' => $httpCode,
+            'raw_response' => $response
+        ];
+    }
+
     $decodedResponse = json_decode($response, true);
 
     return [
@@ -319,4 +331,347 @@ function uploadFileToAPI($endpoint, $filePath, $fieldName = 'file', $token = nul
         'message' => $decodedResponse && isset($decodedResponse['message']) ? $decodedResponse['message'] : 'File upload completed',
         'data' => $decodedResponse && isset($decodedResponse['data']) ? $decodedResponse['data'] : $decodedResponse
     ];
+}
+
+// === AUTHENTICATION WRAPPER FUNCTIONS ===
+
+/**
+ * Login user and save token to session
+ */
+function doLogin(string $email, string $password): array {
+    $data = [
+        'email' => $email,
+        'password' => $password
+    ];
+
+    $response = apiRequest(API_AUTH_LOGIN, 'POST', $data, getAuthHeaders(null));
+
+    if ($response['success']) {
+        $token = $response['data']['token'] ?? null;
+        $user = $response['data']['user'] ?? null;
+
+        if ($token && $user) {
+            saveToken($token, $user);
+            return [
+                'success' => true,
+                'message' => 'Login successful',
+                'data' => $user
+            ];
+        } else {
+            return [
+                'success' => false,
+                'message' => 'Invalid response from server',
+                'data' => null
+            ];
+        }
+    }
+
+    return $response;
+}
+
+/**
+ * Register new user
+ */
+function doRegister(array $data): array {
+    return apiRequest(API_AUTH_REGISTER, 'POST', $data, getAuthHeaders(null));
+}
+
+/**
+ * Logout user and clear session
+ */
+function doLogout(): array {
+    $response = apiRequest(API_AUTH_LOGOUT, 'POST', null, getAuthHeaders());
+
+    // Clear session regardless of API response
+    clearSession();
+
+    // Return success response even if API call failed
+    return [
+        'success' => true,
+        'message' => 'Logout successful',
+        'data' => null
+    ];
+}
+
+// === WILAYAH (LOCATION) WRAPPER FUNCTIONS ===
+
+/**
+ * Get all provinces with optional caching
+ */
+function getProvinsi(bool $useCache = true): array {
+    if ($useCache && isset($_SESSION['wilayah_cache']['provinsi'])) {
+        $cache = $_SESSION['wilayah_cache']['provinsi'];
+        // Cache for 1 hour
+        if (time() - $cache['timestamp'] < 3600) {
+            return [
+                'success' => true,
+                'message' => 'Data provinsi diambil dari cache',
+                'data' => $cache['data']
+            ];
+        }
+    }
+
+    $response = apiRequest(API_WILAYAH_PROVINSI, 'GET', null, getAuthHeaders());
+
+    if ($response['success'] && $useCache) {
+        $_SESSION['wilayah_cache']['provinsi'] = [
+            'timestamp' => time(),
+            'data' => $response['data']
+        ];
+    }
+
+    return $response;
+}
+
+/**
+ * Get all regencies by province ID with optional caching
+ */
+function getKabupaten(int $provinsiId, bool $useCache = true): array {
+    $cacheKey = 'kabupaten_' . $provinsiId;
+
+    if ($useCache && isset($_SESSION['wilayah_cache'][$cacheKey])) {
+        $cache = $_SESSION['wilayah_cache'][$cacheKey];
+        // Cache for 1 hour
+        if (time() - $cache['timestamp'] < 3600) {
+            return [
+                'success' => true,
+                'message' => 'Data kabupaten diambil dari cache',
+                'data' => $cache['data']
+            ];
+        }
+    }
+
+    $url = str_replace('{provinsi_id}', $provinsiId, API_WILAYAH_KABUPATEN);
+    $response = apiRequest($url, 'GET', null, getAuthHeaders());
+
+    if ($response['success'] && $useCache) {
+        $_SESSION['wilayah_cache'][$cacheKey] = [
+            'timestamp' => time(),
+            'data' => $response['data']
+        ];
+    }
+
+    return $response;
+}
+
+/**
+ * Get all districts by regency ID with optional caching
+ */
+function getKecamatan(int $kabupatenId, bool $useCache = true): array {
+    $cacheKey = 'kecamatan_' . $kabupatenId;
+
+    if ($useCache && isset($_SESSION['wilayah_cache'][$cacheKey])) {
+        $cache = $_SESSION['wilayah_cache'][$cacheKey];
+        // Cache for 1 hour
+        if (time() - $cache['timestamp'] < 3600) {
+            return [
+                'success' => true,
+                'message' => 'Data kecamatan diambil dari cache',
+                'data' => $cache['data']
+            ];
+        }
+    }
+
+    $url = str_replace('{kabupaten_id}', $kabupatenId, API_WILAYAH_KECAMATAN);
+    $response = apiRequest($url, 'GET', null, getAuthHeaders());
+
+    if ($response['success'] && $useCache) {
+        $_SESSION['wilayah_cache'][$cacheKey] = [
+            'timestamp' => time(),
+            'data' => $response['data']
+        ];
+    }
+
+    return $response;
+}
+
+/**
+ * Get all villages by district ID with optional caching
+ */
+function getDesa(int $kecamatanId, bool $useCache = true): array {
+    $cacheKey = 'desa_' . $kecamatanId;
+
+    if ($useCache && isset($_SESSION['wilayah_cache'][$cacheKey])) {
+        $cache = $_SESSION['wilayah_cache'][$cacheKey];
+        // Cache for 1 hour
+        if (time() - $cache['timestamp'] < 3600) {
+            return [
+                'success' => true,
+                'message' => 'Data desa diambil dari cache',
+                'data' => $cache['data']
+            ];
+        }
+    }
+
+    $url = str_replace('{kecamatan_id}', $kecamatanId, API_WILAYAH_DESA);
+    $response = apiRequest($url, 'GET', null, getAuthHeaders());
+
+    if ($response['success'] && $useCache) {
+        $_SESSION['wilayah_cache'][$cacheKey] = [
+            'timestamp' => time(),
+            'data' => $response['data']
+        ];
+    }
+
+    return $response;
+}
+
+// === LAPORAN (REPORT) WRAPPER FUNCTIONS ===
+
+/**
+ * Get all reports with optional filters
+ */
+function getAllLaporan(array $filters = []): array {
+    $url = API_LAPORANS;
+
+    // Add query parameters if filters are provided
+    if (!empty($filters)) {
+        $url .= '?' . http_build_query($filters);
+    }
+
+    return apiRequest($url, 'GET', null, getAuthHeaders());
+}
+
+/**
+ * Get report detail by ID
+ */
+function getLaporanDetail(int $id): array {
+    $url = str_replace('{id}', $id, API_LAPORANS_BY_ID);
+    return apiRequest($url, 'GET', null, getAuthHeaders());
+}
+
+/**
+ * Create new report with file uploads
+ */
+function createLaporan(array $data, array $files = []): array {
+    // Prepare multipart form data
+    $multipartData = [];
+
+    // Add regular form fields
+    foreach ($data as $key => $value) {
+        if ($key !== 'is_multipart' && $key !== 'data') { // Avoid recursive data
+            $multipartData[$key] = $value;
+        }
+    }
+
+    // Add file fields if provided
+    $fileFields = ['foto_bukti_1', 'foto_bukti_2', 'foto_bukti_3', 'video_bukti'];
+
+    foreach ($fileFields as $field) {
+        if (isset($files[$field]) && $files[$field]['error'] === UPLOAD_ERR_OK) {
+            $multipartData[$field] = new CURLFile(
+                $files[$field]['tmp_name'],
+                $files[$field]['type'],
+                $files[$field]['name']
+            );
+        }
+    }
+
+    // Prepare request data for multipart
+    $requestData = [
+        'is_multipart' => true,
+        'data' => $multipartData
+    ];
+
+    return apiRequest(API_LAPORANS, 'POST', $requestData);
+}
+
+// === BMKG (METEOROLOGY) WRAPPER FUNCTIONS ===
+
+/**
+ * Get latest earthquake data (public endpoint - no auth required)
+ */
+function getGempaTerbaru(): array {
+    return apiRequest(API_BMKG_GEMPATERBARU, 'GET', null, [
+        'Content-Type: application/json',
+        'Accept: application/json'
+    ]);
+}
+
+/**
+ * Get weather forecast (requires authentication)
+ */
+function getPrakiraanCuaca(): array {
+    return apiRequest(API_BMKG_PRAKIRAAN_CUACA, 'GET', null, getAuthHeaders());
+}
+
+// === HELPER FUNCTIONS ===
+
+/**
+ * Function to replace placeholders in URL with actual values
+ */
+function buildApiUrl(string $baseUrl, array $params = []): string {
+    $url = $baseUrl;
+
+    foreach ($params as $placeholder => $value) {
+        $url = str_replace('{' . $placeholder . '}', $value, $url);
+    }
+
+    return $url;
+}
+
+/**
+ * Specific functions for building wilayah URLs
+ */
+function buildApiUrlProvinsiById(int $id): string {
+    return str_replace('{id}', $id, API_WILAYAH_PROVINSI_BY_ID);
+}
+
+function buildApiUrlKabupatenByProvinsiId(int $provinsiId): string {
+    return str_replace('{provinsi_id}', $provinsiId, API_WILAYAH_KABUPATEN);
+}
+
+function buildApiUrlKecamatanByKabupatenId(int $kabupatenId): string {
+    return str_replace('{kabupaten_id}', $kabupatenId, API_WILAYAH_KECAMATAN);
+}
+
+function buildApiUrlDesaByKecamatanId(int $kecamatanId): string {
+    return str_replace('{kecamatan_id}', $kecamatanId, API_WILAYAH_DESA);
+}
+
+function buildApiUrlWilayahDetailByDesaId(int $desaId): string {
+    return str_replace('{desa_id}', $desaId, API_WILAYAH_DETAIL);
+}
+
+function buildApiUrlWilayahHierarchyByDesaId(int $desaId): string {
+    return str_replace('{desa_id}', $desaId, API_WILAYAH_HIERARCHY);
+}
+
+/**
+ * Functions for other dynamic endpoints with ID
+ */
+function buildApiUrlUsersById(int $id): string {
+    return str_replace('{id}', $id, API_USERS_BY_ID);
+}
+
+function buildApiUrlKategoriBencanaById(int $id): string {
+    return str_replace('{id}', $id, API_KATEGORI_BENCANA_BY_ID);
+}
+
+function buildApiUrlLaporansById(int $id): string {
+    return str_replace('{id}', $id, API_LAPORANS_BY_ID);
+}
+
+function buildApiUrlLaporansVerifikasiById(int $id): string {
+    return str_replace('{id}', $id, API_LAPORANS_VERIFIKASI);
+}
+
+function buildApiUrlLaporansProsesById(int $id): string {
+    return str_replace('{id}', $id, API_LAPORANS_PROSES);
+}
+
+function buildApiUrlLaporansRiwayatById(int $id): string {
+    return str_replace('{id}', $id, API_LAPORANS_RIWAYAT);
+}
+
+function buildApiUrlTindakLanjutById(int $id): string {
+    return str_replace('{id}', $id, API_TINDAK_LANJUT_BY_ID);
+}
+
+function buildApiUrlRiwayatTindakanById(int $id): string {
+    return str_replace('{id}', $id, API_RIWAYAT_TINDAKAN_BY_ID);
+}
+
+function buildApiUrlMonitoringById(int $id): string {
+    return str_replace('{id}', $id, API_MONITORING_BY_ID);
 }
