@@ -1,5 +1,5 @@
 <?php
-require_once 'config/koneksi.php';
+require_once __DIR__ . '/../config/koneksi.php';
 
 class AuthService {
 
@@ -10,16 +10,31 @@ class AuthService {
         ];
 
         // Tidak perlu header otentikasi untuk login
-        $response = apiRequest(API_LOGIN, 'POST', $data);
+        $response = apiRequest(API_AUTH_LOGIN, 'POST', $data);
 
         if ($response['success']) {
             // Simpan token dan data pengguna ke session
             if (isset($response['data']['token'])) {
                 $_SESSION['token'] = $response['data']['token'];
+            } elseif (isset($response['data']['data']['token'])) {
+                $_SESSION['token'] = $response['data']['data']['token'];
             }
 
-            if (isset($response['data']['user'])) {
-                $_SESSION['user'] = $response['data']['user'];
+            // Ambil data user dari struktur respons API
+            $user = null;
+
+            if (isset($response['data']['data']['user'])) {
+                $user = $response['data']['data']['user'];
+            } elseif (isset($response['data']['user'])) {
+                $user = $response['data']['user'];
+            } elseif (isset($response['data']['data'])) {
+                $user = $response['data']['data'];
+            } elseif (isset($response['data'])) {
+                $user = $response['data'];
+            }
+
+            if ($user) {
+                $_SESSION['user'] = $user;
             }
         }
 
@@ -28,16 +43,31 @@ class AuthService {
 
     public function register($userData) {
         // Tidak perlu header otentikasi untuk register
-        $response = apiRequest(API_REGISTER, 'POST', $userData);
+        $response = apiRequest(API_AUTH_REGISTER, 'POST', $userData);
 
         if ($response['success']) {
             // Jika registrasi berhasil, simpan token jika sudah dikembalikan
             if (isset($response['data']['token'])) {
                 $_SESSION['token'] = $response['data']['token'];
+            } elseif (isset($response['data']['data']['token'])) {
+                $_SESSION['token'] = $response['data']['data']['token'];
             }
 
-            if (isset($response['data']['user'])) {
-                $_SESSION['user'] = $response['data']['user'];
+            // Ambil data user dari struktur respons API
+            $user = null;
+
+            if (isset($response['data']['data']['user'])) {
+                $user = $response['data']['data']['user'];
+            } elseif (isset($response['data']['user'])) {
+                $user = $response['data']['user'];
+            } elseif (isset($response['data']['data'])) {
+                $user = $response['data']['data'];
+            } elseif (isset($response['data'])) {
+                $user = $response['data'];
+            }
+
+            if ($user) {
+                $_SESSION['user'] = $user;
             }
         }
 
@@ -47,7 +77,7 @@ class AuthService {
     public function logout() {
         if (isset($_SESSION['token'])) {
             $headers = getAuthHeaders($_SESSION['token']);
-            $response = apiRequest(API_LOGOUT, 'POST', null, $headers);
+            $response = apiRequest(API_AUTH_LOGOUT, 'POST', null, $headers);
 
             // Hapus session lokal terlepas dari apakah API logout sukses atau tidak
             session_destroy();
@@ -75,18 +105,39 @@ class AuthService {
             // Coba panggil API untuk mendapatkan data user
             if (isset($_SESSION['token'])) {
                 $headers = getAuthHeaders($_SESSION['token']);
-                $response = apiRequest(API_ME, 'GET', null, $headers);
+                $response = apiRequest(API_AUTH_ME, 'GET', null, $headers);
 
                 if ($response['success']) {
-                    $_SESSION['user'] = $response['data'];
-                    return $response;
+                    // Ambil data user dari struktur respons API
+                    $userData = null;
+
+                    if (isset($response['data']['data'])) {
+                        // Jika API mengembalikan data dalam format { success: true, data: { data: {...} }}
+                        $userData = $response['data']['data'];
+                    } elseif (isset($response['data']['user'])) {
+                        // Jika API mengembalikan data dalam format { success: true, data: { user: {...} }}
+                        $userData = $response['data']['user'];
+                    } elseif (isset($response['data'])) {
+                        // Jika API mengembalikan data dalam format { success: true, data: {...} }
+                        $userData = $response['data'];
+                    }
+
+                    if ($userData) {
+                        $_SESSION['user'] = $userData;
+                    }
+
+                    return [
+                        'success' => true,
+                        'message' => $response['message'] ?? 'Data user berhasil diambil',
+                        'data' => $userData
+                    ];
                 } else {
                     // Jika API gagal, hapus session
                     unset($_SESSION['token']);
                     unset($_SESSION['user']);
                     return [
                         'success' => false,
-                        'message' => 'Token tidak valid',
+                        'message' => $response['message'] ?? 'Token tidak valid',
                         'data' => null
                     ];
                 }
@@ -103,7 +154,7 @@ class AuthService {
     public function refreshToken() {
         if (isset($_SESSION['token'])) {
             $headers = getAuthHeaders($_SESSION['token']);
-            $response = apiRequest(API_REFRESH, 'POST', null, $headers);
+            $response = apiRequest(API_AUTH_REFRESH, 'POST', null, $headers);
 
             if ($response['success'] && isset($response['data']['token'])) {
                 $_SESSION['token'] = $response['data']['token'];

@@ -8,57 +8,132 @@ define('DEBUG_API', false); // Matikan debugging API
 // URL utama API backend
 define('API_BASE_URL', 'http://localhost:8000/api');
 
-// Endpoint otentikasi
-define('API_LOGIN', API_BASE_URL . '/auth/login');
-define('API_REGISTER', API_BASE_URL . '/auth/register');
-define('API_LOGOUT', API_BASE_URL . '/auth/logout');
-define('API_REFRESH', API_BASE_URL . '/auth/refresh');
-define('API_ME', API_BASE_URL . '/auth/me');
+// === AUTHENTICATION ENDPOINTS ===
+define('API_AUTH_LOGIN', API_BASE_URL . '/auth/login');
+define('API_AUTH_LOGOUT', API_BASE_URL . '/auth/logout');
+define('API_AUTH_ME', API_BASE_URL . '/auth/me');
+define('API_AUTH_REFRESH', API_BASE_URL . '/auth/refresh');
+define('API_AUTH_REGISTER', API_BASE_URL . '/auth/register');
+define('API_AUTH_ROLES', API_BASE_URL . '/auth/roles');
 
-// Endpoint laporan bencana
-define('API_REPORTS', API_BASE_URL . '/laporans');
-define('API_REPORT_BY_ID', API_BASE_URL . '/laporans/{id}');
-define('API_VERIFY_REPORT', API_BASE_URL . '/laporans/{id}/verifikasi');
-define('API_TANGGAPAN_REPORT', API_BASE_URL . '/laporans/{id}/proses');
-
-// Endpoint tindak lanjut
-define('API_TINDAK_LANJUT', API_BASE_URL . '/tindak-lanjut');
-
-// Endpoint riwayat tindakan
-define('API_RIWAYAT_TINDAKAN', API_BASE_URL . '/riwayat-tindakan');
-
-// Endpoint manajemen pengguna
+// === USER MANAGEMENT ENDPOINTS ===
 define('API_USERS', API_BASE_URL . '/users');
-define('API_USER_BY_ID', API_BASE_URL . '/users/{id}');
-define('API_USER_PROFILE', API_BASE_URL . '/users/profile');
-define('API_USER_STATISTICS', API_BASE_URL . '/users/statistics');
+define('API_USERS_BY_ID', API_BASE_URL . '/users/{id}');
+define('API_USERS_PROFILE', API_BASE_URL . '/users/profile');
+define('API_USERS_STATISTICS', API_BASE_URL . '/users/statistics');
 
-// Endpoint kategori bencana
-define('API_KATEGORIS', API_BASE_URL . '/kategoris');
+// === WILAYAH (Administrative Areas) ENDPOINTS ===
+define('API_WILAYAH_ALL', API_BASE_URL . '/wilayah');
+define('API_WILAYAH_PROVINSI', API_BASE_URL . '/wilayah/provinsi');
+define('API_WILAYAH_PROVINSI_BY_ID', API_BASE_URL . '/wilayah/provinsi/{id}');
+define('API_WILAYAH_KABUPATEN', API_BASE_URL . '/wilayah/kabupaten/{provinsi_id}');
+define('API_WILAYAH_KECAMATAN', API_BASE_URL . '/wilayah/kecamatan/{kabupaten_id}');
+define('API_WILAYAH_DESA', API_BASE_URL . '/wilayah/desa/{kecamatan_id}');
+define('API_WILAYAH_DETAIL', API_BASE_URL . '/wilayah/detail/{desa_id}');
+define('API_WILAYAH_HIERARCHY', API_BASE_URL . '/wilayah/hierarchy/{desa_id}');
+define('API_WILAYAH_SEARCH', API_BASE_URL . '/wilayah/search');
+
+// === KATEGORI BENCANA ENDPOINTS ===
 define('API_KATEGORI_BENCANA', API_BASE_URL . '/kategori-bencana');
+define('API_KATEGORI_BENCANA_BY_ID', API_BASE_URL . '/kategori-bencana/{id}');
 
-// Endpoint wilayah
-define('API_DESA', API_BASE_URL . '/desa');
-define('API_KECAMATAN', API_BASE_URL . '/kecamatan');
-define('API_KABUPATEN', API_BASE_URL . '/kabupaten');
-define('API_PROVINSI', API_BASE_URL . '/provinsi');
+// === LAPORAN BENCANA ENDPOINTS ===
+define('API_LAPORANS', API_BASE_URL . '/laporans');
+define('API_LAPORANS_BY_ID', API_BASE_URL . '/laporans/{id}');
 
-// Endpoint monitoring
+// === TINDAK LANJUT ENDPOINTS ===
+define('API_TINDAK_LANJUT', API_BASE_URL . '/tindak-lanjut');
+define('API_TINDAK_LANJUT_BY_ID', API_BASE_URL . '/tindak-lanjut/{id}');
+
+// === RIWAYAT TINDAKAN ENDPOINTS ===
+define('API_RIWAYAT_TINDAKAN', API_BASE_URL . '/riwayat-tindakan');
+define('API_RIWAYAT_TINDAKAN_BY_ID', API_BASE_URL . '/riwayat-tindakan/{id}');
+
+// === MONITORING ENDPOINTS ===
 define('API_MONITORING', API_BASE_URL . '/monitoring');
+define('API_MONITORING_BY_ID', API_BASE_URL . '/monitoring/{id}');
 
-// Endpoint BMKG Integration
-define('API_BMKG_GEMPA_TERBARU', API_BASE_URL . '/bmkg/gempa/terbaru');
+// === BMKG INTEGRATION ENDPOINTS ===
+define('API_BMKG_ALL', API_BASE_URL . '/bmkg');
+define('API_BMKG_GEMPATERBARU', API_BASE_URL . '/bmkg/gempa/terbaru');
 define('API_BMKG_GEMPA_TERKINI', API_BASE_URL . '/bmkg/gempa/terkini');
 define('API_BMKG_GEMPA_DIRASAKAN', API_BASE_URL . '/bmkg/gempa/dirasakan');
-define('API_BMKG_PRAKIRAAN_CUACA', API_BASE_URL . '/bmkg/prakiraan-cuaca');
 define('API_BMKG_PERINGATAN_TSUNAMI', API_BASE_URL . '/bmkg/peringatan-tsunami');
+define('API_BMKG_PRAKIRAAN_CUACA', API_BASE_URL . '/bmkg/prakiraan-cuaca');
 define('API_BMKG_CACHE_STATUS', API_BASE_URL . '/bmkg/cache/status');
 define('API_BMKG_CACHE_CLEAR', API_BASE_URL . '/bmkg/cache/clear');
 
-// Endpoint statistik laporan
-define('API_REPORTS_STATISTICS', API_BASE_URL . '/laporans/statistics');
+/**
+ * Function to replace placeholders in URL with actual values
+ */
+function buildApiUrl($baseUrl, $params = []) {
+    $url = $baseUrl;
 
-// Fungsi untuk mendapatkan header otentikasi
+    foreach ($params as $placeholder => $value) {
+        $url = str_replace('{' . $placeholder . '}', $value, $url);
+    }
+
+    return $url;
+}
+
+/**
+ * Specific functions for building wilayah URLs
+ */
+function buildApiUrlProvinsiById($id) {
+    return str_replace('{id}', $id, API_WILAYAH_PROVINSI_BY_ID);
+}
+
+function buildApiUrlKabupatenByProvinsiId($provinsiId) {
+    return str_replace('{provinsi_id}', $provinsiId, API_WILAYAH_KABUPATEN);
+}
+
+function buildApiUrlKecamatanByKabupatenId($kabupatenId) {
+    return str_replace('{kabupaten_id}', $kabupatenId, API_WILAYAH_KECAMATAN);
+}
+
+function buildApiUrlDesaByKecamatanId($kecamatanId) {
+    return str_replace('{kecamatan_id}', $kecamatanId, API_WILAYAH_DESA);
+}
+
+function buildApiUrlWilayahDetailByDesaId($desaId) {
+    return str_replace('{desa_id}', $desaId, API_WILAYAH_DETAIL);
+}
+
+function buildApiUrlWilayahHierarchyByDesaId($desaId) {
+    return str_replace('{desa_id}', $desaId, API_WILAYAH_HIERARCHY);
+}
+
+/**
+ * Functions for other dynamic endpoints with ID
+ */
+function buildApiUrlUsersById($id) {
+    return str_replace('{id}', $id, API_USERS_BY_ID);
+}
+
+function buildApiUrlKategoriBencanaById($id) {
+    return str_replace('{id}', $id, API_KATEGORI_BENCANA_BY_ID);
+}
+
+function buildApiUrlLaporansById($id) {
+    return str_replace('{id}', $id, API_LAPORANS_BY_ID);
+}
+
+function buildApiUrlTindakLanjutById($id) {
+    return str_replace('{id}', $id, API_TINDAK_LANJUT_BY_ID);
+}
+
+function buildApiUrlRiwayatTindakanById($id) {
+    return str_replace('{id}', $id, API_RIWAYAT_TINDAKAN_BY_ID);
+}
+
+function buildApiUrlMonitoringById($id) {
+    return str_replace('{id}', $id, API_MONITORING_BY_ID);
+}
+
+
+/**
+ * Get authentication headers
+ */
 function getAuthHeaders($token = null) {
     $headers = [
         'Content-Type: application/json',
@@ -72,48 +147,39 @@ function getAuthHeaders($token = null) {
     return $headers;
 }
 
-// Fungsi untuk melakukan request ke API
-function apiRequest($endpoint, $method = 'GET', $data = null, $headers = []) {
+/**
+ * Function to make API requests
+ */
+function apiRequest($url, $method = 'GET', $data = null, $headers = []) {
     $curl = curl_init();
 
-    // Konfigurasi default cURL
+    // Default cURL configuration
     $curlOptions = [
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_URL => $endpoint,
+        CURLOPT_URL => $url,
         CURLOPT_HTTPHEADER => $headers,
         CURLOPT_SSL_VERIFYPEER => false,
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_TIMEOUT => 30,
-        CURLOPT_HEADER => false, // Jangan ikutkan header dalam output
-        CURLOPT_VERBOSE => true, // Aktifkan verbose untuk debugging
+        CURLOPT_HEADER => false, // Don't include header in output
     ];
 
-    // Tambahkan variable untuk menyimpan informasi debugging
-    $debugInfo = [
-        'endpoint' => $endpoint,
-        'method' => $method,
-        'data' => $data,
-        'headers' => $headers
-    ];
-
-    // Menentukan metode HTTP
+    // Determine HTTP method
     switch (strtoupper($method)) {
         case 'POST':
             $curlOptions[CURLOPT_POST] = true;
             if ($data) {
                 $curlOptions[CURLOPT_POSTFIELDS] = is_array($data) ? json_encode($data) : $data;
-                // Tambahkan header Content-Type jika data adalah JSON
-                if (is_array($data)) {
-                    $existingContentHeader = false;
-                    foreach ($headers as $header) {
-                        if (stripos($header, 'Content-Type:') !== false) {
-                            $existingContentHeader = true;
-                            break;
-                        }
+                // Add Content-Type header if data is JSON and not already in headers
+                $hasContentType = false;
+                foreach ($headers as $header) {
+                    if (stripos($header, 'Content-Type:') !== false) {
+                        $hasContentType = true;
+                        break;
                     }
-                    if (!$existingContentHeader) {
-                        $curlOptions[CURLOPT_HTTPHEADER][] = 'Content-Type: application/json';
-                    }
+                }
+                if (!$hasContentType && is_array($data)) {
+                    $curlOptions[CURLOPT_HTTPHEADER][] = 'Content-Type: application/json';
                 }
             }
             break;
@@ -121,18 +187,16 @@ function apiRequest($endpoint, $method = 'GET', $data = null, $headers = []) {
             $curlOptions[CURLOPT_CUSTOMREQUEST] = 'PUT';
             if ($data) {
                 $curlOptions[CURLOPT_POSTFIELDS] = is_array($data) ? json_encode($data) : $data;
-                // Tambahkan header Content-Type jika data adalah JSON
-                if (is_array($data)) {
-                    $existingContentHeader = false;
-                    foreach ($headers as $header) {
-                        if (stripos($header, 'Content-Type:') !== false) {
-                            $existingContentHeader = true;
-                            break;
-                        }
+                // Add Content-Type header if data is JSON and not already in headers
+                $hasContentType = false;
+                foreach ($headers as $header) {
+                    if (stripos($header, 'Content-Type:') !== false) {
+                        $hasContentType = true;
+                        break;
                     }
-                    if (!$existingContentHeader) {
-                        $curlOptions[CURLOPT_HTTPHEADER][] = 'Content-Type: application/json';
-                    }
+                }
+                if (!$hasContentType && is_array($data)) {
+                    $curlOptions[CURLOPT_HTTPHEADER][] = 'Content-Type: application/json';
                 }
             }
             break;
@@ -151,28 +215,6 @@ function apiRequest($endpoint, $method = 'GET', $data = null, $headers = []) {
 
     curl_close($curl);
 
-    // Debug: Tampilkan informasi request ke browser console jika mode debug aktif
-    if (defined('DEBUG_MODE') && DEBUG_MODE) {
-        $debugOutput = "
-        <script>
-        console.groupCollapsed('API Request: " . addslashes($method) . " " . addslashes($endpoint) . "');
-        console.log({
-            endpoint: '" . addslashes($endpoint) . "',
-            method: '" . addslashes($method) . "',
-            httpCode: " . $httpCode . ",
-            response: " . json_encode($response) . ",
-            debugInfo: " . json_encode($debugInfo) . "
-        });
-        console.groupEnd();
-        </script>";
-
-        // Simpan debug output ke dalam buffer agar tidak langsung ditampilkan
-        if (!isset($GLOBALS['debug_buffer'])) {
-            $GLOBALS['debug_buffer'] = [];
-        }
-        $GLOBALS['debug_buffer'][] = $debugOutput;
-    }
-
     if ($error) {
         return [
             'success' => false,
@@ -185,7 +227,7 @@ function apiRequest($endpoint, $method = 'GET', $data = null, $headers = []) {
 
     $decodedResponse = json_decode($response, true);
 
-    // Jika response bukan JSON valid, kembalikan error
+    // If response is not valid JSON, return error
     if ($response !== '' && $decodedResponse === null && json_last_error() !== JSON_ERROR_NONE) {
         return [
             'success' => false,
@@ -194,27 +236,6 @@ function apiRequest($endpoint, $method = 'GET', $data = null, $headers = []) {
             'http_code' => $httpCode,
             'raw_response' => $response
         ];
-    }
-
-    // Debug: Tampilkan respons API ke browser console
-    if (defined('DEBUG_MODE') && DEBUG_MODE) {
-        $debugOutput = "
-        <script>
-        console.groupCollapsed('API Response: " . addslashes($method) . " " . addslashes($endpoint) . " [" . $httpCode . "]');
-        console.log({
-            success: " . ($httpCode >= 200 && $httpCode < 300 ? 'true' : 'false') . ",
-            httpCode: " . $httpCode . ",
-            decodedResponse: " . json_encode($decodedResponse) . ",
-            rawResponse: '" . addslashes(substr($response, 0, 500)) . "' + '" . (strlen($response) > 500 ? '...' : '') . "'
-        });
-        console.groupEnd();
-        </script>";
-
-        // Simpan debug output ke dalam buffer agar tidak langsung ditampilkan
-        if (!isset($GLOBALS['debug_buffer'])) {
-            $GLOBALS['debug_buffer'] = [];
-        }
-        $GLOBALS['debug_buffer'][] = $debugOutput;
     }
 
     return [
@@ -226,7 +247,9 @@ function apiRequest($endpoint, $method = 'GET', $data = null, $headers = []) {
     ];
 }
 
-// Fungsi untuk mengupload file ke API
+/**
+ * Function to upload file to API
+ */
 function uploadFileToAPI($endpoint, $filePath, $fieldName = 'file', $token = null) {
     $curl = curl_init();
 
@@ -238,7 +261,7 @@ function uploadFileToAPI($endpoint, $filePath, $fieldName = 'file', $token = nul
         $headers[] = 'Authorization: Bearer ' . $token;
     }
 
-    // Persiapan data untuk upload
+    // Prepare data for upload
     $postFields = [
         $fieldName => new CURLFile(realpath($filePath))
     ];
@@ -250,7 +273,7 @@ function uploadFileToAPI($endpoint, $filePath, $fieldName = 'file', $token = nul
         CURLOPT_POSTFIELDS => $postFields,
         CURLOPT_HTTPHEADER => $headers,
         CURLOPT_SSL_VERIFYPEER => false,
-        CURLOPT_TIMEOUT => 60 // Lebih lama untuk upload file
+        CURLOPT_TIMEOUT => 60 // Longer timeout for file upload
     ];
 
     curl_setopt_array($curl, $curlOptions);
@@ -278,18 +301,3 @@ function uploadFileToAPI($endpoint, $filePath, $fieldName = 'file', $token = nul
         'data' => $decodedResponse && isset($decodedResponse['data']) ? $decodedResponse['data'] : $decodedResponse
     ];
 }
-
-// Fungsi untuk menampilkan semua debug output di akhir halaman
-function flushDebugBuffer() {
-    if (isset($GLOBALS['debug_buffer']) && is_array($GLOBALS['debug_buffer'])) {
-        foreach ($GLOBALS['debug_buffer'] as $debugOutput) {
-            echo $debugOutput;
-        }
-        // Kosongkan buffer setelah ditampilkan
-        $GLOBALS['debug_buffer'] = [];
-    }
-}
-
-// Register fungsi untuk dijalankan di akhir eksekusi script
-register_shutdown_function('flushDebugBuffer');
-?>

@@ -1,18 +1,20 @@
 <?php
-require_once 'services/AuthService.php';
+require_once dirname(__DIR__) . '/config/koneksi.php';
+require_once dirname(__DIR__) . '/services/AuthService.php';
 
 class AuthController {
     private $authService;
-    
+
     public function __construct() {
         $this->authService = new AuthService();
     }
-    
+
     public function login() {
         // Jika user sudah login, redirect ke dashboard
         $currentUser = $this->authService->getCurrentUser();
-        if ($currentUser['success']) {
-            $this->redirectToDashboard($currentUser['data']['role']);
+        if ($currentUser['success'] && isset($currentUser['data'])) {
+            $role = $currentUser['data']['role'] ?? $currentUser['data']['user']['role'] ?? 'Warga';
+            $this->redirectToDashboard($role);
             return;
         }
 
@@ -25,21 +27,21 @@ class AuthController {
             // Tampilkan halaman login dengan toast dan redirect script
             $title = "Login - SIMONTA BENCANA";
             $should_redirect = true;
-            include 'views/auth/login.php';
+            include dirname(__DIR__) . '/views/auth/login.php';
             return;
         }
 
         // Tampilkan halaman login
         $title = "Login - SIMONTA BENCANA";
         $should_redirect = false;
-        include 'views/auth/login.php';
+        include dirname(__DIR__) . '/views/auth/login.php';
     }
-    
+
     public function processLogin() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $username = $_POST['username'] ?? '';
             $password = $_POST['password'] ?? '';
-            
+
             if (empty($username) || empty($password)) {
                 $_SESSION['toast'] = [
                     'type' => 'error',
@@ -49,13 +51,18 @@ class AuthController {
                 header('Location: index.php?controller=Auth&action=login');
                 return;
             }
-            
+
             $response = $this->authService->login($username, $password);
 
             if ($response['success']) {
                 // Login berhasil, simpan informasi redirect ke session
                 $_SESSION['redirect_after_login'] = true;
-                $_SESSION['user_role'] = $response['data']['user']['role'];
+
+                // Ambil role dari struktur data yang benar
+                $userData = $response['data']['data'] ?? $response['data'];
+                $userRole = $userData['user']['role'] ?? $userData['role'] ?? 'Warga';
+                $_SESSION['user_role'] = $userRole;
+
                 $_SESSION['toast'] = [
                     'type' => 'success',
                     'title' => 'Berhasil',
@@ -65,25 +72,39 @@ class AuthController {
                 return;
             } else {
                 // Login gagal
+                $errorMessage = $response['message'] ?? 'Login gagal';
+
+                // Jika ada detail error dari API, ambil pesan pertama
+                if (isset($response['data']) && is_array($response['data'])) {
+                    $errors = $response['data'];
+                    if (isset($errors['message'])) {
+                        $errorMessage = $errors['message'];
+                    } elseif (isset($errors['errors']) && is_array($errors['errors'])) {
+                        // Ambil pesan error pertama dari array errors
+                        $firstError = reset($errors['errors']);
+                        $errorMessage = is_array($firstError) ? $firstError[0] : $firstError;
+                    }
+                }
+
                 $_SESSION['toast'] = [
                     'type' => 'error',
                     'title' => 'Gagal',
-                    'message' => $response['message'] ?? 'Login gagal'
+                    'message' => $errorMessage
                 ];
                 header('Location: index.php?controller=Auth&action=login');
                 return;
             }
         }
-        
+
         header('Location: index.php?controller=Auth&action=login');
     }
-    
+
     public function register() {
         // Tampilkan halaman register
         $title = "Register - SIMONTA BENCANA";
-        include 'views/auth/register.php';
+        include dirname(__DIR__) . '/views/auth/register.php';
     }
-    
+
     public function processRegister() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $nama = $_POST['nama'] ?? '';
@@ -95,7 +116,7 @@ class AuthController {
             $no_telepon = $_POST['no_telepon'] ?? '';
             $alamat = $_POST['alamat'] ?? '';
             $id_desa = $_POST['id_desa'] ?? '';
-            
+
             // Validasi input
             if (empty($nama) || empty($username) || empty($email) || empty($password)) {
                 $_SESSION['toast'] = [
@@ -106,7 +127,7 @@ class AuthController {
                 header('Location: index.php?controller=Auth&action=register');
                 return;
             }
-            
+
             if ($password !== $password_confirmation) {
                 $_SESSION['toast'] = [
                     'type' => 'error',
@@ -116,7 +137,7 @@ class AuthController {
                 header('Location: index.php?controller=Auth&action=register');
                 return;
             }
-            
+
             $userData = [
                 'nama' => $nama,
                 'username' => $username,
@@ -128,7 +149,7 @@ class AuthController {
                 'alamat' => $alamat,
                 'id_desa' => $id_desa
             ];
-            
+
             $response = $this->authService->register($userData);
 
             if ($response['success']) {
@@ -143,13 +164,17 @@ class AuthController {
             } else {
                 // Register gagal
                 $message = $response['message'] ?? 'Registrasi gagal';
-                if (isset($response['data']['errors'])) {
-                    $errors = $response['data']['errors'];
-                    $errorMessages = [];
-                    foreach ($errors as $field => $error) {
-                        $errorMessages[] = is_array($error) ? $error[0] : $error;
+
+                // Jika ada detail error dari API, ambil pesan yang paling relevan
+                if (isset($response['data']) && is_array($response['data'])) {
+                    $errors = $response['data'];
+                    if (isset($errors['message'])) {
+                        $message = $errors['message'];
+                    } elseif (isset($errors['errors']) && is_array($errors['errors'])) {
+                        // Ambil pesan error pertama dari array errors
+                        $firstError = reset($errors['errors']);
+                        $message = is_array($firstError) ? $firstError[0] : $firstError;
                     }
-                    $message = implode(', ', $errorMessages);
                 }
 
                 $_SESSION['toast'] = [
@@ -161,22 +186,22 @@ class AuthController {
                 return;
             }
         }
-        
+
         header('Location: index.php?controller=Auth&action=register');
     }
-    
+
     public function logout() {
         $this->authService->logout();
-        
+
         $_SESSION['toast'] = [
             'type' => 'success',
             'title' => 'Berhasil',
             'message' => 'Berhasil logout'
         ];
-        
+
         header('Location: index.php?controller=Auth&action=login');
     }
-    
+
     private function redirectToDashboard($role) {
         // Redirect berdasarkan role pengguna
         switch ($role) {
