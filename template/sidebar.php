@@ -42,7 +42,7 @@
             <a class="nav-link" href="index.php?controller=Wilayah&action=indexKecamatan">Daftar Kecamatan</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="index.php?controller=Wilayah&action=index">Daftar Desa</a>
+            <a class="nav-link" href="index.php?controller=Wilayah&action=indexDesa">Daftar Desa</a>
           </li>
         </ul>
       </div>

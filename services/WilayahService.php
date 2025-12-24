@@ -1,395 +1,191 @@
 <?php
 
 // Require konfigurasi dan service otentikasi
-require_once dirname(__DIR__) . '/config/koneksi.php';
+require_once __DIR__ . '/../config/koneksi.php';
+require_once __DIR__ . '/AuthService.php';
 
 class WilayahService
 {
+    /**
+     * Mendapatkan headers otentikasi
+     */
+    private function getHeaders()
+    {
+        $token = $_SESSION['token'] ?? null;
+        return getAuthHeaders($token);
+    }
+
     /**
      * Ambil semua provinsi
      */
     public function getAllProvinsi()
     {
-        return apiRequest(API_WILAYAH_PROVINSI, 'GET', null, getAuthHeaders());
+        $url = API_WILAYAH_PROVINSI;
+        $headers = $this->getHeaders();
+
+        return apiRequest($url, 'GET', null, $headers);
     }
 
     /**
-     * Ambil provinsi berdasarkan ID
+     * Ambil semua kabupaten berdasarkan provinsi ID
      */
-    public function getProvinsiById($id)
-    {
-        $url = str_replace('{id}', $id, API_WILAYAH_PROVINSI_BY_ID);
-        return apiRequest($url, 'GET', null, getAuthHeaders());
-    }
-
-    /**
-     * Ambil kabupaten berdasarkan ID provinsi
-     */
-    public function getKabupatenByProvinsi($provinsiId)
+    public function getAllKabupaten($provinsiId)
     {
         $url = str_replace('{provinsi_id}', $provinsiId, API_WILAYAH_KABUPATEN);
-        return apiRequest($url, 'GET', null, getAuthHeaders());
+        $headers = $this->getHeaders();
+
+        return apiRequest($url, 'GET', null, $headers);
     }
 
     /**
-     * Ambil kecamatan berdasarkan ID kabupaten
+     * Ambil semua kecamatan berdasarkan kabupaten ID
      */
-    public function getKecamatanByKabupaten($kabupatenId)
+    public function getAllKecamatan($kabupatenId)
     {
         $url = str_replace('{kabupaten_id}', $kabupatenId, API_WILAYAH_KECAMATAN);
-        return apiRequest($url, 'GET', null, getAuthHeaders());
+        $headers = $this->getHeaders();
+
+        return apiRequest($url, 'GET', null, $headers);
     }
 
     /**
-     * Ambil desa berdasarkan ID kecamatan
+     * Ambil semua desa berdasarkan kecamatan ID
      */
-    public function getDesaByKecamatan($kecamatanId)
+    public function getAllDesa($kecamatanId)
     {
         $url = str_replace('{kecamatan_id}', $kecamatanId, API_WILAYAH_DESA);
-        return apiRequest($url, 'GET', null, getAuthHeaders());
+        $headers = $this->getHeaders();
+
+        return apiRequest($url, 'GET', null, $headers);
     }
 
     /**
-     * Ambil detail wilayah lengkap berdasarkan ID desa
-     * Endpoint: /wilayah/detail/{desa_id}
+     * Ambil detail wilayah berdasarkan ID dan jenis
      */
-    public function getWilayahDetailByDesa($desaId)
-    {
-        $url = str_replace('{desa_id}', $desaId, API_WILAYAH_DETAIL);
-        return apiRequest($url, 'GET', null, getAuthHeaders());
-    }
-
-    /**
-     * Ambil hierarki wilayah lengkap berdasarkan ID desa
-     * Endpoint: /wilayah/hierarchy/{desa_id}
-     */
-    public function getWilayahHierarchyByDesa($desaId)
-    {
-        $url = str_replace('{desa_id}', $desaId, API_WILAYAH_HIERARCHY);
-        return apiRequest($url, 'GET', null, getAuthHeaders());
-    }
-
-    /**
-     * Ambil semua wilayah dengan filter
-     * Endpoint: GET /wilayah?jenis={jenis}&page={page}&per_page={per_page}
-     */
-    public function getAllWilayah($jenis = null, $params = [])
-    {
-        $url = API_WILAYAH_ALL;
-
-        // Add jenis parameter if provided
-        if ($jenis) {
-            $params['jenis'] = $jenis;
-        }
-
-        // Add pagination defaults if not provided
-        if (!isset($params['page'])) {
-            $params['page'] = 1;
-        }
-        if (!isset($params['per_page'])) {
-            $params['per_page'] = 15; // Default pagination
-        }
-
-        // Support search parameter
-        if (isset($params['nama']) && !empty($params['nama'])) {
-            $params['q'] = $params['nama']; // Use 'q' for search as per API convention
-            unset($params['nama']); // Remove 'nama' since API uses 'q' for search
-        }
-
-        // Build query string
-        if (!empty($params)) {
-            $url .= '?' . http_build_query($params);
-        }
-
-        return apiRequest($url, 'GET', null, getAuthHeaders());
-    }
-
-    /**
-     * Ambil semua desa dengan pagination
-     * Endpoint: GET /wilayah?jenis=desa&page={page}&per_page={per_page}
-     */
-    public function getAllDesa($params = [])
-    {
-        return $this->getAllWilayah('desa', $params);
-    }
-
-    /**
-     * Ambil semua kecamatan dengan pagination
-     * Endpoint: GET /wilayah?jenis=kecamatan&page={page}&per_page={per_page}
-     */
-    public function getAllKecamatan($params = [])
-    {
-        return $this->getAllWilayah('kecamatan', $params);
-    }
-
-    /**
-     * Ambil semua kabupaten dengan pagination
-     * Endpoint: GET /wilayah?jenis=kabupaten&page={page}&per_page={per_page}
-     */
-    public function getAllKabupaten($params = [])
-    {
-        return $this->getAllWilayah('kabupaten', $params);
-    }
-
-    /**
-     * Ambil semua provinsi dengan pagination
-     * Endpoint: GET /wilayah?jenis=provinsi&page={page}&per_page={per_page}
-     */
-    public function getAllProvinsiWithPagination($params = [])
-    {
-        return $this->getAllWilayah('provinsi', $params);
-    }
-
-    /**
-     * Ambil detail wilayah berdasarkan ID
-     * Endpoint: GET /wilayah/{id}
-     */
-    public function getWilayahById($id)
+    public function getById($id, $jenis)
     {
         $url = str_replace('{id}', $id, API_WILAYAH_BY_ID);
-        return apiRequest($url, 'GET', null, getAuthHeaders());
+        $url .= '?jenis=' . $jenis;
+        $headers = $this->getHeaders();
+
+        return apiRequest($url, 'GET', null, $headers);
     }
 
     /**
-     * Ambil detail desa berdasarkan ID
-     * Endpoint: GET /wilayah/{id}
+     * Buat wilayah baru berdasarkan jenis
      */
-    public function getDesaDetail($id)
+    public function store($data, $jenis)
     {
-        return $this->getWilayahById($id);
+        // Pilih endpoint berdasarkan jenis
+        switch ($jenis) {
+            case 'provinsi':
+                $url = API_WILAYAH_PROVINSI;
+                // For provinsi, we don't send jenis or id_parent
+                unset($data['jenis']);
+                unset($data['id_parent']);
+                break;
+            case 'kabupaten':
+                $url = API_WILAYAH_KABUPATEN_CREATE;
+                // For kabupaten, we don't send jenis, but we do send id_parent
+                unset($data['jenis']);
+                if (isset($data['id_parent'])) {
+                    $data['id_provinsi'] = $data['id_parent'];
+                    unset($data['id_parent']);
+                }
+                break;
+            case 'kecamatan':
+                $url = API_WILAYAH_KECAMATAN_CREATE;
+                // For kecamatan, we don't send jenis, but we do send id_parent
+                unset($data['jenis']);
+                if (isset($data['id_parent'])) {
+                    $data['id_kabupaten'] = $data['id_parent'];
+                    unset($data['id_parent']);
+                }
+                break;
+            case 'desa':
+                $url = API_WILAYAH_DESA_CREATE;
+                // For desa, we don't send jenis, but we do send id_parent
+                unset($data['jenis']);
+                if (isset($data['id_parent'])) {
+                    $data['id_kecamatan'] = $data['id_parent'];
+                    unset($data['id_parent']);
+                }
+                break;
+            default:
+                return [
+                    'success' => false,
+                    'message' => 'Jenis wilayah tidak valid',
+                    'data' => null
+                ];
+        }
+
+        $headers = $this->getHeaders();
+
+        return apiRequest($url, 'POST', $data, $headers);
     }
 
     /**
-     * Ambil detail kecamatan berdasarkan ID
-     * Endpoint: GET /wilayah/{id}
+     * Update wilayah berdasarkan ID dan jenis
      */
-    public function getKecamatanDetail($id)
+    public function update($id, $data, $jenis)
     {
-        return $this->getWilayahById($id);
+        // Pilih endpoint berdasarkan jenis
+        switch ($jenis) {
+            case 'provinsi':
+                $url = str_replace('{id}', $id, API_WILAYAH_PROVINSI_BY_ID);
+                // For provinsi, we don't send jenis
+                unset($data['jenis']);
+                unset($data['id_parent']);
+                break;
+            case 'kabupaten':
+                $url = str_replace('{id}', $id, API_WILAYAH_KABUPATEN_BY_ID);
+                // For kabupaten, we don't send jenis, but we do send id_parent
+                unset($data['jenis']);
+                if (isset($data['id_parent'])) {
+                    $data['id_provinsi'] = $data['id_parent'];
+                    unset($data['id_parent']);
+                }
+                break;
+            case 'kecamatan':
+                $url = str_replace('{id}', $id, API_WILAYAH_KECAMATAN_BY_ID);
+                // For kecamatan, we don't send jenis, but we do send id_parent
+                unset($data['jenis']);
+                if (isset($data['id_parent'])) {
+                    $data['id_kabupaten'] = $data['id_parent'];
+                    unset($data['id_parent']);
+                }
+                break;
+            case 'desa':
+                $url = str_replace('{id}', $id, API_WILAYAH_DESA_BY_ID);
+                // For desa, we don't send jenis, but we do send id_parent
+                unset($data['jenis']);
+                if (isset($data['id_parent'])) {
+                    $data['id_kecamatan'] = $data['id_parent'];
+                    unset($data['id_parent']);
+                }
+                break;
+            default:
+                return [
+                    'success' => false,
+                    'message' => 'Jenis wilayah tidak valid',
+                    'data' => null
+                ];
+        }
+
+        $headers = $this->getHeaders();
+
+        return apiRequest($url, 'PUT', $data, $headers);
     }
 
     /**
-     * Ambil detail kabupaten berdasarkan ID
-     * Endpoint: GET /wilayah/{id}
+     * Hapus wilayah berdasarkan ID dan jenis
      */
-    public function getKabupatenDetail($id)
+    public function delete($id, $jenis)
     {
-        return $this->getWilayahById($id);
-    }
+        $url = str_replace('{id}', $id, API_WILAYAH_DELETE);
+        $url .= '?jenis=' . $jenis; // Pass jenis as query parameter for DELETE request
+        $headers = $this->getHeaders();
 
-    /**
-     * Ambil detail provinsi berdasarkan ID
-     * Endpoint: GET /wilayah/{id}
-     */
-    public function getProvinsiDetail($id)
-    {
-        return $this->getWilayahById($id);
-    }
-
-    /**
-     * Create wilayah baru
-     * Endpoint: POST /wilayah
-     * Payload: { jenis: 'desa|kecamatan|kabupaten|provinsi', nama: '...', id_parent: parent_id }
-     */
-    public function createWilayah($data)
-    {
-        return apiRequest(API_WILAYAH_ALL, 'POST', $data, getAuthHeaders());
-    }
-
-    /**
-     * Create desa baru
-     * Endpoint: POST /wilayah/desa
-     * Payload: { jenis: 'desa', nama: '...', id_parent: kecamatan_id }
-     */
-    public function createDesa($data)
-    {
-        $payload = [
-            'jenis' => 'desa',
-            'nama' => $data['nama'] ?? '',
-            'id_parent' => $data['id_kecamatan'] ?? null, // Mapping: id_kecamatan -> id_parent
-        ];
-
-        return apiRequest(API_WILAYAH_DESA_CREATE, 'POST', $payload, getAuthHeaders());
-    }
-
-    /**
-     * Create kecamatan baru
-     * Endpoint: POST /wilayah/kecamatan
-     * Payload: { jenis: 'kecamatan', nama: '...', id_parent: kabupaten_id }
-     */
-    public function createKecamatan($data)
-    {
-        $payload = [
-            'jenis' => 'kecamatan',
-            'nama' => $data['nama'] ?? '',
-            'id_parent' => $data['id_kabupaten'] ?? null, // Mapping: id_kabupaten -> id_parent
-        ];
-
-        return apiRequest(API_WILAYAH_KECAMATAN_CREATE, 'POST', $payload, getAuthHeaders());
-    }
-
-    /**
-     * Create kabupaten baru
-     * Endpoint: POST /wilayah/kabupaten
-     * Payload: { jenis: 'kabupaten', nama: '...', id_parent: provinsi_id }
-     */
-    public function createKabupaten($data)
-    {
-        $payload = [
-            'jenis' => 'kabupaten',
-            'nama' => $data['nama'] ?? '',
-            'id_parent' => $data['id_provinsi'] ?? null, // Mapping: id_provinsi -> id_parent
-        ];
-
-        return apiRequest(API_WILAYAH_KABUPATEN_CREATE, 'POST', $payload, getAuthHeaders());
-    }
-
-    /**
-     * Create provinsi baru
-     * Endpoint: POST /wilayah
-     * Payload: { jenis: 'provinsi', nama: '...' }
-     */
-    public function createProvinsi($data)
-    {
-        $payload = [
-            'jenis' => 'provinsi',
-            'nama' => $data['nama'] ?? '',
-        ];
-
-        return apiRequest(API_WILAYAH_PROVINSI, 'POST', $payload, getAuthHeaders());
-    }
-
-    /**
-     * Update wilayah
-     * Endpoint: PUT /wilayah/{id}
-     * Payload: { jenis: 'desa|kecamatan|kabupaten|provinsi', nama: '...', id_parent: parent_id }
-     */
-    public function updateWilayah($id, $data)
-    {
-        $url = str_replace('{id}', $id, API_WILAYAH_BY_ID);
-        return apiRequest($url, 'PUT', $data, getAuthHeaders());
-    }
-
-    /**
-     * Update desa
-     * Endpoint: PUT /wilayah/desa/{id}
-     * Payload: { jenis: 'desa', nama: '...', id_parent: kecamatan_id }
-     */
-    public function updateDesa($id, $data)
-    {
-        $payload = [
-            'jenis' => 'desa',
-            'nama' => $data['nama'] ?? '',
-            'id_parent' => $data['id_kecamatan'] ?? null, // Mapping: id_kecamatan -> id_parent
-        ];
-
-        $url = str_replace('{id}', $id, API_WILAYAH_DESA_BY_ID);
-        return apiRequest($url, 'PUT', $payload, getAuthHeaders());
-    }
-
-    /**
-     * Update kecamatan
-     * Endpoint: PUT /wilayah/kecamatan/{id}
-     * Payload: { jenis: 'kecamatan', nama: '...', id_parent: kabupaten_id }
-     */
-    public function updateKecamatan($id, $data)
-    {
-        $payload = [
-            'jenis' => 'kecamatan',
-            'nama' => $data['nama'] ?? '',
-            'id_parent' => $data['id_kabupaten'] ?? null, // Mapping: id_kabupaten -> id_parent
-        ];
-
-        $url = str_replace('{id}', $id, API_WILAYAH_KECAMATAN_BY_ID);
-        return apiRequest($url, 'PUT', $payload, getAuthHeaders());
-    }
-
-    /**
-     * Update kabupaten
-     * Endpoint: PUT /wilayah/kabupaten/{id}
-     * Payload: { jenis: 'kabupaten', nama: '...', id_parent: provinsi_id }
-     */
-    public function updateKabupaten($id, $data)
-    {
-        $payload = [
-            'jenis' => 'kabupaten',
-            'nama' => $data['nama'] ?? '',
-            'id_parent' => $data['id_provinsi'] ?? null, // Mapping: id_provinsi -> id_parent
-        ];
-
-        $url = str_replace('{id}', $id, API_WILAYAH_KABUPATEN_BY_ID);
-        return apiRequest($url, 'PUT', $payload, getAuthHeaders());
-    }
-
-    /**
-     * Update provinsi
-     * Endpoint: PUT /wilayah/{id}
-     * Payload: { jenis: 'provinsi', nama: '...' }
-     */
-    public function updateProvinsi($id, $data)
-    {
-        $payload = [
-            'jenis' => 'provinsi',
-            'nama' => $data['nama'] ?? '',
-        ];
-
-        $url = str_replace('{id}', $id, API_WILAYAH_PROVINSI_BY_ID);
-        return apiRequest($url, 'PUT', $payload, getAuthHeaders());
-    }
-
-    /**
-     * Delete wilayah
-     * Endpoint: DELETE /wilayah/{id}
-     */
-    public function deleteWilayah($id)
-    {
-        $url = str_replace('{id}', $id, API_WILAYAH_BY_ID);
-        return apiRequest($url, 'DELETE', null, getAuthHeaders());
-    }
-
-    /**
-     * Delete desa
-     * Endpoint: DELETE /wilayah/{id}
-     */
-    public function deleteDesa($id)
-    {
-        return $this->deleteWilayah($id);
-    }
-
-    /**
-     * Delete kecamatan
-     * Endpoint: DELETE /wilayah/{id}
-     */
-    public function deleteKecamatan($id)
-    {
-        return $this->deleteWilayah($id);
-    }
-
-    /**
-     * Delete kabupaten
-     * Endpoint: DELETE /wilayah/{id}
-     */
-    public function deleteKabupaten($id)
-    {
-        return $this->deleteWilayah($id);
-    }
-
-    /**
-     * Delete provinsi
-     * Endpoint: DELETE /wilayah/{id}
-     */
-    public function deleteProvinsi($id)
-    {
-        return $this->deleteWilayah($id);
-    }
-
-    /**
-     * Search wilayah by name
-     * Endpoint: GET /wilayah/search?q={query}
-     */
-    public function searchWilayah($query)
-    {
-        $url = API_WILAYAH_SEARCH . '?' . http_build_query(['q' => $query]);
-        return apiRequest($url, 'GET', null, getAuthHeaders());
+        return apiRequest($url, 'DELETE', null, $headers);
     }
 }

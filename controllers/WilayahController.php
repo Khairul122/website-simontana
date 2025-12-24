@@ -9,1304 +9,1004 @@ class WilayahController
 
     public function __construct()
     {
+        // Cek otentikasi pengguna
+        if (!isset($_SESSION['user'])) {
+            header('Location: ../login.php');
+            exit();
+        }
+        
         $this->service = new WilayahService();
     }
 
     /**
-     * Ambil semua provinsi (API endpoint)
+     * Provinsi Methods
      */
-    public function getAllProvinsi()
-    {
-        $response = $this->service->getAllProvinsi();
-
-        header('Content-Type: application/json');
-        echo json_encode($response);
-    }
 
     /**
-     * Ambil kabupaten berdasarkan provinsi (API endpoint)
-     */
-    public function getKabupatenByProvinsi()
-    {
-        $provinsiId = $_GET['provinsi_id'] ?? null;
-
-        if (!$provinsiId) {
-            header('Content-Type: application/json');
-            echo json_encode([
-                'success' => false,
-                'message' => 'ID provinsi tidak ditemukan'
-            ]);
-            return;
-        }
-
-        $response = $this->service->getKabupatenByProvinsi($provinsiId);
-
-        header('Content-Type: application/json');
-        echo json_encode($response);
-    }
-
-    /**
-     * Ambil kecamatan berdasarkan kabupaten (API endpoint)
-     */
-    public function getKecamatanByKabupaten()
-    {
-        $kabupatenId = $_GET['kabupaten_id'] ?? null;
-
-        if (!$kabupatenId) {
-            header('Content-Type: application/json');
-            echo json_encode([
-                'success' => false,
-                'message' => 'ID kabupaten tidak ditemukan'
-            ]);
-            return;
-        }
-
-        $response = $this->service->getKecamatanByKabupaten($kabupatenId);
-
-        header('Content-Type: application/json');
-        echo json_encode($response);
-    }
-
-    /**
-     * Ambil desa berdasarkan kecamatan (API endpoint)
-     */
-    public function getDesaByKecamatan()
-    {
-        $kecamatanId = $_GET['kecamatan_id'] ?? null;
-
-        if (!$kecamatanId) {
-            header('Content-Type: application/json');
-            echo json_encode([
-                'success' => false,
-                'message' => 'ID kecamatan tidak ditemukan'
-            ]);
-            return;
-        }
-
-        $response = $this->service->getDesaByKecamatan($kecamatanId);
-
-        header('Content-Type: application/json');
-        echo json_encode($response);
-    }
-
-    /**
-     * Ambil detail wilayah lengkap berdasarkan ID desa (API endpoint)
-     */
-    public function getWilayahDetailByDesa()
-    {
-        $desaId = $_GET['desa_id'] ?? null;
-
-        if (!$desaId) {
-            header('Content-Type: application/json');
-            echo json_encode([
-                'success' => false,
-                'message' => 'ID desa tidak ditemukan'
-            ]);
-            return;
-        }
-
-        $response = $this->service->getWilayahDetailByDesa($desaId);
-
-        header('Content-Type: application/json');
-        echo json_encode($response);
-    }
-
-    /**
-     * Ambil hierarki wilayah lengkap berdasarkan ID desa (API endpoint)
-     */
-    public function getWilayahHierarchyByDesa()
-    {
-        $desaId = $_GET['desa_id'] ?? null;
-
-        if (!$desaId) {
-            header('Content-Type: application/json');
-            echo json_encode([
-                'success' => false,
-                'message' => 'ID desa tidak ditemukan'
-            ]);
-            return;
-        }
-
-        $response = $this->service->getWilayahHierarchyByDesa($desaId);
-
-        header('Content-Type: application/json');
-        echo json_encode($response);
-    }
-
-    /**
-     * Alias untuk getWilayahDetailByDesa untuk kompatibilitas
-     */
-    public function getWilayahDetailByDesaId()
-    {
-        $this->getWilayahDetailByDesa();
-    }
-
-    /**
-     * Display list of all desa
-     * Endpoint: /wilayah?jenis=desa&page={page}&per_page={per_page}
-     * Response structure: { data: { data: [...], current_page: ..., last_page: ... }, ... }
-     */
-    public function index()
-    {
-        // Get pagination parameters from request
-        $page = $_GET['page'] ?? 1;
-        $perPage = $_GET['per_page'] ?? 15;
-        $search = $_GET['search'] ?? '';
-
-        $params = [
-            'page' => $page,
-            'per_page' => $perPage
-        ];
-
-        // Add search filter if provided
-        if (!empty($search)) {
-            $params['q'] = $search; // Use 'q' for search as per API convention
-        }
-
-        $response = $this->service->getAllDesa($params);
-
-        // Handle unauthorized
-        if (isset($response['http_code']) && $response['http_code'] === 401) {
-            header('Location: index.php?controller=Auth&action=logout');
-            exit;
-        }
-
-        $desaList = [];
-        $pagination = [];
-
-        if ($response['success']) {
-            // Parse response dari endpoint /wilayah?jenis=desa
-            // Response structure: { data: { data: [...], current_page: X, last_page: Y, ... }, ... }
-            $responseData = $response['data'] ?? [];
-
-            // Check if response has pagination structure
-            if (isset($responseData['data']) && is_array($responseData['data'])) {
-                // API returns paginated data
-                $rawData = $responseData['data'];
-                $pagination = [
-                    'current_page' => $responseData['current_page'] ?? 1,
-                    'last_page' => $responseData['last_page'] ?? 1,
-                    'per_page' => $responseData['per_page'] ?? 15,
-                    'total' => $responseData['total'] ?? 0,
-                    'from' => $responseData['from'] ?? 0,
-                    'to' => $responseData['to'] ?? 0,
-                ];
-            } elseif (is_array($responseData)) {
-                // API returns non-paginated data (direct array)
-                $rawData = $responseData;
-                $pagination = [
-                    'current_page' => 1,
-                    'last_page' => 1,
-                    'per_page' => count($responseData),
-                    'total' => count($responseData),
-                ];
-            } else {
-                $rawData = [];
-            }
-
-            // Transform data wilayah ke format desa untuk view
-            if (is_array($rawData)) {
-                foreach ($rawData as $item) {
-                    // Handle nested parent structure
-                    $kecamatanNama = '';
-                    $kabupatenNama = '';
-                    $provinsiNama = '';
-
-                    // Extract hierarchical data from nested parent structure
-                    if (isset($item['parent']) && is_array($item['parent'])) {
-                        $kecamatanNama = $item['parent']['nama'] ?? '';
-
-                        if (isset($item['parent']['parent']) && is_array($item['parent']['parent'])) {
-                            $kabupatenNama = $item['parent']['parent']['nama'] ?? '';
-
-                            if (isset($item['parent']['parent']['parent']) && is_array($item['parent']['parent']['parent'])) {
-                                $provinsiNama = $item['parent']['parent']['parent']['nama'] ?? '';
-                            }
-                        }
-                    }
-
-                    $desaList[] = [
-                        'id' => $item['id'] ?? null,
-                        'nama' => $item['nama'] ?? '',
-                        'id_kecamatan' => $item['id_parent'] ?? null,
-                        'nama_kecamatan' => $kecamatanNama,
-                        'nama_kabupaten' => $kabupatenNama,
-                        'nama_provinsi' => $provinsiNama,
-                        'jenis' => $item['jenis'] ?? '',
-                    ];
-                }
-            }
-        }
-
-        $title = "Manajemen Wilayah - Daftar Desa";
-        include 'views/wilayah/index.php';
-    }
-
-    /**
-     * Show form for creating new desa
-     */
-    public function create()
-    {
-        $isEdit = false;
-        $desa = null;
-
-        $title = "Manajemen Wilayah - Tambah Desa";
-        include 'views/wilayah/form.php';
-    }
-
-    /**
-     * Show form for editing existing desa
-     */
-    public function edit()
-    {
-        $id = $_GET['id'] ?? null;
-
-        if (!$id) {
-            header('Location: index.php?controller=Wilayah&action=index&error=ID+desa+tidak+ditemukan');
-            exit;
-        }
-
-        $response = $this->service->getDesaDetail($id);
-
-        // Handle unauthorized
-        if (isset($response['http_code']) && $response['http_code'] === 401) {
-            header('Location: index.php?controller=Auth&action=logout');
-            exit;
-        }
-
-        // Handle forbidden
-        if (isset($response['http_code']) && $response['http_code'] === 403) {
-            header('Location: index.php?controller=Wilayah&action=index&error=' . urlencode('Anda tidak memiliki hak akses untuk mengedit data ini'));
-            exit;
-        }
-
-        if (!$response['success']) {
-            header('Location: index.php?controller=Wilayah&action=index&error=' . urlencode($response['message'] ?? 'Data desa tidak ditemukan'));
-            exit;
-        }
-
-        $isEdit = true;
-
-        // Parse response dari endpoint /wilayah/{id}
-        $rawData = $response['data'];
-
-        // Transform data wilayah ke format desa untuk form
-        $desa = [
-            'id' => $rawData['id'] ?? null,
-            'nama' => $rawData['nama'] ?? '',
-            'id_kecamatan' => $rawData['id_parent'] ?? null,
-            'jenis' => $rawData['jenis'] ?? '',
-            // Data hierarki lengkap untuk pre-fill dropdown
-            'kecamatan' => [
-                'id' => $rawData['parent']['id'] ?? null,
-                'nama' => $rawData['parent']['nama'] ?? '',
-            ],
-            'kabupaten' => [
-                'id' => $rawData['parent']['parent']['id'] ?? null,
-                'nama' => $rawData['parent']['parent']['nama'] ?? '',
-            ],
-            'provinsi' => [
-                'id' => $rawData['parent']['parent']['parent']['id'] ?? null,
-                'nama' => $rawData['parent']['parent']['parent']['nama'] ?? '',
-            ],
-        ];
-
-        $title = "Manajemen Wilayah - Edit Desa";
-        include 'views/wilayah/form.php';
-    }
-
-    /**
-     * Store new desa
-     */
-    public function store()
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: index.php?controller=Wilayah&action=index');
-            exit;
-        }
-
-        $data = [
-            'nama' => $_POST['nama'] ?? '',
-            'id_kecamatan' => $_POST['id_kecamatan'] ?? null,
-        ];
-
-        // Validasi input
-        if (empty($data['nama']) || empty($data['id_kecamatan'])) {
-            header('Location: index.php?controller=Wilayah&action=create&error=Nama+desa+dan+kecamatan+wajib+diisi');
-            exit;
-        }
-
-        $response = $this->service->createDesa($data);
-
-        // Handle unauthorized
-        if (isset($response['http_code']) && $response['http_code'] === 401) {
-            header('Location: index.php?controller=Auth&action=logout');
-            exit;
-        }
-
-        // Handle forbidden
-        if (isset($response['http_code']) && $response['http_code'] === 403) {
-            $errorMessage = 'Anda tidak memiliki hak akses untuk menambah data desa.';
-            header('Location: index.php?controller=Wilayah&action=create&error=' . urlencode($errorMessage));
-            exit;
-        }
-
-        if ($response['success']) {
-            header('Location: index.php?controller=Wilayah&action=index&success=' . urlencode('Desa berhasil ditambahkan'));
-            exit;
-        } else {
-            $errorMessage = $response['message'] ?? 'Gagal menambahkan desa';
-            header('Location: index.php?controller=Wilayah&action=create&error=' . urlencode($errorMessage));
-            exit;
-        }
-    }
-
-    /**
-     * Update existing desa
-     */
-    public function update()
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: index.php?controller=Wilayah&action=index');
-            exit;
-        }
-
-        $id = $_POST['id'] ?? null;
-
-        if (!$id) {
-            header('Location: index.php?controller=Wilayah&action=index&error=ID+desa+tidak+ditemukan');
-            exit;
-        }
-
-        $data = [
-            'nama' => $_POST['nama'] ?? '',
-            'id_kecamatan' => $_POST['id_kecamatan'] ?? null,
-        ];
-
-        // Validasi input
-        if (empty($data['nama']) || empty($data['id_kecamatan'])) {
-            header('Location: index.php?controller=Wilayah&action=edit&id=' . $id . '&error=Nama+desa+dan+kecamatan+wajib+diisi');
-            exit;
-        }
-
-        $response = $this->service->updateDesa($id, $data);
-
-        // Handle unauthorized
-        if (isset($response['http_code']) && $response['http_code'] === 401) {
-            header('Location: index.php?controller=Auth&action=logout');
-            exit;
-        }
-
-        // Handle forbidden
-        if (isset($response['http_code']) && $response['http_code'] === 403) {
-            $errorMessage = 'Anda tidak memiliki hak akses untuk mengedit data desa.';
-            header('Location: index.php?controller=Wilayah&action=edit&id=' . $id . '&error=' . urlencode($errorMessage));
-            exit;
-        }
-
-        if ($response['success']) {
-            header('Location: index.php?controller=Wilayah&action=index&success=' . urlencode('Desa berhasil diperbarui'));
-            exit;
-        } else {
-            $errorMessage = $response['message'] ?? 'Gagal memperbarui desa';
-            header('Location: index.php?controller=Wilayah&action=edit&id=' . $id . '&error=' . urlencode($errorMessage));
-            exit;
-        }
-    }
-
-    /**
-     * Delete desa
-     */
-    public function delete()
-    {
-        $id = $_GET['id'] ?? null;
-
-        if (!$id) {
-            header('Location: index.php?controller=Wilayah&action=index&error=ID+desa+tidak+ditemukan');
-            exit;
-        }
-
-        $response = $this->service->deleteDesa($id);
-
-        // Handle unauthorized
-        if (isset($response['http_code']) && $response['http_code'] === 401) {
-            header('Location: index.php?controller=Auth&action=logout');
-            exit;
-        }
-
-        // Handle forbidden
-        if (isset($response['http_code']) && $response['http_code'] === 403) {
-            $errorMessage = 'Anda tidak memiliki hak akses untuk menghapus data desa.';
-            header('Location: index.php?controller=Wilayah&action=index&error=' . urlencode($errorMessage));
-            exit;
-        }
-
-        if ($response['success']) {
-            header('Location: index.php?controller=Wilayah&action=index&success=' . urlencode('Desa berhasil dihapus'));
-            exit;
-        } else {
-            $errorMessage = $response['message'] ?? 'Gagal menghapus desa';
-            header('Location: index.php?controller=Wilayah&action=index&error=' . urlencode($errorMessage));
-            exit;
-        }
-    }
-
-    /**
-     * Display list of all provinsi
-     * Endpoint: /wilayah?jenis=provinsi&page={page}&per_page={per_page}
+     * Tampilkan halaman index provinsi
      */
     public function indexProvinsi()
     {
-        // Get pagination parameters from request
-        $page = $_GET['page'] ?? 1;
-        $perPage = $_GET['per_page'] ?? 15;
-        $search = $_GET['search'] ?? '';
+        $response = $this->service->getAllProvinsi();
 
-        $params = [
-            'page' => $page,
-            'per_page' => $perPage
-        ];
-
-        // Add search filter if provided
-        if (!empty($search)) {
-            $params['q'] = $search; // Use 'q' for search as per API convention
+        if (!$response['success']) {
+            $provinsiList = [];
+        } else {
+            $provinsiList = $response['data'] ?? [];
         }
 
-        $response = $this->service->getAllProvinsiWithPagination($params);
-
-        // Handle unauthorized
-        if (isset($response['http_code']) && $response['http_code'] === 401) {
-            header('Location: index.php?controller=Auth&action=logout');
-            exit;
-        }
-
-        $provinsiList = [];
-        $pagination = [];
-
-        if ($response['success']) {
-            // Parse response dari endpoint /wilayah?jenis=provinsi
-            // Response structure: { data: { data: [...], current_page: X, last_page: Y, ... }, ... }
-            $responseData = $response['data'] ?? [];
-
-            // Check if response has pagination structure
-            if (isset($responseData['data']) && is_array($responseData['data'])) {
-                // API returns paginated data
-                $rawData = $responseData['data'];
-                $pagination = [
-                    'current_page' => $responseData['current_page'] ?? 1,
-                    'last_page' => $responseData['last_page'] ?? 1,
-                    'per_page' => $responseData['per_page'] ?? 15,
-                    'total' => $responseData['total'] ?? 0,
-                    'from' => $responseData['from'] ?? 0,
-                    'to' => $responseData['to'] ?? 0,
-                ];
-            } elseif (is_array($responseData)) {
-                // API returns non-paginated data (direct array)
-                $rawData = $responseData;
-                $pagination = [
-                    'current_page' => 1,
-                    'last_page' => 1,
-                    'per_page' => count($responseData),
-                    'total' => count($responseData),
-                ];
-            } else {
-                $rawData = [];
-            }
-
-            // Transform data wilayah ke format provinsi untuk view
-            if (is_array($rawData)) {
-                foreach ($rawData as $item) {
-                    $provinsiList[] = [
-                        'id' => $item['id'] ?? null,
-                        'nama' => $item['nama'] ?? '',
-                        'jenis' => $item['jenis'] ?? '',
-                    ];
-                }
-            }
-        }
-
-        $title = "Manajemen Wilayah - Daftar Provinsi";
-        include 'views/wilayah/index_provinsi.php';
+        include __DIR__ . '/../views/wilayah/index-provinsi.php';
     }
 
     /**
-     * Show form for creating new provinsi
+     * Tampilkan form create provinsi
      */
     public function createProvinsi()
     {
         $isEdit = false;
         $provinsi = null;
 
-        $title = "Manajemen Wilayah - Tambah Provinsi";
-        include 'views/wilayah/form_provinsi.php';
+        include __DIR__ . '/../views/wilayah/form-provinsi.php';
     }
 
     /**
-     * Show form for editing existing provinsi
-     */
-    public function editProvinsi()
-    {
-        $id = $_GET['id'] ?? null;
-
-        if (!$id) {
-            header('Location: index.php?controller=Wilayah&action=indexProvinsi&error=ID+provinsi+tidak+ditemukan');
-            exit;
-        }
-
-        $response = $this->service->getProvinsiDetail($id);
-
-        // Handle unauthorized
-        if (isset($response['http_code']) && $response['http_code'] === 401) {
-            header('Location: index.php?controller=Auth&action=logout');
-            exit;
-        }
-
-        // Handle forbidden
-        if (isset($response['http_code']) && $response['http_code'] === 403) {
-            header('Location: index.php?controller=Wilayah&action=indexProvinsi&error=' . urlencode('Anda tidak memiliki hak akses untuk mengedit data ini'));
-            exit;
-        }
-
-        if (!$response['success']) {
-            header('Location: index.php?controller=Wilayah&action=indexProvinsi&error=' . urlencode($response['message'] ?? 'Data provinsi tidak ditemukan'));
-            exit;
-        }
-
-        $isEdit = true;
-
-        // Parse response dari endpoint /wilayah/{id}
-        $rawData = $response['data'];
-
-        // Transform data wilayah ke format provinsi untuk form
-        $provinsi = [
-            'id' => $rawData['id'] ?? null,
-            'nama' => $rawData['nama'] ?? '',
-            'jenis' => $rawData['jenis'] ?? '',
-        ];
-
-        $title = "Manajemen Wilayah - Edit Provinsi";
-        include 'views/wilayah/form_provinsi.php';
-    }
-
-    /**
-     * Store new provinsi
+     * Simpan data provinsi baru
      */
     public function storeProvinsi()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: index.php?controller=Wilayah&action=indexProvinsi');
-            exit;
+            exit();
         }
 
+        // Ambil data dari form
+        $nama = trim($_POST['nama'] ?? '');
+
+        // Validasi
+        if (empty($nama)) {
+            echo '<script>alert("Nama provinsi wajib diisi"); window.location.href="index.php?controller=Wilayah&action=createProvinsi";</script>';
+            exit();
+        }
+
+        // Data untuk dikirim ke API
         $data = [
-            'nama' => $_POST['nama'] ?? '',
+            'nama' => $nama
         ];
 
-        // Validasi input
-        if (empty($data['nama'])) {
-            header('Location: index.php?controller=Wilayah&action=createProvinsi&error=Nama+provinsi+wajib+diisi');
-            exit;
-        }
-
-        $response = $this->service->createProvinsi($data);
-
-        // Handle unauthorized
-        if (isset($response['http_code']) && $response['http_code'] === 401) {
-            header('Location: index.php?controller=Auth&action=logout');
-            exit;
-        }
-
-        // Handle forbidden
-        if (isset($response['http_code']) && $response['http_code'] === 403) {
-            $errorMessage = 'Anda tidak memiliki hak akses untuk menambah data provinsi.';
-            header('Location: index.php?controller=Wilayah&action=createProvinsi&error=' . urlencode($errorMessage));
-            exit;
-        }
+        // Panggil service
+        $response = $this->service->store($data, 'provinsi');
 
         if ($response['success']) {
-            header('Location: index.php?controller=Wilayah&action=indexProvinsi&success=' . urlencode('Provinsi berhasil ditambahkan'));
-            exit;
+            echo '<script>alert("Provinsi berhasil ditambahkan"); window.location.href="index.php?controller=Wilayah&action=indexProvinsi";</script>';
         } else {
-            $errorMessage = $response['message'] ?? 'Gagal menambahkan provinsi';
-            header('Location: index.php?controller=Wilayah&action=createProvinsi&error=' . urlencode($errorMessage));
-            exit;
+            echo '<script>alert("Gagal menambahkan provinsi: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexProvinsi";</script>';
         }
+        exit();
     }
 
     /**
-     * Update existing provinsi
+     * Tampilkan form edit provinsi
      */
-    public function updateProvinsi()
+    public function editProvinsi()
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: index.php?controller=Wilayah&action=indexProvinsi');
-            exit;
-        }
-
-        $id = $_POST['id'] ?? null;
-
-        if (!$id) {
-            header('Location: index.php?controller=Wilayah&action=indexProvinsi&error=ID+provinsi+tidak+ditemukan');
-            exit;
-        }
-
-        $data = [
-            'nama' => $_POST['nama'] ?? '',
-        ];
-
-        // Validasi input
-        if (empty($data['nama'])) {
-            header('Location: index.php?controller=Wilayah&action=editProvinsi&id=' . $id . '&error=Nama+provinsi+wajib+diisi');
-            exit;
-        }
-
-        $response = $this->service->updateProvinsi($id, $data);
-
-        // Handle unauthorized
-        if (isset($response['http_code']) && $response['http_code'] === 401) {
-            header('Location: index.php?controller=Auth&action=logout');
-            exit;
-        }
-
-        // Handle forbidden
-        if (isset($response['http_code']) && $response['http_code'] === 403) {
-            $errorMessage = 'Anda tidak memiliki hak akses untuk mengedit data provinsi.';
-            header('Location: index.php?controller=Wilayah&action=editProvinsi&id=' . $id . '&error=' . urlencode($errorMessage));
-            exit;
-        }
-
-        if ($response['success']) {
-            header('Location: index.php?controller=Wilayah&action=indexProvinsi&success=' . urlencode('Provinsi berhasil diperbarui'));
-            exit;
-        } else {
-            $errorMessage = $response['message'] ?? 'Gagal memperbarui provinsi';
-            header('Location: index.php?controller=Wilayah&action=editProvinsi&id=' . $id . '&error=' . urlencode($errorMessage));
-            exit;
-        }
-    }
-
-    /**
-     * Delete provinsi
-     */
-    public function deleteProvinsi()
-    {
+        // Ambil ID dari query string
         $id = $_GET['id'] ?? null;
 
+        // Validasi ID
         if (!$id) {
-            header('Location: index.php?controller=Wilayah&action=indexProvinsi&error=ID+provinsi+tidak+ditemukan');
+            echo '<script>alert("ID tidak ditemukan"); window.location.href="index.php?controller=Wilayah&action=indexProvinsi";</script>';
             exit;
         }
 
-        $response = $this->service->deleteProvinsi($id);
-
-        // Handle unauthorized
-        if (isset($response['http_code']) && $response['http_code'] === 401) {
-            header('Location: index.php?controller=Auth&action=logout');
-            exit;
-        }
-
-        // Handle forbidden
-        if (isset($response['http_code']) && $response['http_code'] === 403) {
-            $errorMessage = 'Anda tidak memiliki hak akses untuk menghapus data provinsi.';
-            header('Location: index.php?controller=Wilayah&action=indexProvinsi&error=' . urlencode($errorMessage));
-            exit;
-        }
-
-        if ($response['success']) {
-            header('Location: index.php?controller=Wilayah&action=indexProvinsi&success=' . urlencode('Provinsi berhasil dihapus'));
-            exit;
-        } else {
-            $errorMessage = $response['message'] ?? 'Gagal menghapus provinsi';
-            header('Location: index.php?controller=Wilayah&action=indexProvinsi&error=' . urlencode($errorMessage));
-            exit;
-        }
-    }
-
-    /**
-     * Display list of all kabupaten
-     * Endpoint: /wilayah?jenis=kabupaten&page={page}&per_page={per_page}
-     */
-    public function indexKabupaten()
-    {
-        // Get pagination parameters from request
-        $page = $_GET['page'] ?? 1;
-        $perPage = $_GET['per_page'] ?? 15;
-        $search = $_GET['search'] ?? '';
-
-        $params = [
-            'page' => $page,
-            'per_page' => $perPage
-        ];
-
-        // Add search filter if provided
-        if (!empty($search)) {
-            $params['q'] = $search; // Use 'q' for search as per API convention
-        }
-
-        $response = $this->service->getAllKabupaten($params);
-
-        // Handle unauthorized
-        if (isset($response['http_code']) && $response['http_code'] === 401) {
-            header('Location: index.php?controller=Auth&action=logout');
-            exit;
-        }
-
-        $kabupatenList = [];
-        $pagination = [];
-
-        if ($response['success']) {
-            // Parse response dari endpoint /wilayah?jenis=kabupaten
-            // Response structure: { data: { data: [...], current_page: X, last_page: Y, ... }, ... }
-            $responseData = $response['data'] ?? [];
-
-            // Check if response has pagination structure
-            if (isset($responseData['data']) && is_array($responseData['data'])) {
-                // API returns paginated data
-                $rawData = $responseData['data'];
-                $pagination = [
-                    'current_page' => $responseData['current_page'] ?? 1,
-                    'last_page' => $responseData['last_page'] ?? 1,
-                    'per_page' => $responseData['per_page'] ?? 15,
-                    'total' => $responseData['total'] ?? 0,
-                    'from' => $responseData['from'] ?? 0,
-                    'to' => $responseData['to'] ?? 0,
-                ];
-            } elseif (is_array($responseData)) {
-                // API returns non-paginated data (direct array)
-                $rawData = $responseData;
-                $pagination = [
-                    'current_page' => 1,
-                    'last_page' => 1,
-                    'per_page' => count($responseData),
-                    'total' => count($responseData),
-                ];
-            } else {
-                $rawData = [];
-            }
-
-            // Transform data wilayah ke format kabupaten untuk view
-            if (is_array($rawData)) {
-                foreach ($rawData as $item) {
-                    // Handle nested parent structure
-                    $provinsiNama = '';
-
-                    // Extract hierarchical data from nested parent structure
-                    if (isset($item['parent']) && is_array($item['parent'])) {
-                        $provinsiNama = $item['parent']['nama'] ?? '';
-                    }
-
-                    $kabupatenList[] = [
-                        'id' => $item['id'] ?? null,
-                        'nama' => $item['nama'] ?? '',
-                        'id_provinsi' => $item['id_parent'] ?? null,
-                        'nama_provinsi' => $provinsiNama,
-                        'jenis' => $item['jenis'] ?? '',
-                    ];
-                }
-            }
-        }
-
-        $title = "Manajemen Wilayah - Daftar Kabupaten";
-        include 'views/wilayah/index_kabupaten.php';
-    }
-
-    /**
-     * Show form for creating new kabupaten
-     */
-    public function createKabupaten()
-    {
-        $isEdit = false;
-        $kabupaten = null;
-
-        $title = "Manajemen Wilayah - Tambah Kabupaten";
-        include 'views/wilayah/form_kabupaten.php';
-    }
-
-    /**
-     * Show form for editing existing kabupaten
-     */
-    public function editKabupaten()
-    {
-        $id = $_GET['id'] ?? null;
-
-        if (!$id) {
-            header('Location: index.php?controller=Wilayah&action=indexKabupaten&error=ID+kabupaten+tidak+ditemukan');
-            exit;
-        }
-
-        $response = $this->service->getKabupatenDetail($id);
-
-        // Handle unauthorized
-        if (isset($response['http_code']) && $response['http_code'] === 401) {
-            header('Location: index.php?controller=Auth&action=logout');
-            exit;
-        }
-
-        // Handle forbidden
-        if (isset($response['http_code']) && $response['http_code'] === 403) {
-            header('Location: index.php?controller=Wilayah&action=indexKabupaten&error=' . urlencode('Anda tidak memiliki hak akses untuk mengedit data ini'));
-            exit;
-        }
+        $response = $this->service->getById($id, 'provinsi');
 
         if (!$response['success']) {
-            header('Location: index.php?controller=Wilayah&action=indexKabupaten&error=' . urlencode($response['message'] ?? 'Data kabupaten tidak ditemukan'));
-            exit;
+            echo '<script>alert("Gagal mengambil data provinsi: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexProvinsi";</script>';
+            exit();
+        }
+
+        // Cek struktur data yang dikembalikan API
+        if (isset($response['data']['data'])) {
+            $provinsi = $response['data']['data'];
+        } elseif (isset($response['data']) && !empty($response['data'])) {
+            $provinsi = $response['data'];
+        } else {
+            echo '<script>alert("Provinsi tidak ditemukan"); window.location.href="index.php?controller=Wilayah&action=indexProvinsi";</script>';
+            exit();
         }
 
         $isEdit = true;
 
-        // Parse response dari endpoint /wilayah/{id}
-        $rawData = $response['data'];
-
-        // Transform data wilayah ke format kabupaten untuk form
-        $kabupaten = [
-            'id' => $rawData['id'] ?? null,
-            'nama' => $rawData['nama'] ?? '',
-            'id_provinsi' => $rawData['id_parent'] ?? null,
-            'jenis' => $rawData['jenis'] ?? '',
-            // Data hierarki lengkap untuk pre-fill dropdown
-            'provinsi' => [
-                'id' => $rawData['parent']['id'] ?? null,
-                'nama' => $rawData['parent']['nama'] ?? '',
-            ],
-        ];
-
-        $title = "Manajemen Wilayah - Edit Kabupaten";
-        include 'views/wilayah/form_kabupaten.php';
+        include __DIR__ . '/../views/wilayah/form-provinsi.php';
     }
 
     /**
-     * Store new kabupaten
+     * Update data provinsi
+     */
+    public function updateProvinsi()
+    {
+        // Ambil ID dari query string
+        $id = $_GET['id'] ?? null;
+
+        // Validasi ID
+        if (!$id) {
+            header('Location: index.php?controller=Wilayah&action=indexProvinsi');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: index.php?controller=Wilayah&action=indexProvinsi');
+            exit();
+        }
+
+        // Ambil data dari form
+        $nama = trim($_POST['nama'] ?? '');
+
+        // Validasi
+        if (empty($nama)) {
+            echo '<script>alert("Nama provinsi wajib diisi"); window.location.href="index.php?controller=Wilayah&action=editProvinsi&id=' . $id . '";</script>';
+            exit();
+        }
+
+        // Data untuk dikirim ke API
+        $data = [
+            'nama' => $nama
+        ];
+
+        // Panggil service
+        $response = $this->service->update($id, $data, 'provinsi');
+
+        if ($response['success']) {
+            echo '<script>alert("Provinsi berhasil diperbarui"); window.location.href="index.php?controller=Wilayah&action=indexProvinsi";</script>';
+        } else {
+            echo '<script>alert("Gagal memperbarui provinsi: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexProvinsi";</script>';
+        }
+        exit();
+    }
+
+    /**
+     * Hapus data provinsi
+     */
+    public function deleteProvinsi()
+    {
+        // Ambil ID dari query string
+        $id = $_GET['id'] ?? null;
+
+        // Validasi ID
+        if (!$id) {
+            header('Location: index.php?controller=Wilayah&action=indexProvinsi');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: index.php?controller=Wilayah&action=indexProvinsi');
+            exit();
+        }
+
+        // Panggil service
+        $response = $this->service->delete($id, 'provinsi');
+
+        if ($response['success']) {
+            echo '<script>alert("Provinsi berhasil dihapus"); window.location.href="index.php?controller=Wilayah&action=indexProvinsi";</script>';
+        } else {
+            echo '<script>alert("Gagal menghapus provinsi: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexProvinsi";</script>';
+        }
+        exit();
+    }
+
+    /**
+     * Kabupaten Methods
+     */
+
+    /**
+     * Tampilkan halaman index kabupaten
+     */
+    public function indexKabupaten()
+    {
+        // Ambil semua provinsi untuk dropdown
+        $provinsiResponse = $this->service->getAllProvinsi();
+        if (!$provinsiResponse['success']) {
+            $provinsiList = [];
+        } else {
+            $provinsiList = $provinsiResponse['data'] ?? [];
+        }
+
+        // Ambil kabupaten berdasarkan provinsi_id yang dipilih
+        $provinsi_id = $_GET['provinsi_id'] ?? 0;
+
+        // Jika provinsi_id tidak dipilih, set kabupatenList menjadi array kosong
+        if ($provinsi_id > 0) {
+            $response = $this->service->getAllKabupaten($provinsi_id);
+        } else {
+            // Jika tidak ada provinsi yang dipilih, set kabupatenList menjadi array kosong
+            $response = ['success' => true, 'data' => []];
+        }
+
+        if (!$response['success']) {
+            $kabupatenList = [];
+        } else {
+            $kabupatenList = $response['data'] ?? [];
+        }
+
+        include __DIR__ . '/../views/wilayah/index-kabupaten.php';
+    }
+
+    /**
+     * Tampilkan form create kabupaten
+     */
+    public function createKabupaten()
+    {
+        // Ambil semua provinsi untuk dropdown
+        $provinsiResponse = $this->service->getAllProvinsi();
+        if (!$provinsiResponse['success']) {
+            $provinsiList = [];
+        } else {
+            $provinsiList = $provinsiResponse['data'] ?? [];
+        }
+
+        $isEdit = false;
+        $kabupaten = null;
+
+        include __DIR__ . '/../views/wilayah/form-kabupaten.php';
+    }
+
+    /**
+     * Simpan data kabupaten baru
      */
     public function storeKabupaten()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: index.php?controller=Wilayah&action=indexKabupaten');
-            exit;
+            exit();
         }
 
+        // Ambil data dari form
+        $nama = trim($_POST['nama'] ?? '');
+        $id_provinsi = $_POST['id_provinsi'] ?? null;
+
+        // Validasi
+        if (empty($nama)) {
+            echo '<script>alert("Nama kabupaten wajib diisi"); window.location.href="index.php?controller=Wilayah&action=createKabupaten";</script>';
+            exit();
+        }
+
+        if (empty($id_provinsi)) {
+            echo '<script>alert("Provinsi wajib dipilih"); window.location.href="index.php?controller=Wilayah&action=createKabupaten";</script>';
+            exit();
+        }
+
+        // Data untuk dikirim ke API
         $data = [
-            'nama' => $_POST['nama'] ?? '',
-            'id_provinsi' => $_POST['id_provinsi'] ?? null,
+            'nama' => $nama,
+            'id_parent' => $id_provinsi
         ];
 
-        // Validasi input
-        if (empty($data['nama']) || empty($data['id_provinsi'])) {
-            header('Location: index.php?controller=Wilayah&action=createKabupaten&error=Nama+kabupaten+dan+provinsi+wajib+diisi');
-            exit;
-        }
-
-        $response = $this->service->createKabupaten($data);
-
-        // Handle unauthorized
-        if (isset($response['http_code']) && $response['http_code'] === 401) {
-            header('Location: index.php?controller=Auth&action=logout');
-            exit;
-        }
-
-        // Handle forbidden
-        if (isset($response['http_code']) && $response['http_code'] === 403) {
-            $errorMessage = 'Anda tidak memiliki hak akses untuk menambah data kabupaten.';
-            header('Location: index.php?controller=Wilayah&action=createKabupaten&error=' . urlencode($errorMessage));
-            exit;
-        }
+        // Panggil service
+        $response = $this->service->store($data, 'kabupaten');
 
         if ($response['success']) {
-            header('Location: index.php?controller=Wilayah&action=indexKabupaten&success=' . urlencode('Kabupaten berhasil ditambahkan'));
-            exit;
+            echo '<script>alert("Kabupaten berhasil ditambahkan"); window.location.href="index.php?controller=Wilayah&action=indexKabupaten";</script>';
         } else {
-            $errorMessage = $response['message'] ?? 'Gagal menambahkan kabupaten';
-            header('Location: index.php?controller=Wilayah&action=createKabupaten&error=' . urlencode($errorMessage));
-            exit;
+            echo '<script>alert("Gagal menambahkan kabupaten: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexKabupaten";</script>';
         }
+        exit();
     }
 
     /**
-     * Update existing kabupaten
+     * Tampilkan form edit kabupaten
      */
-    public function updateKabupaten()
+    public function editKabupaten()
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: index.php?controller=Wilayah&action=indexKabupaten');
-            exit;
-        }
-
-        $id = $_POST['id'] ?? null;
-
-        if (!$id) {
-            header('Location: index.php?controller=Wilayah&action=indexKabupaten&error=ID+kabupaten+tidak+ditemukan');
-            exit;
-        }
-
-        $data = [
-            'nama' => $_POST['nama'] ?? '',
-            'id_provinsi' => $_POST['id_provinsi'] ?? null,
-        ];
-
-        // Validasi input
-        if (empty($data['nama']) || empty($data['id_provinsi'])) {
-            header('Location: index.php?controller=Wilayah&action=editKabupaten&id=' . $id . '&error=Nama+kabupaten+dan+provinsi+wajib+diisi');
-            exit;
-        }
-
-        $response = $this->service->updateKabupaten($id, $data);
-
-        // Handle unauthorized
-        if (isset($response['http_code']) && $response['http_code'] === 401) {
-            header('Location: index.php?controller=Auth&action=logout');
-            exit;
-        }
-
-        // Handle forbidden
-        if (isset($response['http_code']) && $response['http_code'] === 403) {
-            $errorMessage = 'Anda tidak memiliki hak akses untuk mengedit data kabupaten.';
-            header('Location: index.php?controller=Wilayah&action=editKabupaten&id=' . $id . '&error=' . urlencode($errorMessage));
-            exit;
-        }
-
-        if ($response['success']) {
-            header('Location: index.php?controller=Wilayah&action=indexKabupaten&success=' . urlencode('Kabupaten berhasil diperbarui'));
-            exit;
-        } else {
-            $errorMessage = $response['message'] ?? 'Gagal memperbarui kabupaten';
-            header('Location: index.php?controller=Wilayah&action=editKabupaten&id=' . $id . '&error=' . urlencode($errorMessage));
-            exit;
-        }
-    }
-
-    /**
-     * Delete kabupaten
-     */
-    public function deleteKabupaten()
-    {
+        // Ambil ID dari query string
         $id = $_GET['id'] ?? null;
 
+        // Validasi ID
         if (!$id) {
-            header('Location: index.php?controller=Wilayah&action=indexKabupaten&error=ID+kabupaten+tidak+ditemukan');
+            echo '<script>alert("ID tidak ditemukan"); window.location.href="index.php?controller=Wilayah&action=indexKabupaten";</script>';
             exit;
         }
 
-        $response = $this->service->deleteKabupaten($id);
-
-        // Handle unauthorized
-        if (isset($response['http_code']) && $response['http_code'] === 401) {
-            header('Location: index.php?controller=Auth&action=logout');
-            exit;
-        }
-
-        // Handle forbidden
-        if (isset($response['http_code']) && $response['http_code'] === 403) {
-            $errorMessage = 'Anda tidak memiliki hak akses untuk menghapus data kabupaten.';
-            header('Location: index.php?controller=Wilayah&action=indexKabupaten&error=' . urlencode($errorMessage));
-            exit;
-        }
-
-        if ($response['success']) {
-            header('Location: index.php?controller=Wilayah&action=indexKabupaten&success=' . urlencode('Kabupaten berhasil dihapus'));
-            exit;
+        // Ambil semua provinsi untuk dropdown
+        $provinsiResponse = $this->service->getAllProvinsi();
+        if (!$provinsiResponse['success']) {
+            $provinsiList = [];
         } else {
-            $errorMessage = $response['message'] ?? 'Gagal menghapus kabupaten';
-            header('Location: index.php?controller=Wilayah&action=indexKabupaten&error=' . urlencode($errorMessage));
-            exit;
-        }
-    }
-
-    /**
-     * Display list of all kecamatan
-     * Endpoint: /wilayah?jenis=kecamatan&page={page}&per_page={per_page}
-     */
-    public function indexKecamatan()
-    {
-        // Get pagination parameters from request
-        $page = $_GET['page'] ?? 1;
-        $perPage = $_GET['per_page'] ?? 15;
-        $search = $_GET['search'] ?? '';
-
-        $params = [
-            'page' => $page,
-            'per_page' => $perPage
-        ];
-
-        // Add search filter if provided
-        if (!empty($search)) {
-            $params['q'] = $search; // Use 'q' for search as per API convention
+            $provinsiList = $provinsiResponse['data'] ?? [];
         }
 
-        $response = $this->service->getAllKecamatan($params);
-
-        // Handle unauthorized
-        if (isset($response['http_code']) && $response['http_code'] === 401) {
-            header('Location: index.php?controller=Auth&action=logout');
-            exit;
-        }
-
-        $kecamatanList = [];
-        $pagination = [];
-
-        if ($response['success']) {
-            // Parse response dari endpoint /wilayah?jenis=kecamatan
-            // Response structure: { data: { data: [...], current_page: X, last_page: Y, ... }, ... }
-            $responseData = $response['data'] ?? [];
-
-            // Check if response has pagination structure
-            if (isset($responseData['data']) && is_array($responseData['data'])) {
-                // API returns paginated data
-                $rawData = $responseData['data'];
-                $pagination = [
-                    'current_page' => $responseData['current_page'] ?? 1,
-                    'last_page' => $responseData['last_page'] ?? 1,
-                    'per_page' => $responseData['per_page'] ?? 15,
-                    'total' => $responseData['total'] ?? 0,
-                    'from' => $responseData['from'] ?? 0,
-                    'to' => $responseData['to'] ?? 0,
-                ];
-            } elseif (is_array($responseData)) {
-                // API returns non-paginated data (direct array)
-                $rawData = $responseData;
-                $pagination = [
-                    'current_page' => 1,
-                    'last_page' => 1,
-                    'per_page' => count($responseData),
-                    'total' => count($responseData),
-                ];
-            } else {
-                $rawData = [];
-            }
-
-            // Transform data wilayah ke format kecamatan untuk view
-            if (is_array($rawData)) {
-                foreach ($rawData as $item) {
-                    // Handle nested parent structure
-                    $kabupatenNama = '';
-                    $provinsiNama = '';
-
-                    // Extract hierarchical data from nested parent structure
-                    if (isset($item['parent']) && is_array($item['parent'])) {
-                        $kabupatenNama = $item['parent']['nama'] ?? '';
-
-                        if (isset($item['parent']['parent']) && is_array($item['parent']['parent'])) {
-                            $provinsiNama = $item['parent']['parent']['nama'] ?? '';
-                        }
-                    }
-
-                    $kecamatanList[] = [
-                        'id' => $item['id'] ?? null,
-                        'nama' => $item['nama'] ?? '',
-                        'id_kabupaten' => $item['id_parent'] ?? null,
-                        'nama_kabupaten' => $kabupatenNama,
-                        'nama_provinsi' => $provinsiNama,
-                        'jenis' => $item['jenis'] ?? '',
-                    ];
-                }
-            }
-        }
-
-        $title = "Manajemen Wilayah - Daftar Kecamatan";
-        include 'views/wilayah/index_kecamatan.php';
-    }
-
-    /**
-     * Show form for creating new kecamatan
-     */
-    public function createKecamatan()
-    {
-        $isEdit = false;
-        $kecamatan = null;
-
-        $title = "Manajemen Wilayah - Tambah Kecamatan";
-        include 'views/wilayah/form_kecamatan.php';
-    }
-
-    /**
-     * Show form for editing existing kecamatan
-     */
-    public function editKecamatan()
-    {
-        $id = $_GET['id'] ?? null;
-
-        if (!$id) {
-            header('Location: index.php?controller=Wilayah&action=indexKecamatan&error=ID+kecamatan+tidak+ditemukan');
-            exit;
-        }
-
-        $response = $this->service->getKecamatanDetail($id);
-
-        // Handle unauthorized
-        if (isset($response['http_code']) && $response['http_code'] === 401) {
-            header('Location: index.php?controller=Auth&action=logout');
-            exit;
-        }
-
-        // Handle forbidden
-        if (isset($response['http_code']) && $response['http_code'] === 403) {
-            header('Location: index.php?controller=Wilayah&action=indexKecamatan&error=' . urlencode('Anda tidak memiliki hak akses untuk mengedit data ini'));
-            exit;
-        }
+        $response = $this->service->getById($id, 'kabupaten');
 
         if (!$response['success']) {
-            header('Location: index.php?controller=Wilayah&action=indexKecamatan&error=' . urlencode($response['message'] ?? 'Data kecamatan tidak ditemukan'));
-            exit;
+            echo '<script>alert("Gagal mengambil data kabupaten: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexKabupaten";</script>';
+            exit();
+        }
+
+        // Cek struktur data yang dikembalikan API
+        if (isset($response['data']['data'])) {
+            $kabupaten = $response['data']['data'];
+        } elseif (isset($response['data']) && !empty($response['data'])) {
+            $kabupaten = $response['data'];
+        } else {
+            echo '<script>alert("Kabupaten tidak ditemukan"); window.location.href="index.php?controller=Wilayah&action=indexKabupaten";</script>';
+            exit();
         }
 
         $isEdit = true;
 
-        // Parse response dari endpoint /wilayah/{id}
-        $rawData = $response['data'];
-
-        // Transform data wilayah ke format kecamatan untuk form
-        $kecamatan = [
-            'id' => $rawData['id'] ?? null,
-            'nama' => $rawData['nama'] ?? '',
-            'id_kabupaten' => $rawData['id_parent'] ?? null,
-            'jenis' => $rawData['jenis'] ?? '',
-            // Data hierarki lengkap untuk pre-fill dropdown
-            'kabupaten' => [
-                'id' => $rawData['parent']['id'] ?? null,
-                'nama' => $rawData['parent']['nama'] ?? '',
-            ],
-            'provinsi' => [
-                'id' => $rawData['parent']['parent']['id'] ?? null,
-                'nama' => $rawData['parent']['parent']['nama'] ?? '',
-            ],
-        ];
-
-        $title = "Manajemen Wilayah - Edit Kecamatan";
-        include 'views/wilayah/form_kecamatan.php';
+        include __DIR__ . '/../views/wilayah/form-kabupaten.php';
     }
 
     /**
-     * Store new kecamatan
+     * Update data kabupaten
+     */
+    public function updateKabupaten()
+    {
+        // Ambil ID dari query string
+        $id = $_GET['id'] ?? null;
+
+        // Validasi ID
+        if (!$id) {
+            header('Location: index.php?controller=Wilayah&action=indexKabupaten');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: index.php?controller=Wilayah&action=indexKabupaten');
+            exit();
+        }
+
+        // Ambil data dari form
+        $nama = trim($_POST['nama'] ?? '');
+        $id_provinsi = $_POST['id_provinsi'] ?? null;
+
+        // Validasi
+        if (empty($nama)) {
+            echo '<script>alert("Nama kabupaten wajib diisi"); window.location.href="index.php?controller=Wilayah&action=editKabupaten&id=' . $id . '";</script>';
+            exit();
+        }
+
+        if (empty($id_provinsi)) {
+            echo '<script>alert("Provinsi wajib dipilih"); window.location.href="index.php?controller=Wilayah&action=editKabupaten&id=' . $id . '";</script>';
+            exit();
+        }
+
+        // Data untuk dikirim ke API
+        $data = [
+            'nama' => $nama,
+            'id_parent' => $id_provinsi
+        ];
+
+        // Panggil service
+        $response = $this->service->update($id, $data, 'kabupaten');
+
+        if ($response['success']) {
+            echo '<script>alert("Kabupaten berhasil diperbarui"); window.location.href="index.php?controller=Wilayah&action=indexKabupaten";</script>';
+        } else {
+            echo '<script>alert("Gagal memperbarui kabupaten: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexKabupaten";</script>';
+        }
+        exit();
+    }
+
+    /**
+     * Hapus data kabupaten
+     */
+    public function deleteKabupaten()
+    {
+        // Ambil ID dari query string
+        $id = $_GET['id'] ?? null;
+
+        // Validasi ID
+        if (!$id) {
+            header('Location: index.php?controller=Wilayah&action=indexKabupaten');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: index.php?controller=Wilayah&action=indexKabupaten');
+            exit();
+        }
+
+        // Panggil service
+        $response = $this->service->delete($id, 'kabupaten');
+
+        if ($response['success']) {
+            echo '<script>alert("Kabupaten berhasil dihapus"); window.location.href="index.php?controller=Wilayah&action=indexKabupaten";</script>';
+        } else {
+            echo '<script>alert("Gagal menghapus kabupaten: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexKabupaten";</script>';
+        }
+        exit();
+    }
+
+    /**
+     * Kecamatan Methods
+     */
+
+    /**
+     * Tampilkan halaman index kecamatan
+     */
+    public function indexKecamatan()
+    {
+        // Ambil semua provinsi untuk dropdown
+        $provinsiResponse = $this->service->getAllProvinsi();
+        if (!$provinsiResponse['success']) {
+            $provinsiList = [];
+        } else {
+            $provinsiList = $provinsiResponse['data'] ?? [];
+        }
+
+        // Ambil semua kabupaten untuk dropdown (diperlukan ID provinsi untuk mengambil kabupaten)
+        $provinsi_id = $_GET['provinsi_id'] ?? 0;
+        $kabupatenList = [];
+        if ($provinsi_id > 0) {
+            $kabupatenResponse = $this->service->getAllKabupaten($provinsi_id);
+            if ($kabupatenResponse['success']) {
+                $kabupatenList = $kabupatenResponse['data'] ?? [];
+            }
+        }
+
+        // Ambil semua kecamatan untuk dropdown (diperlukan ID kabupaten untuk mengambil kecamatan)
+        $kabupaten_id = $_GET['kabupaten_id'] ?? 0;
+        $kecamatanList = [];
+        if ($kabupaten_id > 0) {
+            $kecamatanResponse = $this->service->getAllKecamatan($kabupaten_id);
+            if ($kecamatanResponse['success']) {
+                $kecamatanList = $kecamatanResponse['data'] ?? [];
+            }
+        }
+
+        // Ambil kecamatan berdasarkan kabupaten_id yang dipilih
+        $response = $this->service->getAllKecamatan($_GET['kabupaten_id'] ?? 0);
+
+        if (!$response['success']) {
+            $kecamatanList = [];
+        } else {
+            $kecamatanList = $response['data'] ?? [];
+        }
+
+        include __DIR__ . '/../views/wilayah/index-kecamatan.php';
+    }
+
+    /**
+     * Tampilkan form create kecamatan
+     */
+    public function createKecamatan()
+    {
+        // Ambil semua provinsi untuk dropdown
+        $provinsiResponse = $this->service->getAllProvinsi();
+        if (!$provinsiResponse['success']) {
+            $provinsiList = [];
+        } else {
+            $provinsiList = $provinsiResponse['data'] ?? [];
+        }
+
+        // Ambil semua kabupaten untuk dropdown (diperlukan ID provinsi)
+        $provinsi_id = $_GET['provinsi_id'] ?? 0;
+        $kabupatenResponse = $this->service->getAllKabupaten($provinsi_id);
+        if (!$kabupatenResponse['success']) {
+            $kabupatenList = [];
+        } else {
+            $kabupatenList = $kabupatenResponse['data'] ?? [];
+        }
+
+        $isEdit = false;
+        $kecamatan = null;
+
+        include __DIR__ . '/../views/wilayah/form-kecamatan.php';
+    }
+
+    /**
+     * Simpan data kecamatan baru
      */
     public function storeKecamatan()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: index.php?controller=Wilayah&action=indexKecamatan');
-            exit;
+            exit();
         }
 
+        // Ambil data dari form
+        $nama = trim($_POST['nama'] ?? '');
+        $id_kabupaten = $_POST['id_kabupaten'] ?? null;
+
+        // Validasi
+        if (empty($nama)) {
+            echo '<script>alert("Nama kecamatan wajib diisi"); window.location.href="index.php?controller=Wilayah&action=createKecamatan";</script>';
+            exit();
+        }
+
+        if (empty($id_kabupaten)) {
+            echo '<script>alert("Kabupaten wajib dipilih"); window.location.href="index.php?controller=Wilayah&action=createKecamatan";</script>';
+            exit();
+        }
+
+        // Data untuk dikirim ke API
         $data = [
-            'nama' => $_POST['nama'] ?? '',
-            'id_kabupaten' => $_POST['id_kabupaten'] ?? null,
+            'nama' => $nama,
+            'id_parent' => $id_kabupaten
         ];
 
-        // Validasi input
-        if (empty($data['nama']) || empty($data['id_kabupaten'])) {
-            header('Location: index.php?controller=Wilayah&action=createKecamatan&error=Nama+kecamatan+dan+kabupaten+wajib+diisi');
-            exit;
-        }
-
-        $response = $this->service->createKecamatan($data);
-
-        // Handle unauthorized
-        if (isset($response['http_code']) && $response['http_code'] === 401) {
-            header('Location: index.php?controller=Auth&action=logout');
-            exit;
-        }
-
-        // Handle forbidden
-        if (isset($response['http_code']) && $response['http_code'] === 403) {
-            $errorMessage = 'Anda tidak memiliki hak akses untuk menambah data kecamatan.';
-            header('Location: index.php?controller=Wilayah&action=createKecamatan&error=' . urlencode($errorMessage));
-            exit;
-        }
+        // Panggil service
+        $response = $this->service->store($data, 'kecamatan');
 
         if ($response['success']) {
-            header('Location: index.php?controller=Wilayah&action=indexKecamatan&success=' . urlencode('Kecamatan berhasil ditambahkan'));
-            exit;
+            echo '<script>alert("Kecamatan berhasil ditambahkan"); window.location.href="index.php?controller=Wilayah&action=indexKecamatan";</script>';
         } else {
-            $errorMessage = $response['message'] ?? 'Gagal menambahkan kecamatan';
-            header('Location: index.php?controller=Wilayah&action=createKecamatan&error=' . urlencode($errorMessage));
-            exit;
+            echo '<script>alert("Gagal menambahkan kecamatan: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexKecamatan";</script>';
         }
+        exit();
     }
 
     /**
-     * Update existing kecamatan
+     * Tampilkan form edit kecamatan
+     */
+    public function editKecamatan()
+    {
+        // Ambil ID dari query string
+        $id = $_GET['id'] ?? null;
+
+        // Validasi ID
+        if (!$id) {
+            echo '<script>alert("ID tidak ditemukan"); window.location.href="index.php?controller=Wilayah&action=indexKecamatan";</script>';
+            exit;
+        }
+
+        // Ambil semua provinsi untuk dropdown
+        $provinsiResponse = $this->service->getAllProvinsi();
+        if (!$provinsiResponse['success']) {
+            $provinsiList = [];
+        } else {
+            $provinsiList = $provinsiResponse['data'] ?? [];
+        }
+
+        // Ambil semua kabupaten untuk dropdown
+        // Jika kabupaten_id disediakan di URL, kita perlu menentukan provinsi_id dari kabupaten tersebut
+        $kabupaten_id = $_GET['kabupaten_id'] ?? 0;
+        $provinsi_id = $_GET['provinsi_id'] ?? 0;
+
+        // Jika tidak ada provinsi_id di URL tapi ada kabupaten_id, kita ambil kabupaten untuk mendapatkan provinsi_id
+        if ($provinsi_id == 0 && $kabupaten_id > 0) {
+            $kabupatenResponse = $this->service->getById($kabupaten_id, 'kabupaten');
+            if ($kabupatenResponse['success'] && isset($kabupatenResponse['data'])) {
+                $kabupatenDetail = $kabupatenResponse['data'];
+                if (isset($kabupatenDetail['id_provinsi'])) {
+                    $provinsi_id = $kabupatenDetail['id_provinsi'];
+                } elseif (isset($kabupatenDetail['id_parent'])) {
+                    $provinsi_id = $kabupatenDetail['id_parent'];
+                }
+            }
+        }
+
+        // Ambil kabupaten untuk dropdown berdasarkan provinsi_id
+        if ($provinsi_id > 0) {
+            $kabupatenResponse = $this->service->getAllKabupaten($provinsi_id);
+            if (!$kabupatenResponse['success']) {
+                $kabupatenList = [];
+            } else {
+                $kabupatenList = $kabupatenResponse['data'] ?? [];
+            }
+        } else {
+            $kabupatenList = [];
+        }
+
+        $response = $this->service->getById($id, 'kecamatan');
+
+        if (!$response['success']) {
+            echo '<script>alert("Gagal mengambil data kecamatan: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexKecamatan";</script>';
+            exit();
+        }
+
+        // Cek struktur data yang dikembalikan API
+        if (isset($response['data']['data'])) {
+            $kecamatan = $response['data']['data'];
+        } elseif (isset($response['data']) && !empty($response['data'])) {
+            $kecamatan = $response['data'];
+        } else {
+            echo '<script>alert("Kecamatan tidak ditemukan"); window.location.href="index.php?controller=Wilayah&action=indexKecamatan";</script>';
+            exit();
+        }
+
+        $isEdit = true;
+
+        include __DIR__ . '/../views/wilayah/form-kecamatan.php';
+    }
+
+    /**
+     * Update data kecamatan
      */
     public function updateKecamatan()
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        // Ambil ID dari query string
+        $id = $_GET['id'] ?? null;
+
+        // Validasi ID
+        if (!$id) {
             header('Location: index.php?controller=Wilayah&action=indexKecamatan');
             exit;
         }
 
-        $id = $_POST['id'] ?? null;
-
-        if (!$id) {
-            header('Location: index.php?controller=Wilayah&action=indexKecamatan&error=ID+kecamatan+tidak+ditemukan');
-            exit;
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: index.php?controller=Wilayah&action=indexKecamatan');
+            exit();
         }
 
+        // Ambil data dari form
+        $nama = trim($_POST['nama'] ?? '');
+        $id_kabupaten = $_POST['id_kabupaten'] ?? null;
+
+        // Validasi
+        if (empty($nama)) {
+            echo '<script>alert("Nama kecamatan wajib diisi"); window.location.href="index.php?controller=Wilayah&action=editKecamatan&id=' . $id . '";</script>';
+            exit();
+        }
+
+        if (empty($id_kabupaten)) {
+            echo '<script>alert("Kabupaten wajib dipilih"); window.location.href="index.php?controller=Wilayah&action=editKecamatan&id=' . $id . '";</script>';
+            exit();
+        }
+
+        // Data untuk dikirim ke API
         $data = [
-            'nama' => $_POST['nama'] ?? '',
-            'id_kabupaten' => $_POST['id_kabupaten'] ?? null,
+            'nama' => $nama,
+            'id_parent' => $id_kabupaten
         ];
 
-        // Validasi input
-        if (empty($data['nama']) || empty($data['id_kabupaten'])) {
-            header('Location: index.php?controller=Wilayah&action=editKecamatan&id=' . $id . '&error=Nama+kecamatan+dan+kabupaten+wajib+diisi');
-            exit;
-        }
-
-        $response = $this->service->updateKecamatan($id, $data);
-
-        // Handle unauthorized
-        if (isset($response['http_code']) && $response['http_code'] === 401) {
-            header('Location: index.php?controller=Auth&action=logout');
-            exit;
-        }
-
-        // Handle forbidden
-        if (isset($response['http_code']) && $response['http_code'] === 403) {
-            $errorMessage = 'Anda tidak memiliki hak akses untuk mengedit data kecamatan.';
-            header('Location: index.php?controller=Wilayah&action=editKecamatan&id=' . $id . '&error=' . urlencode($errorMessage));
-            exit;
-        }
+        // Panggil service
+        $response = $this->service->update($id, $data, 'kecamatan');
 
         if ($response['success']) {
-            header('Location: index.php?controller=Wilayah&action=indexKecamatan&success=' . urlencode('Kecamatan berhasil diperbarui'));
-            exit;
+            echo '<script>alert("Kecamatan berhasil diperbarui"); window.location.href="index.php?controller=Wilayah&action=indexKecamatan";</script>';
         } else {
-            $errorMessage = $response['message'] ?? 'Gagal memperbarui kecamatan';
-            header('Location: index.php?controller=Wilayah&action=editKecamatan&id=' . $id . '&error=' . urlencode($errorMessage));
-            exit;
+            echo '<script>alert("Gagal memperbarui kecamatan: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexKecamatan";</script>';
         }
+        exit();
     }
 
     /**
-     * Delete kecamatan
+     * Hapus data kecamatan
      */
     public function deleteKecamatan()
     {
+        // Ambil ID dari query string
         $id = $_GET['id'] ?? null;
 
+        // Validasi ID
         if (!$id) {
-            header('Location: index.php?controller=Wilayah&action=indexKecamatan&error=ID+kecamatan+tidak+ditemukan');
+            header('Location: index.php?controller=Wilayah&action=indexKecamatan');
             exit;
         }
 
-        $response = $this->service->deleteKecamatan($id);
-
-        // Handle unauthorized
-        if (isset($response['http_code']) && $response['http_code'] === 401) {
-            header('Location: index.php?controller=Auth&action=logout');
-            exit;
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: index.php?controller=Wilayah&action=indexKecamatan');
+            exit();
         }
 
-        // Handle forbidden
-        if (isset($response['http_code']) && $response['http_code'] === 403) {
-            $errorMessage = 'Anda tidak memiliki hak akses untuk menghapus data kecamatan.';
-            header('Location: index.php?controller=Wilayah&action=indexKecamatan&error=' . urlencode($errorMessage));
-            exit;
-        }
+        // Panggil service
+        $response = $this->service->delete($id, 'kecamatan');
 
         if ($response['success']) {
-            header('Location: index.php?controller=Wilayah&action=indexKecamatan&success=' . urlencode('Kecamatan berhasil dihapus'));
-            exit;
+            echo '<script>alert("Kecamatan berhasil dihapus"); window.location.href="index.php?controller=Wilayah&action=indexKecamatan";</script>';
         } else {
-            $errorMessage = $response['message'] ?? 'Gagal menghapus kecamatan';
-            header('Location: index.php?controller=Wilayah&action=indexKecamatan&error=' . urlencode($errorMessage));
+            echo '<script>alert("Gagal menghapus kecamatan: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexKecamatan";</script>';
+        }
+        exit();
+    }
+
+    /**
+     * Desa Methods
+     */
+
+    /**
+     * Tampilkan halaman index desa
+     */
+    public function indexDesa()
+    {
+        // Ambil semua provinsi untuk dropdown
+        $provinsiResponse = $this->service->getAllProvinsi();
+        if (!$provinsiResponse['success']) {
+            $provinsiList = [];
+        } else {
+            $provinsiList = $provinsiResponse['data'] ?? [];
+        }
+
+        // Ambil semua kabupaten untuk dropdown (diperlukan ID provinsi untuk mengambil kabupaten)
+        $provinsi_id = $_GET['provinsi_id'] ?? 0;
+        $kabupatenList = [];
+        if ($provinsi_id > 0) {
+            $kabupatenResponse = $this->service->getAllKabupaten($provinsi_id);
+            if ($kabupatenResponse['success']) {
+                $kabupatenList = $kabupatenResponse['data'] ?? [];
+            }
+        }
+
+        // Ambil semua kecamatan untuk dropdown (diperlukan ID kabupaten untuk mengambil kecamatan)
+        $kabupaten_id = $_GET['kabupaten_id'] ?? 0;
+        $kecamatanList = [];
+        if ($kabupaten_id > 0) {
+            $kecamatanResponse = $this->service->getAllKecamatan($kabupaten_id);
+            if ($kecamatanResponse['success']) {
+                $kecamatanList = $kecamatanResponse['data'] ?? [];
+            }
+        }
+
+        // Ambil desa berdasarkan kecamatan_id yang dipilih
+        $kecamatan_id = $_GET['kecamatan_id'] ?? 0;
+
+        // Jika kecamatan_id tidak dipilih, set desaList menjadi array kosong
+        if ($kecamatan_id > 0) {
+            $response = $this->service->getAllDesa($kecamatan_id);
+        } else {
+            // Jika tidak ada kecamatan yang dipilih, set desaList menjadi array kosong
+            $response = ['success' => true, 'data' => []];
+        }
+
+        if (!$response['success']) {
+            $desaList = [];
+        } else {
+            $desaList = $response['data'] ?? [];
+        }
+
+        include __DIR__ . '/../views/wilayah/index-desa.php';
+    }
+
+    /**
+     * Tampilkan form create desa
+     */
+    public function createDesa()
+    {
+        // Ambil semua provinsi untuk dropdown
+        $provinsiResponse = $this->service->getAllProvinsi();
+        if (!$provinsiResponse['success']) {
+            $provinsiList = [];
+        } else {
+            $provinsiList = $provinsiResponse['data'] ?? [];
+        }
+
+        // Ambil semua kabupaten untuk dropdown (diperlukan ID provinsi)
+        $provinsi_id = $_GET['provinsi_id'] ?? 0;
+        $kabupatenResponse = $this->service->getAllKabupaten($provinsi_id);
+        if (!$kabupatenResponse['success']) {
+            $kabupatenList = [];
+        } else {
+            $kabupatenList = $kabupatenResponse['data'] ?? [];
+        }
+
+        // Ambil semua kecamatan untuk dropdown (diperlukan ID kabupaten)
+        $kabupaten_id = $_GET['kabupaten_id'] ?? 0;
+        $kecamatanResponse = $this->service->getAllKecamatan($kabupaten_id);
+        if (!$kecamatanResponse['success']) {
+            $kecamatanList = [];
+        } else {
+            $kecamatanList = $kecamatanResponse['data'] ?? [];
+        }
+
+        $isEdit = false;
+        $desa = null;
+
+        include __DIR__ . '/../views/wilayah/form-desa.php';
+    }
+
+    /**
+     * Simpan data desa baru
+     */
+    public function storeDesa()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: index.php?controller=Wilayah&action=indexDesa');
+            exit();
+        }
+
+        // Ambil data dari form
+        $nama = trim($_POST['nama'] ?? '');
+        $id_kecamatan = $_POST['id_kecamatan'] ?? null;
+
+        // Validasi
+        if (empty($nama)) {
+            echo '<script>alert("Nama desa wajib diisi"); window.location.href="index.php?controller=Wilayah&action=createDesa";</script>';
+            exit();
+        }
+
+        if (empty($id_kecamatan)) {
+            echo '<script>alert("Kecamatan wajib dipilih"); window.location.href="index.php?controller=Wilayah&action=createDesa";</script>';
+            exit();
+        }
+
+        // Data untuk dikirim ke API
+        $data = [
+            'nama' => $nama,
+            'id_parent' => $id_kecamatan
+        ];
+
+        // Panggil service
+        $response = $this->service->store($data, 'desa');
+
+        if ($response['success']) {
+            echo '<script>alert("Desa berhasil ditambahkan"); window.location.href="index.php?controller=Wilayah&action=indexDesa";</script>';
+        } else {
+            echo '<script>alert("Gagal menambahkan desa: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexDesa";</script>';
+        }
+        exit();
+    }
+
+    /**
+     * Tampilkan form edit desa
+     */
+    public function editDesa()
+    {
+        // Ambil ID dari query string
+        $id = $_GET['id'] ?? null;
+
+        // Validasi ID
+        if (!$id) {
+            echo '<script>alert("ID tidak ditemukan"); window.location.href="index.php?controller=Wilayah&action=indexDesa";</script>';
             exit;
         }
+
+        // Ambil semua provinsi untuk dropdown
+        $provinsiResponse = $this->service->getAllProvinsi();
+        if (!$provinsiResponse['success']) {
+            $provinsiList = [];
+        } else {
+            $provinsiList = $provinsiResponse['data'] ?? [];
+        }
+
+        // Ambil semua kabupaten untuk dropdown (diperlukan ID provinsi)
+        $provinsi_id = $_GET['provinsi_id'] ?? 0;
+        $kabupatenResponse = $this->service->getAllKabupaten($provinsi_id);
+        if (!$kabupatenResponse['success']) {
+            $kabupatenList = [];
+        } else {
+            $kabupatenList = $kabupatenResponse['data'] ?? [];
+        }
+
+        // Ambil semua kecamatan untuk dropdown (diperlukan ID kabupaten)
+        $kabupaten_id = $_GET['kabupaten_id'] ?? 0;
+        $kecamatanResponse = $this->service->getAllKecamatan($kabupaten_id);
+        if (!$kecamatanResponse['success']) {
+            $kecamatanList = [];
+        } else {
+            $kecamatanList = $kecamatanResponse['data'] ?? [];
+        }
+
+        $response = $this->service->getById($id, 'desa');
+
+        if (!$response['success']) {
+            echo '<script>alert("Gagal mengambil data desa: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexDesa";</script>';
+            exit();
+        }
+
+        // Cek struktur data yang dikembalikan API
+        if (isset($response['data']['data'])) {
+            $desa = $response['data']['data'];
+        } elseif (isset($response['data']) && !empty($response['data'])) {
+            $desa = $response['data'];
+        } else {
+            echo '<script>alert("Desa tidak ditemukan"); window.location.href="index.php?controller=Wilayah&action=indexDesa";</script>';
+            exit();
+        }
+
+        $isEdit = true;
+
+        include __DIR__ . '/../views/wilayah/form-desa.php';
+    }
+
+    /**
+     * Update data desa
+     */
+    public function updateDesa()
+    {
+        // Ambil ID dari query string
+        $id = $_GET['id'] ?? null;
+
+        // Validasi ID
+        if (!$id) {
+            header('Location: index.php?controller=Wilayah&action=indexDesa');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: index.php?controller=Wilayah&action=indexDesa');
+            exit();
+        }
+
+        // Ambil data dari form
+        $nama = trim($_POST['nama'] ?? '');
+        $id_kecamatan = $_POST['id_kecamatan'] ?? null;
+
+        // Validasi
+        if (empty($nama)) {
+            echo '<script>alert("Nama desa wajib diisi"); window.location.href="index.php?controller=Wilayah&action=editDesa&id=' . $id . '";</script>';
+            exit();
+        }
+
+        if (empty($id_kecamatan)) {
+            echo '<script>alert("Kecamatan wajib dipilih"); window.location.href="index.php?controller=Wilayah&action=editDesa&id=' . $id . '";</script>';
+            exit();
+        }
+
+        // Data untuk dikirim ke API
+        $data = [
+            'nama' => $nama,
+            'id_parent' => $id_kecamatan
+        ];
+
+        // Panggil service
+        $response = $this->service->update($id, $data, 'desa');
+
+        if ($response['success']) {
+            echo '<script>alert("Desa berhasil diperbarui"); window.location.href="index.php?controller=Wilayah&action=indexDesa";</script>';
+        } else {
+            echo '<script>alert("Gagal memperbarui desa: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexDesa";</script>';
+        }
+        exit();
+    }
+
+    /**
+     * Hapus data desa
+     */
+    public function deleteDesa()
+    {
+        // Ambil ID dari query string
+        $id = $_GET['id'] ?? null;
+
+        // Validasi ID
+        if (!$id) {
+            header('Location: index.php?controller=Wilayah&action=indexDesa');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: index.php?controller=Wilayah&action=indexDesa');
+            exit();
+        }
+
+        // Panggil service
+        $response = $this->service->delete($id, 'desa');
+
+        if ($response['success']) {
+            echo '<script>alert("Desa berhasil dihapus"); window.location.href="index.php?controller=Wilayah&action=indexDesa";</script>';
+        } else {
+            echo '<script>alert("Gagal menghapus desa: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexDesa";</script>';
+        }
+        exit();
+    }
+
+    /**
+     * AJAX endpoint untuk mendapatkan kabupaten berdasarkan provinsi
+     */
+    public function getKabupatenByProvinsi()
+    {
+        $provinsiId = $_GET['id'] ?? 0;
+
+        if (!$provinsiId) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'Provinsi ID tidak valid']);
+            exit;
+        }
+
+        $response = $this->service->getAllKabupaten($provinsiId);
+
+        header('Content-Type: application/json');
+        echo json_encode($response);
+        exit;
+    }
+
+    /**
+     * AJAX endpoint untuk mendapatkan kecamatan berdasarkan kabupaten
+     */
+    public function getKecamatanByKabupaten()
+    {
+        $kabupatenId = $_GET['id'] ?? 0;
+
+        if (!$kabupatenId) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'Kabupaten ID tidak valid']);
+            exit;
+        }
+
+        $response = $this->service->getAllKecamatan($kabupatenId);
+
+        header('Content-Type: application/json');
+        echo json_encode($response);
+        exit;
     }
 }
