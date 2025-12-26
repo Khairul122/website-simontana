@@ -979,14 +979,18 @@ class WilayahController
 
         if (!$provinsiId) {
             header('Content-Type: application/json');
-            echo json_encode(['success' => false, 'message' => 'Provinsi ID tidak valid']);
+            echo json_encode(['success' => false, 'message' => 'Provinsi ID tidak valid', 'data' => null]);
             exit;
         }
 
         $response = $this->service->getAllKabupaten($provinsiId);
 
         header('Content-Type: application/json');
-        echo json_encode($response);
+        if ($response['success']) {
+            echo json_encode(['success' => true, 'data' => $response['data']]);
+        } else {
+            echo json_encode(['success' => false, 'message' => $response['message'] ?? 'Gagal mengambil data kabupaten', 'data' => null]);
+        }
         exit;
     }
 
@@ -999,14 +1003,85 @@ class WilayahController
 
         if (!$kabupatenId) {
             header('Content-Type: application/json');
-            echo json_encode(['success' => false, 'message' => 'Kabupaten ID tidak valid']);
+            echo json_encode(['success' => false, 'message' => 'Kabupaten ID tidak valid', 'data' => null]);
             exit;
         }
 
         $response = $this->service->getAllKecamatan($kabupatenId);
 
         header('Content-Type: application/json');
-        echo json_encode($response);
+        if ($response['success']) {
+            echo json_encode(['success' => true, 'data' => $response['data']]);
+        } else {
+            echo json_encode(['success' => false, 'message' => $response['message'] ?? 'Gagal mengambil data kecamatan', 'data' => null]);
+        }
+        exit;
+    }
+
+    /**
+     * AJAX endpoint untuk mendapatkan semua provinsi
+     */
+    public function getAllProvinsi()
+    {
+        $response = $this->service->getAllProvinsi();
+
+        header('Content-Type: application/json');
+        if ($response['success']) {
+            echo json_encode(['success' => true, 'data' => $response['data']]);
+        } else {
+            echo json_encode(['success' => false, 'message' => $response['message'] ?? 'Gagal mengambil data provinsi', 'data' => null]);
+        }
+        exit;
+    }
+
+    /**
+     * AJAX endpoint untuk mendapatkan desa berdasarkan kecamatan
+     */
+    public function getDesaByKecamatan()
+    {
+        $kecamatanId = $_GET['id'] ?? 0;
+
+        if (!$kecamatanId) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'Kecamatan ID tidak valid', 'data' => null]);
+            exit;
+        }
+
+        $response = $this->service->getAllDesa($kecamatanId);
+
+        header('Content-Type: application/json');
+        if ($response['success']) {
+            echo json_encode(['success' => true, 'data' => $response['data']]);
+        } else {
+            echo json_encode(['success' => false, 'message' => $response['message'] ?? 'Gagal mengambil data desa', 'data' => null]);
+        }
+        exit;
+    }
+
+    /**
+     * AJAX endpoint untuk mendapatkan detail wilayah lengkap berdasarkan ID desa
+     */
+    public function getWilayahDetailByDesa()
+    {
+        $desaId = $_GET['desa_id'] ?? 0;
+
+        if (!$desaId) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'Desa ID tidak valid', 'data' => null]);
+            exit;
+        }
+
+        require_once dirname(__DIR__) . '/services/WilayahService.php';
+        $wilayahService = new \WilayahService();
+
+        $response = $wilayahService->getById($desaId, 'desa');
+
+        header('Content-Type: application/json');
+        if ($response['success']) {
+            echo json_encode(['success' => true, 'data' => $response['data']]);
+        } else {
+            echo json_encode(['success' => false, 'message' => $response['message'] ?? 'Gagal mengambil detail wilayah', 'data' => null]);
+        }
         exit;
     }
 }

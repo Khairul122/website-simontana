@@ -10,27 +10,35 @@
         <div class="content-wrapper">
           <div class="row">
             <div class="col-sm-12">
-              <div class="card">
-                <div class="card-body">
-                  <h4 class="card-title">Data Provinsi</h4>
-                  <p class="card-description">Daftar provinsi di Indonesia</p>
-                  
-                  <div class="row">
-                    <div class="col-12">
-                      <div class="template-demo d-flex justify-content-between">
-                        <a href="index.php?controller=Wilayah&action=createProvinsi" class="btn btn-primary btn-fw">
-                          <i class="mdi mdi-plus"></i>Tambah Provinsi
+              <div class="page-header">
+                <h3 class="page-title">Data Provinsi</h3>
+                <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="index.php">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Wilayah</li>
+                    <li class="breadcrumb-item active" aria-current="page">Provinsi</li>
+                  </ol>
+                </nav>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-12 grid-margin stretch-card">
+                  <div class="card">
+                    <div class="card-body">
+                      <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="card-title">Daftar Provinsi</h4>
+                        <a href="index.php?controller=Wilayah&action=createProvinsi" class="btn btn-primary btn-sm">
+                          <i class="mdi mdi-plus-circle-outline mr-1"></i> Tambah Provinsi
                         </a>
                       </div>
-                      
-                      
+
                       <div class="table-responsive">
-                        <table class="table table-striped">
+                        <table class="table table-hover">
                           <thead>
-                            <tr>
-                              <th>No</th>
+                            <tr class="bg-primary text-white">
+                              <th>#</th>
                               <th>Nama Provinsi</th>
-                              <th>Aksi</th>
+                              <th class="text-center">Aksi</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -39,18 +47,32 @@
                               <?php foreach ($provinsiList as $provinsi): ?>
                                 <tr>
                                   <td><?php echo $no++; ?></td>
-                                  <td><?php echo htmlspecialchars($provinsi['nama'] ?? $provinsi['name'] ?? ''); ?></td>
                                   <td>
-                                    <a href="index.php?controller=Wilayah&action=editProvinsi&id=<?php echo $provinsi['id']; ?>" class="btn btn-outline-warning btn-sm">Edit</a>
-                                    <form method="POST" action="index.php?controller=Wilayah&action=deleteProvinsi&id=<?php echo $provinsi['id']; ?>" style="display:inline;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus provinsi ini?');">
-                                      <button type="submit" class="btn btn-outline-danger btn-sm">Hapus</button>
-                                    </form>
+                                    <div class="font-weight-medium"><?php echo htmlspecialchars($provinsi['nama'] ?? $provinsi['name'] ?? ''); ?></div>
+                                  </td>
+                                  <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                      <a href="index.php?controller=Wilayah&action=editProvinsi&id=<?php echo $provinsi['id']; ?>" class="btn btn-outline-warning btn-sm" title="Edit">
+                                        <i class="mdi mdi-pencil"></i>
+                                      </a>
+                                      <form method="POST" action="index.php?controller=Wilayah&action=deleteProvinsi&id=<?php echo $provinsi['id']; ?>" style="display:inline;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus provinsi ini?');">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Hapus">
+                                          <i class="mdi mdi-delete"></i>
+                                        </button>
+                                      </form>
+                                    </div>
                                   </td>
                                 </tr>
                               <?php endforeach; ?>
                             <?php else: ?>
                               <tr>
-                                <td colspan="3" class="text-center">Tidak ada data provinsi</td>
+                                <td colspan="3" class="text-center py-5">
+                                  <div class="d-flex flex-column align-items-center justify-content-center">
+                                    <i class="mdi mdi-map-marker-off mdi-48px text-muted mb-3"></i>
+                                    <h5 class="text-muted">Tidak ada data provinsi</h5>
+                                    <p class="text-muted">Belum ada data provinsi yang tersedia</p>
+                                  </div>
+                                </td>
                               </tr>
                             <?php endif; ?>
                           </tbody>

@@ -10,66 +10,93 @@
         <div class="content-wrapper">
           <div class="row">
             <div class="col-sm-12">
-              <div class="card">
-                <div class="card-body">
-                  <h4 class="card-title"><?php echo $isEdit ? 'Edit' : 'Tambah'; ?> Kecamatan</h4>
-                  <p class="card-description"><?php echo $isEdit ? 'Edit' : 'Tambah'; ?> data kecamatan baru</p>
-                  
-                  <form action="index.php?controller=Wilayah&action=<?php echo $isEdit ? 'updateKecamatan&id=' . $kecamatan['id'] : 'storeKecamatan'; ?>" method="POST">
-                    <?php if ($isEdit && isset($kecamatan['kabupaten']) && isset($kecamatan['kabupaten']['provinsi'])): ?>
-                    <div class="form-group">
-                      <label for="id_provinsi">Provinsi</label>
-                      <input type="text" class="form-control" value="<?php echo htmlspecialchars(isset($kecamatan['kabupaten']['provinsi']['nama']) ? $kecamatan['kabupaten']['provinsi']['nama'] : (isset($kecamatan['kabupaten']['provinsi']['name']) ? $kecamatan['kabupaten']['provinsi']['name'] : '')); ?>" readonly>
-                      <input type="hidden" name="id_provinsi" value="<?php echo isset($kecamatan['kabupaten']['id_provinsi']) ? $kecamatan['kabupaten']['id_provinsi'] : (isset($kecamatan['kabupaten']['id_parent']) ? $kecamatan['kabupaten']['id_parent'] : ''); ?>">
-                    </div>
-                    <?php else: ?>
-                    <div class="form-group">
-                      <label for="id_provinsi">Provinsi</label>
-                      <select class="form-control" id="id_provinsi" name="id_provinsi" required onchange="loadKabupatenByProvinsi()">
-                        <option value="">-- Pilih Provinsi --</option>
-                        <?php foreach ($provinsiList as $provinsi): ?>
-                          <option value="<?php echo $provinsi['id']; ?>"
-                            <?php echo ((isset($kecamatan['kabupaten']['id_provinsi']) && $kecamatan['kabupaten']['id_provinsi'] == $provinsi['id']) ? 'selected' :
-                                       ((isset($_GET['provinsi_id']) && $_GET['provinsi_id'] == $provinsi['id']) ? 'selected' : '')); ?>>
-                            <?php echo htmlspecialchars($provinsi['nama'] ?? $provinsi['name'] ?? ''); ?>
-                          </option>
-                        <?php endforeach; ?>
-                      </select>
-                    </div>
-                    <?php endif; ?>
+              <div class="page-header">
+                <h3 class="page-title"><?php echo $isEdit ? 'Edit' : 'Tambah'; ?> Kecamatan</h3>
+                <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="index.php">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="index.php?controller=Wilayah&action=indexKecamatan">Wilayah</a></li>
+                    <li class="breadcrumb-item active" aria-current="page"><?php echo $isEdit ? 'Edit' : 'Tambah'; ?> Kecamatan</li>
+                  </ol>
+                </nav>
+              </div>
 
-                    <div class="form-group">
-                      <label for="id_kabupaten">Kabupaten</label>
-                      <select class="form-control" id="id_kabupaten" name="id_kabupaten" required>
-                        <option value="">-- Pilih Kabupaten --</option>
-                        <?php foreach ($kabupatenList as $kabupaten): ?>
-                          <option value="<?php echo $kabupaten['id']; ?>"
-                            <?php
-                            $selected = '';
-                            if (isset($kecamatan['id_kabupaten']) && $kecamatan['id_kabupaten'] == $kabupaten['id']) {
-                                $selected = 'selected';
-                            } elseif (isset($kecamatan['id_parent']) && $kecamatan['id_parent'] == $kabupaten['id']) {
-                                $selected = 'selected';
-                            } elseif (isset($_GET['kabupaten_id']) && $_GET['kabupaten_id'] == $kabupaten['id']) {
-                                $selected = 'selected';
-                            }
-                            echo $selected;
-                            ?>>
-                            <?php echo htmlspecialchars($kabupaten['nama'] ?? $kabupaten['name'] ?? ''); ?>
-                          </option>
-                        <?php endforeach; ?>
-                      </select>
-                    </div>
+              <div class="row">
+                <div class="col-lg-8 mx-auto">
+                  <div class="card">
+                    <div class="card-body">
+                      <h4 class="card-title"><?php echo $isEdit ? 'Edit' : 'Tambah'; ?> Data Kecamatan</h4>
+                      <p class="card-description"><?php echo $isEdit ? 'Edit' : 'Tambah'; ?> data kecamatan baru</p>
 
-                    <div class="form-group">
-                      <label for="nama">Nama Kecamatan</label>
-                      <input type="text" class="form-control" id="nama" name="nama" placeholder="Masukkan nama kecamatan"
-                        value="<?php echo htmlspecialchars($kecamatan['nama'] ?? $kecamatan['name'] ?? ''); ?>" required>
-                    </div>
+                      <form action="index.php?controller=Wilayah&action=<?php echo $isEdit ? 'updateKecamatan&id=' . $kecamatan['id'] : 'storeKecamatan'; ?>" method="POST" class="forms-sample">
+                        <?php if ($isEdit && isset($kecamatan['kabupaten']) && isset($kecamatan['kabupaten']['provinsi'])): ?>
+                        <div class="form-group row">
+                          <label for="id_provinsi" class="col-sm-3 col-form-label">Provinsi</label>
+                          <div class="col-sm-9">
+                            <input type="text" class="form-control" value="<?php echo htmlspecialchars(isset($kecamatan['kabupaten']['provinsi']['nama']) ? $kecamatan['kabupaten']['provinsi']['nama'] : (isset($kecamatan['kabupaten']['provinsi']['name']) ? $kecamatan['kabupaten']['provinsi']['name'] : '')); ?>" readonly>
+                            <input type="hidden" name="id_provinsi" value="<?php echo isset($kecamatan['kabupaten']['id_provinsi']) ? $kecamatan['kabupaten']['id_provinsi'] : (isset($kecamatan['kabupaten']['id_parent']) ? $kecamatan['kabupaten']['id_parent'] : ''); ?>">
+                          </div>
+                        </div>
+                        <?php else: ?>
+                        <div class="form-group row">
+                          <label for="id_provinsi" class="col-sm-3 col-form-label">Provinsi</label>
+                          <div class="col-sm-9">
+                            <select class="form-control" id="id_provinsi" name="id_provinsi" required onchange="loadKabupatenByProvinsi()">
+                              <option value="">-- Pilih Provinsi --</option>
+                              <?php foreach ($provinsiList as $provinsi): ?>
+                                <option value="<?php echo $provinsi['id']; ?>"
+                                  <?php echo ((isset($kecamatan['kabupaten']['id_provinsi']) && $kecamatan['kabupaten']['id_provinsi'] == $provinsi['id']) ? 'selected' :
+                                             ((isset($_GET['provinsi_id']) && $_GET['provinsi_id'] == $provinsi['id']) ? 'selected' : '')); ?>>
+                                  <?php echo htmlspecialchars($provinsi['nama'] ?? $provinsi['name'] ?? ''); ?>
+                                </option>
+                              <?php endforeach; ?>
+                            </select>
+                          </div>
+                        </div>
+                        <?php endif; ?>
 
-                    <button type="submit" class="btn btn-primary mr-2"><?php echo $isEdit ? 'Update' : 'Simpan'; ?></button>
-                    <a href="index.php?controller=Wilayah&action=indexKecamatan<?php echo (isset($_GET['kabupaten_id']) ? '&kabupaten_id=' . $_GET['kabupaten_id'] : ''); ?>" class="btn btn-light">Batal</a>
-                  </form>
+                        <div class="form-group row">
+                          <label for="id_kabupaten" class="col-sm-3 col-form-label">Kabupaten</label>
+                          <div class="col-sm-9">
+                            <select class="form-control" id="id_kabupaten" name="id_kabupaten" required>
+                              <option value="">-- Pilih Kabupaten --</option>
+                              <?php foreach ($kabupatenList as $kabupaten): ?>
+                                <option value="<?php echo $kabupaten['id']; ?>"
+                                  <?php
+                                  $selected = '';
+                                  if (isset($kecamatan['id_kabupaten']) && $kecamatan['id_kabupaten'] == $kabupaten['id']) {
+                                      $selected = 'selected';
+                                  } elseif (isset($kecamatan['id_parent']) && $kecamatan['id_parent'] == $kabupaten['id']) {
+                                      $selected = 'selected';
+                                  } elseif (isset($_GET['kabupaten_id']) && $_GET['kabupaten_id'] == $kabupaten['id']) {
+                                      $selected = 'selected';
+                                  }
+                                  echo $selected;
+                                  ?>>
+                                  <?php echo htmlspecialchars($kabupaten['nama'] ?? $kabupaten['name'] ?? ''); ?>
+                                </option>
+                              <?php endforeach; ?>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div class="form-group row">
+                          <label for="nama" class="col-sm-3 col-form-label">Nama Kecamatan</label>
+                          <div class="col-sm-9">
+                            <input type="text" class="form-control" id="nama" name="nama" placeholder="Masukkan nama kecamatan"
+                              value="<?php echo htmlspecialchars($kecamatan['nama'] ?? $kecamatan['name'] ?? ''); ?>" required>
+                          </div>
+                        </div>
+
+                        <div class="mt-4">
+                          <button type="submit" class="btn btn-primary mr-2"><?php echo $isEdit ? 'Update' : 'Simpan'; ?></button>
+                          <a href="index.php?controller=Wilayah&action=indexKecamatan<?php echo (isset($_GET['kabupaten_id']) ? '&kabupaten_id=' . $_GET['kabupaten_id'] : ''); ?>" class="btn btn-light">Batal</a>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
                   <script>
                     function loadKabupatenByProvinsi() {

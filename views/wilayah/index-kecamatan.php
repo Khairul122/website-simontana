@@ -10,57 +10,78 @@
         <div class="content-wrapper">
           <div class="row">
             <div class="col-sm-12">
-              <div class="card">
-                <div class="card-body">
-                  <h4 class="card-title">Data Kecamatan</h4>
-                  <p class="card-description">Daftar kecamatan di Indonesia</p>
-                  
-                  <div class="row">
-                    <div class="col-12">
-                      <form method="GET" class="form-inline mb-3">
-                        <input type="hidden" name="controller" value="Wilayah">
-                        <input type="hidden" name="action" value="indexKecamatan">
-                        <div class="form-group mb-2 mr-2">
-                          <label for="provinsi_id" class="sr-only">Provinsi</label>
-                          <select name="provinsi_id" id="provinsi_id" class="form-control" onchange="this.form.submit()">
-                            <option value="">-- Pilih Provinsi --</option>
-                            <?php foreach ($provinsiList as $provinsi): ?>
-                              <option value="<?php echo $provinsi['id']; ?>" <?php echo ((isset($_GET['provinsi_id']) && $_GET['provinsi_id'] == $provinsi['id']) ? 'selected' : ''); ?>>
-                                <?php echo htmlspecialchars($provinsi['nama'] ?? $provinsi['name'] ?? ''); ?>
-                              </option>
-                            <?php endforeach; ?>
-                          </select>
-                        </div>
-                        
-                        <div class="form-group mb-2">
-                          <label for="kabupaten_id" class="sr-only">Kabupaten</label>
-                          <select name="kabupaten_id" id="kabupaten_id" class="form-control" onchange="this.form.submit()">
-                            <option value="">-- Pilih Kabupaten --</option>
-                            <?php foreach ($kabupatenList as $kabupaten): ?>
-                              <option value="<?php echo $kabupaten['id']; ?>" <?php echo ((isset($_GET['kabupaten_id']) && $_GET['kabupaten_id'] == $kabupaten['id']) ? 'selected' : ''); ?>>
-                                <?php echo htmlspecialchars($kabupaten['nama'] ?? $kabupaten['name'] ?? ''); ?>
-                              </option>
-                            <?php endforeach; ?>
-                          </select>
-                        </div>
-                      </form>
-                      
-                      <div class="template-demo d-flex justify-content-between">
-                        <a href="index.php?controller=Wilayah&action=createKecamatan<?php echo isset($_GET['kabupaten_id']) ? '&kabupaten_id=' . $_GET['kabupaten_id'] : ''; ?>" class="btn btn-primary btn-fw">
-                          <i class="mdi mdi-plus"></i>Tambah Kecamatan
+              <div class="page-header">
+                <h3 class="page-title">Data Kecamatan</h3>
+                <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="index.php">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Wilayah</li>
+                    <li class="breadcrumb-item active" aria-current="page">Kecamatan</li>
+                  </ol>
+                </nav>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-12 grid-margin stretch-card">
+                  <div class="card">
+                    <div class="card-body">
+                      <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="card-title">Daftar Kecamatan</h4>
+                        <a href="index.php?controller=Wilayah&action=createKecamatan<?php echo isset($_GET['kabupaten_id']) ? '&kabupaten_id=' . $_GET['kabupaten_id'] : ''; ?>" class="btn btn-primary btn-sm">
+                          <i class="mdi mdi-plus-circle-outline mr-1"></i> Tambah Kecamatan
                         </a>
                       </div>
-                      
-                      
+
+                      <div class="row mb-4">
+                        <div class="col-md-6">
+                          <form method="GET" class="form-inline">
+                            <input type="hidden" name="controller" value="Wilayah">
+                            <input type="hidden" name="action" value="indexKecamatan">
+
+                            <div class="form-group mb-2 w-100">
+                              <label class="mr-2">Provinsi:</label>
+                              <select name="provinsi_id" id="provinsi_id" class="form-control w-100" onchange="this.form.submit()">
+                                <option value="">-- Pilih Provinsi --</option>
+                                <?php foreach ($provinsiList as $provinsi): ?>
+                                  <option value="<?php echo $provinsi['id']; ?>" <?php echo ((isset($_GET['provinsi_id']) && $_GET['provinsi_id'] == $provinsi['id']) ? 'selected' : ''); ?>>
+                                    <?php echo htmlspecialchars($provinsi['nama'] ?? $provinsi['name'] ?? ''); ?>
+                                  </option>
+                                <?php endforeach; ?>
+                              </select>
+                            </div>
+                          </form>
+                        </div>
+
+                        <div class="col-md-6">
+                          <form method="GET" class="form-inline">
+                            <input type="hidden" name="controller" value="Wilayah">
+                            <input type="hidden" name="action" value="indexKecamatan">
+                            <input type="hidden" name="provinsi_id" value="<?php echo htmlspecialchars($_GET['provinsi_id'] ?? ''); ?>">
+
+                            <div class="form-group mb-2 w-100">
+                              <label class="mr-2">Kabupaten:</label>
+                              <select name="kabupaten_id" id="kabupaten_id" class="form-control w-100" onchange="this.form.submit()">
+                                <option value="">-- Pilih Kabupaten --</option>
+                                <?php foreach ($kabupatenList as $kabupaten): ?>
+                                  <option value="<?php echo $kabupaten['id']; ?>" <?php echo ((isset($_GET['kabupaten_id']) && $_GET['kabupaten_id'] == $kabupaten['id']) ? 'selected' : ''); ?>>
+                                    <?php echo htmlspecialchars($kabupaten['nama'] ?? $kabupaten['name'] ?? ''); ?>
+                                  </option>
+                                <?php endforeach; ?>
+                              </select>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+
                       <div class="table-responsive">
-                        <table class="table table-striped">
+                        <table class="table table-hover">
                           <thead>
-                            <tr>
-                              <th>No</th>
+                            <tr class="bg-primary text-white">
+                              <th>#</th>
                               <th>Nama Kecamatan</th>
                               <th>Kabupaten</th>
                               <th>Provinsi</th>
-                              <th>Aksi</th>
+                              <th class="text-center">Aksi</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -69,60 +90,78 @@
                               <?php foreach ($kecamatanList as $kecamatan): ?>
                                 <tr>
                                   <td><?php echo $no++; ?></td>
-                                  <td><?php echo htmlspecialchars($kecamatan['nama'] ?? $kecamatan['name'] ?? ''); ?></td>
-                                  <td><?php
-                                    // Handle different possible structures for kabupaten
-                                    $kabupaten_nama = '';
-                                    if (isset($kecamatan['kabupaten'])) {
-                                        $kabupaten_nama = $kecamatan['kabupaten']['nama'] ?? $kecamatan['kabupaten']['name'] ?? '';
-                                    } elseif (isset($kecamatan['id_kabupaten'])) {
-                                        // If we only have the ID, we might need to get the name from kabupatenList
-                                        foreach ($kabupatenList as $kab) {
-                                            if ($kab['id'] == $kecamatan['id_kabupaten']) {
-                                                $kabupaten_nama = $kab['nama'] ?? $kab['name'] ?? '';
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    echo htmlspecialchars($kabupaten_nama);
-                                  ?></td>
-                                  <td><?php
-                                    // Handle different possible structures for provinsi
-                                    $provinsi_nama = '';
-                                    if (isset($kecamatan['kabupaten']) && isset($kecamatan['kabupaten']['provinsi'])) {
-                                        $provinsi_nama = $kecamatan['kabupaten']['provinsi']['nama'] ?? $kecamatan['kabupaten']['provinsi']['name'] ?? '';
-                                    } elseif (isset($kecamatan['id_kabupaten'])) {
-                                        // If we have kabupaten ID, find the provinsi through kabupatenList
-                                        foreach ($kabupatenList as $kab) {
-                                            if ($kab['id'] == $kecamatan['id_kabupaten']) {
-                                                if (isset($kab['provinsi'])) {
-                                                    $provinsi_nama = $kab['provinsi']['nama'] ?? $kab['provinsi']['name'] ?? '';
-                                                } else {
-                                                    // If provinsi is not nested in kabupaten, try to find it in provinsiList
-                                                    foreach ($provinsiList as $prov) {
-                                                        if ($prov['id'] == $kab['id_provinsi']) {
-                                                            $provinsi_nama = $prov['nama'] ?? $prov['name'] ?? '';
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    echo htmlspecialchars($provinsi_nama);
-                                  ?></td>
                                   <td>
-                                    <a href="index.php?controller=Wilayah&action=editKecamatan&id=<?php echo $kecamatan['id']; ?>&kabupaten_id=<?php echo $_GET['kabupaten_id'] ?? ''; ?>" class="btn btn-outline-warning btn-sm">Edit</a>
-                                    <form method="POST" action="index.php?controller=Wilayah&action=deleteKecamatan&id=<?php echo $kecamatan['id']; ?>" style="display:inline;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus kecamatan ini?');">
-                                      <button type="submit" class="btn btn-outline-danger btn-sm">Hapus</button>
-                                    </form>
+                                    <div class="font-weight-medium"><?php echo htmlspecialchars($kecamatan['nama'] ?? $kecamatan['name'] ?? ''); ?></div>
+                                  </td>
+                                  <td>
+                                    <?php
+                                      // Handle different possible structures for kabupaten
+                                      $kabupaten_nama = '';
+                                      if (isset($kecamatan['kabupaten'])) {
+                                          $kabupaten_nama = $kecamatan['kabupaten']['nama'] ?? $kecamatan['kabupaten']['name'] ?? '';
+                                      } elseif (isset($kecamatan['id_kabupaten'])) {
+                                          // If we only have the ID, we might need to get the name from kabupatenList
+                                          foreach ($kabupatenList as $kab) {
+                                              if ($kab['id'] == $kecamatan['id_kabupaten']) {
+                                                  $kabupaten_nama = $kab['nama'] ?? $kab['name'] ?? '';
+                                                  break;
+                                              }
+                                          }
+                                      }
+                                      echo htmlspecialchars($kabupaten_nama);
+                                    ?>
+                                  </td>
+                                  <td>
+                                    <?php
+                                      // Handle different possible structures for provinsi
+                                      $provinsi_nama = '';
+                                      if (isset($kecamatan['kabupaten']) && isset($kecamatan['kabupaten']['provinsi'])) {
+                                          $provinsi_nama = $kecamatan['kabupaten']['provinsi']['nama'] ?? $kecamatan['kabupaten']['provinsi']['name'] ?? '';
+                                      } elseif (isset($kecamatan['id_kabupaten'])) {
+                                          // If we have kabupaten ID, find the provinsi through kabupatenList
+                                          foreach ($kabupatenList as $kab) {
+                                              if ($kab['id'] == $kecamatan['id_kabupaten']) {
+                                                  if (isset($kab['provinsi'])) {
+                                                      $provinsi_nama = $kab['provinsi']['nama'] ?? $kab['provinsi']['name'] ?? '';
+                                                  } else {
+                                                      // If provinsi is not nested in kabupaten, try to find it in provinsiList
+                                                      foreach ($provinsiList as $prov) {
+                                                          if ($prov['id'] == $kab['id_provinsi']) {
+                                                              $provinsi_nama = $prov['nama'] ?? $prov['name'] ?? '';
+                                                              break;
+                                                          }
+                                                      }
+                                                  }
+                                                  break;
+                                              }
+                                          }
+                                      }
+                                      echo htmlspecialchars($provinsi_nama);
+                                    ?>
+                                  </td>
+                                  <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                      <a href="index.php?controller=Wilayah&action=editKecamatan&id=<?php echo $kecamatan['id']; ?>&kabupaten_id=<?php echo $_GET['kabupaten_id'] ?? ''; ?>" class="btn btn-outline-warning btn-sm" title="Edit">
+                                        <i class="mdi mdi-pencil"></i>
+                                      </a>
+                                      <form method="POST" action="index.php?controller=Wilayah&action=deleteKecamatan&id=<?php echo $kecamatan['id']; ?>" style="display:inline;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus kecamatan ini?');">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Hapus">
+                                          <i class="mdi mdi-delete"></i>
+                                        </button>
+                                      </form>
+                                    </div>
                                   </td>
                                 </tr>
                               <?php endforeach; ?>
                             <?php else: ?>
                               <tr>
-                                <td colspan="5" class="text-center">Tidak ada data kecamatan</td>
+                                <td colspan="5" class="text-center py-5">
+                                  <div class="d-flex flex-column align-items-center justify-content-center">
+                                    <i class="mdi mdi-map-marker-off mdi-48px text-muted mb-3"></i>
+                                    <h5 class="text-muted">Tidak ada data kecamatan</h5>
+                                    <p class="text-muted">Silakan pilih kabupaten untuk melihat daftar kecamatan</p>
+                                  </div>
+                                </td>
                               </tr>
                             <?php endif; ?>
                           </tbody>

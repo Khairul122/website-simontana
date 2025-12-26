@@ -23,7 +23,7 @@
       </a>
     </li>
 
-      <!-- Wilayah Management -->
+    <!-- Wilayah Management -->
     <li class="nav-item">
       <a class="nav-link" data-bs-toggle="collapse" href="#wilayah-menu" aria-expanded="false" aria-controls="wilayah-menu">
         <i class="mdi mdi-map menu-icon"></i>
@@ -46,6 +46,13 @@
           </li>
         </ul>
       </div>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link" href="index.php?controller=LaporanAdmin&action=index">
+        <i class="mdi mdi-account-group menu-icon"></i>
+        <span class="menu-title">Laporan Bencana</span>
+      </a>
     </li>
 
     <!-- Desa Management -->

@@ -379,7 +379,7 @@ unset($_SESSION['server_response_edit']);
                 const response = await $.ajax({
                     url: 'index.php?controller=Wilayah&action=getKabupatenByProvinsi',
                     method: 'GET',
-                    data: { provinsi_id: provinsiId },
+                    data: { id: provinsiId },
                     dataType: 'json'
                 });
 
@@ -428,7 +428,7 @@ unset($_SESSION['server_response_edit']);
                 const response = await $.ajax({
                     url: 'index.php?controller=Wilayah&action=getKecamatanByKabupaten',
                     method: 'GET',
-                    data: { kabupaten_id: kabupatenId },
+                    data: { id: kabupatenId },
                     dataType: 'json'
                 });
 
@@ -477,7 +477,7 @@ unset($_SESSION['server_response_edit']);
                 const response = await $.ajax({
                     url: 'index.php?controller=Wilayah&action=getDesaByKecamatan',
                     method: 'GET',
-                    data: { kecamatan_id: kecamatanId },
+                    data: { id: kecamatanId },
                     dataType: 'json'
                 });
 

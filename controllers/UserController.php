@@ -85,6 +85,12 @@ class UserController
         $isEdit = false;
         $user = null;
 
+        // Ambil data wilayah untuk dropdown
+        $provinsiList = $this->getAllProvinsi();
+        $kabupatenList = [];
+        $kecamatanList = [];
+        $desaList = [];
+
         include dirname(__DIR__) . '/views/user/form.php';
     }
 
@@ -130,6 +136,18 @@ class UserController
             $user['desa'] = $this->getWilayahDetail($user['id_desa']);
         }
 
+        // Ambil data wilayah untuk dropdown
+        $provinsiList = $this->getAllProvinsi();
+        $kabupatenList = [];
+        $kecamatanList = [];
+        $desaList = [];
+
+        // Jika user memiliki desa, kita bisa memuat provinsi list untuk kebutuhan tampilan
+        if (!empty($user['id_desa'])) {
+            // Load provinsi list untuk ditampilkan di form
+            $provinsiList = $this->getAllProvinsi();
+        }
+
         // Set session for debugging during edit
         $_SESSION['server_response_edit'] = $response;
 
@@ -148,6 +166,74 @@ class UserController
 
         if (!$response['success'] || empty($response['data'])) {
             return null;
+        }
+
+        return $response['data'];
+    }
+
+    /**
+     * Fungsi untuk mendapatkan semua provinsi
+     */
+    private function getAllProvinsi()
+    {
+        require_once dirname(__DIR__) . '/services/WilayahService.php';
+        $wilayahService = new \WilayahService();
+
+        $response = $wilayahService->getAllProvinsi();
+
+        if (!$response['success'] || empty($response['data'])) {
+            return [];
+        }
+
+        return $response['data'];
+    }
+
+    /**
+     * Fungsi untuk mendapatkan kabupaten berdasarkan provinsi
+     */
+    private function getKabupatenByProvinsi($provinsiId)
+    {
+        require_once dirname(__DIR__) . '/services/WilayahService.php';
+        $wilayahService = new \WilayahService();
+
+        $response = $wilayahService->getAllKabupaten($provinsiId);
+
+        if (!$response['success'] || empty($response['data'])) {
+            return [];
+        }
+
+        return $response['data'];
+    }
+
+    /**
+     * Fungsi untuk mendapatkan kecamatan berdasarkan kabupaten
+     */
+    private function getKecamatanByKabupaten($kabupatenId)
+    {
+        require_once dirname(__DIR__) . '/services/WilayahService.php';
+        $wilayahService = new \WilayahService();
+
+        $response = $wilayahService->getAllKecamatan($kabupatenId);
+
+        if (!$response['success'] || empty($response['data'])) {
+            return [];
+        }
+
+        return $response['data'];
+    }
+
+    /**
+     * Fungsi untuk mendapatkan desa berdasarkan kecamatan
+     */
+    private function getDesaByKecamatan($kecamatanId)
+    {
+        require_once dirname(__DIR__) . '/services/WilayahService.php';
+        $wilayahService = new \WilayahService();
+
+        $response = $wilayahService->getAllDesa($kecamatanId);
+
+        if (!$response['success'] || empty($response['data'])) {
+            return [];
         }
 
         return $response['data'];
