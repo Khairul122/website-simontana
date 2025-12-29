@@ -209,7 +209,7 @@
                       </div>
 
                       <div class="row">
-                        <div class="col-lg-8">
+                        <div class="col-12">
                           <div class="card info-card detail-section">
                             <h5 class="card-title mb-4 pb-2 border-bottom">
                               <i class="mdi mdi-information me-2 text-primary"></i> Informasi Laporan
@@ -287,8 +287,10 @@
                             </div>
                           </div>
                         </div>
+                      </div>
 
-                        <div class="col-lg-4">
+                      <div class="row mt-4">
+                        <div class="col-12">
                           <div class="card location-card detail-section mb-4 overflow-hidden">
                             <div class="card-header bg-white border-0 p-3 pt-3 pb-3">
                               <h5 class="card-title mb-0">
@@ -321,77 +323,83 @@
                               </div>
                             </div>
                           </div>
+                        </div>
+                      </div>
 
+                      <div class="row mt-4">
+                        <div class="col-12">
                           <div class="card evidence-card detail-section">
                             <h5 class="card-title mb-4 pb-2 border-bottom">
                               <i class="mdi mdi-camera me-2 text-primary"></i> Bukti Dokumentasi
                             </h5>
 
-                            <div class="evidence-grid">
-                              <div class="evidence-item">
-                                <h6 class="evidence-label">Foto Bukti 1</h6>
-                                <?php if (!empty($laporan['foto_bukti_1'])): ?>
-                                  <div class="image-preview">
-                                    <a href="<?php echo htmlspecialchars($laporan['foto_bukti_1_url'] ?? $laporan['foto_bukti_1']); ?>" data-bs-toggle="modal" data-bs-target="#imageModal" data-image="<?php echo htmlspecialchars($laporan['foto_bukti_1_url'] ?? $laporan['foto_bukti_1']); ?>" class="d-block">
-                                      <img src="<?php echo htmlspecialchars($laporan['foto_bukti_1_url'] ?? $laporan['foto_bukti_1']); ?>" alt="Foto Bukti 1" class="img-fluid" style="max-height: 200px; object-fit: cover; width: 100%;">
-                                    </a>
-                                  </div>
-                                <?php else: ?>
-                                  <div class="no-evidence">
-                                    <i class="mdi mdi-image-off mb-2"></i>
-                                    <div>Tidak ada foto bukti 1</div>
-                                  </div>
-                                <?php endif; ?>
-                              </div>
-
-                              <div class="evidence-item">
-                                <h6 class="evidence-label">Foto Bukti 2</h6>
-                                <?php if (!empty($laporan['foto_bukti_2'])): ?>
-                                  <div class="image-preview">
-                                    <a href="<?php echo htmlspecialchars($laporan['foto_bukti_2_url'] ?? $laporan['foto_bukti_2']); ?>" data-bs-toggle="modal" data-bs-target="#imageModal" data-image="<?php echo htmlspecialchars($laporan['foto_bukti_2_url'] ?? $laporan['foto_bukti_2']); ?>" class="d-block">
-                                      <img src="<?php echo htmlspecialchars($laporan['foto_bukti_2_url'] ?? $laporan['foto_bukti_2']); ?>" alt="Foto Bukti 2" class="img-fluid" style="max-height: 200px; object-fit: cover; width: 100%;">
-                                    </a>
-                                  </div>
-                                <?php else: ?>
-                                  <div class="no-evidence">
-                                    <i class="mdi mdi-image-off mb-2"></i>
-                                    <div>Tidak ada foto bukti 2</div>
-                                  </div>
-                                <?php endif; ?>
-                              </div>
-
-                              <div class="evidence-item">
-                                <h6 class="evidence-label">Foto Bukti 3</h6>
-                                <?php if (!empty($laporan['foto_bukti_3'])): ?>
-                                  <div class="image-preview">
-                                    <a href="<?php echo htmlspecialchars($laporan['foto_bukti_3_url'] ?? $laporan['foto_bukti_3']); ?>" data-bs-toggle="modal" data-bs-target="#imageModal" data-image="<?php echo htmlspecialchars($laporan['foto_bukti_3_url'] ?? $laporan['foto_bukti_3']); ?>" class="d-block">
-                                      <img src="<?php echo htmlspecialchars($laporan['foto_bukti_3_url'] ?? $laporan['foto_bukti_3']); ?>" alt="Foto Bukti 3" class="img-fluid" style="max-height: 200px; object-fit: cover; width: 100%;">
-                                    </a>
-                                  </div>
-                                <?php else: ?>
-                                  <div class="no-evidence">
-                                    <i class="mdi mdi-image-off mb-2"></i>
-                                    <div>Tidak ada foto bukti 3</div>
-                                  </div>
-                                <?php endif; ?>
-                              </div>
-                            </div>
-
-                            <div class="mt-4">
-                              <h6 class="evidence-label">Video Bukti</h6>
-                              <?php if (!empty($laporan['video_bukti'])): ?>
-                                <div class="video-preview">
-                                  <video width="100%" height="auto" controls class="w-100" style="max-height: 200px;">
-                                    <source src="<?php echo htmlspecialchars($laporan['video_bukti_url'] ?? $laporan['video_bukti']); ?>" type="video/mp4">
-                                    Browser Anda tidak mendukung elemen video.
-                                  </video>
+                            <div class="card-body">
+                              <div class="row g-3">
+                                <div class="col-md-4">
+                                  <h6 class="evidence-label">Foto Bukti 1</h6>
+                                  <?php if (!empty($laporan['foto_bukti_1'])): ?>
+                                    <div class="image-preview">
+                                      <a href="<?php echo htmlspecialchars($laporan['foto_bukti_1_url'] ?? $laporan['foto_bukti_1']); ?>" data-bs-toggle="modal" data-bs-target="#fullScreenImageModal" data-image="<?php echo htmlspecialchars($laporan['foto_bukti_1_url'] ?? $laporan['foto_bukti_1']); ?>" class="d-block">
+                                        <img src="<?php echo htmlspecialchars($laporan['foto_bukti_1_url'] ?? $laporan['foto_bukti_1']); ?>" alt="Foto Bukti 1" class="img-fluid rounded" style="height: 250px; object-fit: cover; width: 100%;">
+                                      </a>
+                                    </div>
+                                  <?php else: ?>
+                                    <div class="no-evidence">
+                                      <i class="mdi mdi-image-off mb-2"></i>
+                                      <div>Tidak ada foto bukti 1</div>
+                                    </div>
+                                  <?php endif; ?>
                                 </div>
-                              <?php else: ?>
-                                <div class="no-evidence mt-2">
-                                  <i class="mdi mdi-video-off mb-2"></i>
-                                  <div>Tidak ada video bukti</div>
+
+                                <div class="col-md-4">
+                                  <h6 class="evidence-label">Foto Bukti 2</h6>
+                                  <?php if (!empty($laporan['foto_bukti_2'])): ?>
+                                    <div class="image-preview">
+                                      <a href="<?php echo htmlspecialchars($laporan['foto_bukti_2_url'] ?? $laporan['foto_bukti_2']); ?>" data-bs-toggle="modal" data-bs-target="#fullScreenImageModal" data-image="<?php echo htmlspecialchars($laporan['foto_bukti_2_url'] ?? $laporan['foto_bukti_2']); ?>" class="d-block">
+                                        <img src="<?php echo htmlspecialchars($laporan['foto_bukti_2_url'] ?? $laporan['foto_bukti_2']); ?>" alt="Foto Bukti 2" class="img-fluid rounded" style="height: 250px; object-fit: cover; width: 100%;">
+                                      </a>
+                                    </div>
+                                  <?php else: ?>
+                                    <div class="no-evidence">
+                                      <i class="mdi mdi-image-off mb-2"></i>
+                                      <div>Tidak ada foto bukti 2</div>
+                                    </div>
+                                  <?php endif; ?>
                                 </div>
-                              <?php endif; ?>
+
+                                <div class="col-md-4">
+                                  <h6 class="evidence-label">Foto Bukti 3</h6>
+                                  <?php if (!empty($laporan['foto_bukti_3'])): ?>
+                                    <div class="image-preview">
+                                      <a href="<?php echo htmlspecialchars($laporan['foto_bukti_3_url'] ?? $laporan['foto_bukti_3']); ?>" data-bs-toggle="modal" data-bs-target="#fullScreenImageModal" data-image="<?php echo htmlspecialchars($laporan['foto_bukti_3_url'] ?? $laporan['foto_bukti_3']); ?>" class="d-block">
+                                        <img src="<?php echo htmlspecialchars($laporan['foto_bukti_3_url'] ?? $laporan['foto_bukti_3']); ?>" alt="Foto Bukti 3" class="img-fluid rounded" style="height: 250px; object-fit: cover; width: 100%;">
+                                      </a>
+                                    </div>
+                                  <?php else: ?>
+                                    <div class="no-evidence">
+                                      <i class="mdi mdi-image-off mb-2"></i>
+                                      <div>Tidak ada foto bukti 3</div>
+                                    </div>
+                                  <?php endif; ?>
+                                </div>
+                              </div>
+
+                              <div class="mt-4">
+                                <h6 class="evidence-label">Video Bukti</h6>
+                                <?php if (!empty($laporan['video_bukti'])): ?>
+                                  <div class="video-preview">
+                                    <video width="100%" height="auto" controls class="w-100" style="max-height: 300px;" onclick="this.requestFullscreen();">
+                                      <source src="<?php echo htmlspecialchars($laporan['video_bukti_url'] ?? $laporan['video_bukti']); ?>" type="video/mp4">
+                                      Browser Anda tidak mendukung elemen video.
+                                    </video>
+                                  </div>
+                                <?php else: ?>
+                                  <div class="no-evidence mt-2">
+                                    <i class="mdi mdi-video-off mb-2"></i>
+                                    <div>Tidak ada video bukti</div>
+                                  </div>
+                                <?php endif; ?>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -431,6 +439,23 @@
     </div>
   </div>
   
+  <!-- Full Screen Image Modal -->
+  <div class="modal fade" id="fullScreenImageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+      <div class="modal-content bg-black">
+        <div class="modal-header border-0">
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body d-flex align-items-center justify-content-center p-0">
+          <img id="fullScreenImage" src="" alt="Full Screen Gambar" class="img-fluid" style="max-height: 100vh; object-fit: contain;">
+        </div>
+        <div class="modal-footer bg-transparent border-0">
+          <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Tutup</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
   <?php include 'template/script.php'; ?>
   
   <!-- Leaflet JS -->
@@ -441,7 +466,11 @@
     document.querySelectorAll('[data-bs-toggle="modal"]').forEach(item => {
       item.addEventListener('click', function() {
         const imageUrl = this.getAttribute('data-image');
-        document.getElementById('modalImage').src = imageUrl;
+        if (this.getAttribute('data-bs-target') === '#imageModal') {
+          document.getElementById('modalImage').src = imageUrl;
+        } else if (this.getAttribute('data-bs-target') === '#fullScreenImageModal') {
+          document.getElementById('fullScreenImage').src = imageUrl;
+        }
       });
     });
     

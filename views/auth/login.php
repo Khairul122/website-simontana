@@ -1,10 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title><?= $title ?></title>
 
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,543 +19,142 @@
   <!-- Favicon -->
   <link rel="shortcut icon" href="assets/images/favicon.png" />
 
-  <style>
-    :root {
-      /* Modern Blue Color Palette */
-      --primary-color: #4F46E5;
-      --primary-dark: #4338CA;
-      --primary-light: #818CF8;
-      --primary-50: #EEF2FF;
-      --primary-100: #E0E7FF;
-      --gray-50: #F9FAFB;
-      --gray-100: #F3F4F6;
-      --gray-200: #E5E7EB;
-      --gray-300: #D1D5DB;
-      --gray-400: #9CA3AF;
-      --gray-500: #6B7280;
-      --gray-600: #4B5563;
-      --gray-700: #374151;
-      --gray-800: #1F2937;
-      --gray-900: #111827;
-      --success: #10B981;
-      --error: #EF4444;
-      --warning: #F59E0B;
-      --info: #3B82F6;
-      --border-radius: 12px;
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-      --transition: all 0.3s ease;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-      background-color: var(--gray-50);
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    .login-container {
-      display: flex;
-      min-height: 100vh;
-    }
-
-    /* Left side - Branding */
-    .login-left {
-      flex: 1;
-      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-      color: white;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 2rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .login-left::before {
-      content: '';
-      position: absolute;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
-      top: -50%;
-      left: -50%;
-    }
-
-    .brand-content {
-      text-align: center;
-      z-index: 2;
-      max-width: 500px;
-    }
-
-    .brand-logo {
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-      background: linear-gradient(90deg, #ffffff, #e0e7ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      text-fill-color: transparent;
-    }
-
-    .brand-title {
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      color: white;
-    }
-
-    .brand-subtitle {
-      font-size: 1rem;
-      color: rgba(255, 255, 255, 0.8);
-      margin-bottom: 2rem;
-      line-height: 1.6;
-    }
-
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1.5rem;
-      margin-top: 2rem;
-    }
-
-    .feature-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.75rem;
-    }
-
-    .feature-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      margin-top: 0.25rem;
-    }
-
-    .feature-text {
-      color: rgba(255, 255, 255, 0.9);
-      font-size: 0.9rem;
-      line-height: 1.5;
-    }
-
-    /* Right side - Login Form */
-    .login-right {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 2rem;
-      background: white;
-    }
-
-    .login-card {
-      width: 100%;
-      max-width: 420px;
-      padding: 2.5rem;
-      border-radius: var(--border-radius);
-      box-shadow: var(--shadow-lg);
-      background: white;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .login-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
-    }
-
-    .logo-section {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-
-    .logo-section h1 {
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--gray-800);
-      margin-bottom: 0.5rem;
-      letter-spacing: -0.5px;
-    }
-
-    .logo-section p {
-      color: var(--gray-500);
-      margin: 0;
-      font-size: 0.95rem;
-    }
-
-    .form-group {
-      margin-bottom: 1.5rem;
-    }
-
-    .form-label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-      color: var(--gray-700);
-      font-size: 0.9rem;
-    }
-
-    .input-group {
-      position: relative;
-    }
-
-    .form-control {
-      width: 100%;
-      padding: 0.875rem 1rem 0.875rem 3rem;
-      border: 1px solid var(--gray-300);
-      border-radius: 8px;
-      font-size: 1rem;
-      transition: var(--transition);
-      background: white;
-    }
-
-    .form-control:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-    }
-
-    .input-icon {
-      position: absolute;
-      left: 1rem;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--gray-400);
-      z-index: 10;
-    }
-
-    .password-toggle {
-      position: absolute;
-      right: 1rem;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      color: var(--gray-400);
-      cursor: pointer;
-      padding: 0.25rem;
-      border-radius: 4px;
-      transition: var(--transition);
-    }
-
-    .password-toggle:hover {
-      color: var(--gray-600);
-      background: var(--gray-100);
-    }
-
-    .btn {
-      padding: 0.875rem 1rem;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: var(--transition);
-      border: none;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-    }
-
-    .btn-primary {
-      background-color: var(--primary-color);
-      color: white;
-      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    }
-
-    .btn-primary:hover {
-      background-color: var(--primary-dark);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3), 0 2px 4px -1px rgba(79, 70, 229, 0.2);
-    }
-
-    .btn-primary:active {
-      transform: translateY(0);
-    }
-
-    .auth-link {
-      text-align: center;
-      display: block;
-      margin-top: 1.5rem;
-      color: var(--primary-color);
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 0.95rem;
-      transition: var(--transition);
-    }
-
-    .auth-link:hover {
-      color: var(--primary-dark);
-      text-decoration: underline;
-    }
-
-    .toast-container {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 9999;
-      max-width: 400px;
-    }
-
-    .custom-toast {
-      background: white;
-      border-radius: 8px;
-      box-shadow: var(--shadow-lg);
-      margin-bottom: 10px;
-      padding: 1rem;
-      border-left: 4px solid;
-      display: flex;
-      align-items: flex-start;
-      gap: 0.75rem;
-      animation: slideInRight 0.3s ease-out;
-      transition: var(--transition);
-      position: relative;
-      overflow: hidden;
-      min-height: 64px;
-    }
-
-    .custom-toast.hiding {
-      animation: slideOutRight 0.3s ease-out;
-      opacity: 0;
-      transform: translateX(100%);
-    }
-
-    .custom-toast.success {
-      border-left-color: var(--success);
-      background-color: #F0FDF4;
-    }
-
-    .custom-toast.error {
-      border-left-color: var(--error);
-      background-color: #FEF2F2;
-    }
-
-    .custom-toast.warning {
-      border-left-color: var(--warning);
-      background-color: #FFFBEB;
-    }
-
-    .custom-toast.info {
-      border-left-color: var(--info);
-      background-color: #EFF6FF;
-    }
-
-    .toast-icon {
-      flex-shrink: 0;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      color: white;
-      font-weight: 600;
-      margin-top: 2px;
-    }
-
-    .custom-toast.success .toast-icon { background: var(--success); }
-    .custom-toast.error .toast-icon { background: var(--error); }
-    .custom-toast.warning .toast-icon { background: var(--warning); }
-    .custom-toast.info .toast-icon { background: var(--info); }
-
-    .toast-content {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .toast-title {
-      font-weight: 600;
-      font-size: 0.9rem;
-      margin-bottom: 0.125rem;
-      color: var(--gray-800);
-    }
-
-    .toast-message {
-      font-size: 0.85rem;
-      color: var(--gray-600);
-      line-height: 1.4;
-    }
-
-    .toast-close {
-      position: absolute;
-      top: 0.75rem;
-      right: 0.75rem;
-      background: none;
-      border: none;
-      font-size: 16px;
-      color: var(--gray-400);
-      cursor: pointer;
-      padding: 0.25rem;
-      border-radius: 4px;
-      transition: var(--transition);
-    }
-
-    .toast-close:hover {
-      color: var(--gray-600);
-      background: var(--gray-100);
-    }
-
-    .toast-progress {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      height: 3px;
-      background: currentColor;
-      opacity: 0.2;
-      animation: progress 5s linear forwards;
-    }
-
-    @keyframes slideInRight {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-
-    @keyframes slideOutRight {
-      from { transform: translateX(0); opacity: 1; }
-      to { transform: translateX(100%); opacity: 0; }
-    }
-
-    @keyframes progress {
-      from { width: 100%; }
-      to { width: 0%; }
-    }
-
-    /* Responsive design */
-    @media (max-width: 991px) {
-      .login-container {
-        flex-direction: column;
-      }
-
-      .login-left {
-        padding: 1.5rem;
-        min-height: 40vh;
-      }
-
-      .features-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .login-right {
-        padding: 1.5rem;
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            'sans': ['Inter', 'sans-serif'],
+          },
+          colors: {
+            'primary': {
+              50: '#EEF2FF',
+              100: '#E0E7FF',
+              200: '#C7D2FE',
+              300: '#A5B4FC',
+              400: '#818CF8',
+              500: '#6366F1',
+              600: '#4F46E5',
+              700: '#4338CA',
+              800: '#3730A3',
+              900: '#312E81',
+            }
+          }
+        }
       }
     }
-
-    @media (max-width: 768px) {
-      .login-card {
-        max-width: 100%;
-        margin: 0 1rem;
-      }
-    }
-  </style>
+  </script>
 </head>
-<body>
-  <div class="login-container">
-    <div class="login-left">
-      <div class="brand-content">
-        <div class="brand-logo">SIMONTA</div>
-        <h2 class="brand-title">Sistem Informasi Monitoring dan Pelaporan Bencana</h2>
-        <p class="brand-subtitle">Solusi komprehensif untuk pengelolaan data bencana, pelaporan real-time, dan koordinasi penanganan darurat.</p>
-
-        <div class="features-grid">
-          <div class="feature-item">
-            <div class="feature-icon">
+<body class="h-full font-sans bg-gray-50">
+  <div class="h-screen w-full flex overflow-hidden">
+    <!-- Image Section -->
+    <div class="hidden lg:flex lg:w-1/2 xl:w-2/3 bg-cover bg-center relative" style="background-image: url('https://source.unsplash.com/random/1920x1080/?nature,disaster');">
+      <!-- Gradient Overlay -->
+      <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-70"></div>
+      
+      <!-- Branding Content -->
+      <div class="relative z-10 flex flex-col justify-center items-center text-center text-white p-12 w-full">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-primary-200 bg-clip-text text-transparent">
+          SIMONTA BENCANA
+        </h1>
+        <p class="text-xl md:text-2xl font-semibold mb-6">Sistem Informasi Monitoring dan Pelaporan Bencana</p>
+        <p class="text-lg text-primary-200 max-w-2xl">
+          Solusi komprehensif untuk pengelolaan data bencana, pelaporan real-time, dan koordinasi penanganan darurat.
+        </p>
+        
+        <!-- Features -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10 w-full max-w-2xl">
+          <div class="flex items-start gap-3">
+            <div class="bg-primary-500 bg-opacity-30 p-2 rounded-lg">
               <i class="fas fa-bolt"></i>
             </div>
-            <div class="feature-text">
-              Laporan Real-time
+            <div class="text-left">
+              <div class="font-medium">Laporan Real-time</div>
+              <div class="text-primary-200 text-sm">Pembaruan instan</div>
             </div>
           </div>
-          <div class="feature-item">
-            <div class="feature-icon">
+          <div class="flex items-start gap-3">
+            <div class="bg-primary-500 bg-opacity-30 p-2 rounded-lg">
               <i class="fas fa-sync-alt"></i>
             </div>
-            <div class="feature-text">
-              Update Otomatis
+            <div class="text-left">
+              <div class="font-medium">Update Otomatis</div>
+              <div class="text-primary-200 text-sm">Data terkini</div>
             </div>
           </div>
-          <div class="feature-item">
-            <div class="feature-icon">
+          <div class="flex items-start gap-3">
+            <div class="bg-primary-500 bg-opacity-30 p-2 rounded-lg">
               <i class="fas fa-shield-alt"></i>
             </div>
-            <div class="feature-text">
-              Data Terpercaya
+            <div class="text-left">
+              <div class="font-medium">Data Terpercaya</div>
+              <div class="text-primary-200 text-sm">Keamanan terjamin</div>
             </div>
           </div>
-          <div class="feature-item">
-            <div class="feature-icon">
+          <div class="flex items-start gap-3">
+            <div class="bg-primary-500 bg-opacity-30 p-2 rounded-lg">
               <i class="fas fa-users"></i>
             </div>
-            <div class="feature-text">
-              Kolaborasi Tim
+            <div class="text-left">
+              <div class="font-medium">Kolaborasi Tim</div>
+              <div class="text-primary-200 text-sm">Koordinasi efektif</div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="login-right">
-      <div class="login-card">
-        <div class="logo-section">
-          <h1>Selamat Datang</h1>
-          <p>Masuk ke akun Anda untuk melanjutkan</p>
+    <!-- Form Section -->
+    <div class="w-full lg:w-1/2 xl:w-1/3 flex items-center justify-center bg-white px-8 py-12 sm:px-12">
+      <div class="w-full max-w-md">
+        <div class="text-center mb-10">
+          <h1 class="text-3xl font-bold text-gray-800 mb-2">Selamat Datang</h1>
+          <p class="text-gray-500">Masuk ke akun Anda untuk melanjutkan</p>
         </div>
 
-        <form method="POST" action="index.php?controller=Auth&action=processLogin">
-          <div class="form-group">
-            <label for="username" class="form-label">Username atau Email</label>
-            <div class="input-group">
-              <span class="input-icon"><i class="fas fa-user"></i></span>
-              <input type="text" class="form-control" id="username" name="username" placeholder="Masukkan username atau email" required>
+        <form method="POST" action="index.php?controller=Auth&action=processLogin" class="space-y-6">
+          <div class="space-y-4">
+            <div>
+              <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username atau Email</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <i class="fas fa-user text-gray-400"></i>
+                </div>
+                <input type="text" class="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition" id="username" name="username" placeholder="Masukkan username atau email" required>
+              </div>
+            </div>
+
+            <div>
+              <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Kata Sandi</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <i class="fas fa-lock text-gray-400"></i>
+                </div>
+                <input type="password" class="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition" id="password" name="password" placeholder="Masukkan kata sandi" required>
+                <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center" id="togglePassword">
+                  <i class="fas fa-eye text-gray-400"></i>
+                </button>
+              </div>
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="password" class="form-label">Kata Sandi</label>
-            <div class="input-group">
-              <span class="input-icon"><i class="fas fa-lock"></i></span>
-              <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan kata sandi" required>
-              <button type="button" class="password-toggle" id="togglePassword">
-                <i class="fas fa-eye"></i>
-              </button>
-            </div>
-          </div>
-
-          <button type="submit" class="btn btn-primary">
+          <button type="submit" class="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white py-3 px-4 rounded-lg font-medium hover:from-primary-700 hover:to-primary-800 transition-all duration-200 transform hover:-translate-y-0.5 shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
             <i class="fas fa-sign-in-alt"></i>
             MASUK
           </button>
 
-          <a href="index.php?controller=Auth&action=register" class="auth-link">
-            Belum punya akun? Buat akun baru
-          </a>
+          <div class="text-center">
+            <a href="index.php?controller=Auth&action=register" class="text-primary-600 hover:text-primary-800 font-medium text-sm transition">
+              Belum punya akun? Buat akun baru
+            </a>
+          </div>
         </form>
       </div>
     </div>
   </div>
 
   <!-- Toast Container -->
-  <div class="toast-container" id="toastContainer"></div>
+  <div class="fixed top-4 right-4 z-50 space-y-2" id="toastContainer"></div>
 
   <script>
     // Password visibility toggle functionality
@@ -580,36 +182,27 @@
         const toastContainer = document.getElementById('toastContainer');
 
         const toast = document.createElement('div');
-        toast.className = `custom-toast ${type}`;
+        toast.className = `p-4 rounded-lg shadow-lg max-w-sm transform transition-all duration-300 ${type === 'success' ? 'bg-green-100 border-l-4 border-green-500' : type === 'error' ? 'bg-red-100 border-l-4 border-red-500' : type === 'warning' ? 'bg-yellow-100 border-l-4 border-yellow-500' : 'bg-blue-100 border-l-4 border-blue-500'}`;
 
         toast.innerHTML = `
-          <div class="toast-icon">${type === 'success' ? '✓' : type === 'error' ? '!' : type === 'warning' ? '⚠' : 'ℹ'}</div>
-          <div class="toast-content">
-            <div class="toast-title">${title}</div>
-            <div class="toast-message">${message}</div>
+          <div class="flex items-start gap-3">
+            <div class="${type === 'success' ? 'text-green-500' : type === 'error' ? 'text-red-500' : type === 'warning' ? 'text-yellow-500' : 'text-blue-500'}">
+              <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i>
+            </div>
+            <div class="flex-1">
+              <div class="font-medium ${type === 'success' ? 'text-green-800' : type === 'error' ? 'text-red-800' : type === 'warning' ? 'text-yellow-800' : 'text-blue-800'}">${title}</div>
+              <div class="text-sm ${type === 'success' ? 'text-green-600' : type === 'error' ? 'text-red-600' : type === 'warning' ? 'text-yellow-600' : 'text-blue-600'}">${message}</div>
+            </div>
+            <button class="text-gray-500 hover:text-gray-700" onclick="this.parentElement.parentElement.remove()">&times;</button>
           </div>
-          <button class="toast-close">&times;</button>
-          <div class="toast-progress"></div>
         `;
 
         toastContainer.appendChild(toast);
 
-        // Tambahkan event listener untuk tombol close
-        const closeBtn = toast.querySelector('.toast-close');
-        closeBtn.addEventListener('click', function() {
-          toast.classList.add('hiding');
-          setTimeout(() => {
-            toast.remove();
-          }, 300);
-        });
-
         // Hapus toast setelah 5 detik
         setTimeout(() => {
-          if (!toast.classList.contains('hiding')) {
-            toast.classList.add('hiding');
-            setTimeout(() => {
-              toast.remove();
-            }, 300);
+          if (toast.parentNode) {
+            toast.remove();
           }
         }, 5000);
 
