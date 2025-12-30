@@ -30,9 +30,9 @@
                         <label for="status">Status <span class="text-danger">*</span></label>
                         <select class="form-control" id="status" name="status" required>
                           <option value="">Pilih Status</option>
-                          <option value="Draft" <?php echo ($report['status'] ?? '') === 'Draft' ? 'selected' : ''; ?>>Draft</option>
                           <option value="Menunggu Verifikasi" <?php echo ($report['status'] ?? '') === 'Menunggu Verifikasi' ? 'selected' : ''; ?>>Menunggu Verifikasi</option>
-                          <option value="Sedang Diproses" <?php echo ($report['status'] ?? '') === 'Sedang Diproses' ? 'selected' : ''; ?>>Sedang Diproses</option>
+                          <option value="Diverifikasi" <?php echo ($report['status'] ?? '') === 'Diverifikasi' ? 'selected' : ''; ?>>Diverifikasi</option>
+                          <option value="Ditolak" <?php echo ($report['status'] ?? '') === 'Ditolak' ? 'selected' : ''; ?>>Ditolak</option>
                           <option value="Selesai" <?php echo ($report['status'] ?? '') === 'Selesai' ? 'selected' : ''; ?>>Selesai</option>
                         </select>
                       </div>
