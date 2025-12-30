@@ -79,12 +79,54 @@ class DashboardController {
     public function operator() {
         $currentUser = $this->authService->getCurrentUser();
 
-        // Pastikan role adalah OperatorDesa
-        if ($currentUser['data']['role'] !== 'OperatorDesa') {
+        // Pastikan user login & role == 'OperatorDesa'
+        if (!$currentUser['success'] || $currentUser['data']['role'] !== 'OperatorDesa') {
             // Jika bukan OperatorDesa, redirect ke halaman sesuai role
-            $this->redirectToRoleDashboard($currentUser['data']['role']);
+            $this->redirectToRoleDashboard($currentUser['data']['role'] ?? 'Guest');
             return;
         }
+
+        // Ambil id_desa dari session user
+        $id_desa = $currentUser['data']['id_desa'] ?? null;
+
+        if (!$id_desa) {
+            // Jika tidak ada id_desa, tampilkan error atau redirect
+            $error_message = "Data desa tidak ditemukan untuk user ini.";
+            $title = "Dashboard Operator Desa - SIMONTA BENCANA";
+            include 'views/dashboard/operator.php';
+            return;
+        }
+
+        // Panggil function service: $this->dashboardService->getStatistikDesa($id_desa)
+        $dashboardData = $this->dashboardService->getStatistikDesa($id_desa);
+
+        $title = "Dashboard Operator Desa - SIMONTA BENCANA";
+        include 'views/dashboard/operator.php';
+    }
+
+    public function indexOperator() {
+        $currentUser = $this->authService->getCurrentUser();
+
+        // Pastikan user login & role == 'OperatorDesa'
+        if (!$currentUser['success'] || $currentUser['data']['role'] !== 'OperatorDesa') {
+            // Jika bukan OperatorDesa, redirect ke halaman sesuai role
+            $this->redirectToRoleDashboard($currentUser['data']['role'] ?? 'Guest');
+            return;
+        }
+
+        // Ambil id_desa dari session user
+        $id_desa = $currentUser['data']['id_desa'] ?? null;
+
+        if (!$id_desa) {
+            // Jika tidak ada id_desa, tampilkan error atau redirect
+            $error_message = "Data desa tidak ditemukan untuk user ini.";
+            $title = "Dashboard Operator Desa - SIMONTA BENCANA";
+            include 'views/dashboard/operator.php';
+            return;
+        }
+
+        // Panggil function service: $this->dashboardService->getStatistikDesa($id_desa)
+        $dashboardData = $this->dashboardService->getStatistikDesa($id_desa);
 
         $title = "Dashboard Operator Desa - SIMONTA BENCANA";
         include 'views/dashboard/operator.php';

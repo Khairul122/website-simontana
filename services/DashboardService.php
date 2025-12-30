@@ -307,4 +307,140 @@ class DashboardService {
             'errors' => $response['success'] ? [] : [$response['message']]
         ];
     }
+
+    // Fungsi untuk mendapatkan statistik desa (untuk Operator Desa)
+    public function getStatistikDesa($id_desa) {
+        $headers = $this->getAuthHeaders();
+
+        try {
+            // Ambil total laporan untuk desa ini
+            $url = API_LAPORANS . '?id_desa=' . $id_desa . '&limit=100'; // Ambil semua laporan untuk perhitungan
+            $response = apiRequest($url, 'GET', null, $headers);
+
+            $total_laporan = 0;
+            $total_warga_terdampak = 0;
+            $total_rumah_rusak = 0;
+            $laporan_terbaru = [];
+            $logistik_status = null;
+            $laporan_stats = null;
+
+            if ($response['success'] && isset($response['data'])) {
+                $laporan_list = [];
+
+                // Ambil data laporan dari respons
+                if (isset($response['data']['data']) && is_array($response['data']['data'])) {
+                    $laporan_list = $response['data']['data'];
+                } elseif (is_array($response['data'])) {
+                    $laporan_list = $response['data'];
+                }
+
+                // Hitung total laporan
+                $total_laporan = count($laporan_list);
+
+                // Hitung total warga terdampak dan rumah rusak
+                foreach ($laporan_list as $laporan) {
+                    $total_warga_terdampak += (int)($laporan['jumlah_korban'] ?? 0);
+                    $total_rumah_rusak += (int)($laporan['jumlah_rumah_rusak'] ?? 0);
+                }
+
+                // Ambil 5 laporan terbaru berdasarkan tanggal
+                usort($laporan_list, function($a, $b) {
+                    return strtotime($b['waktu_laporan'] ?? '') - strtotime($a['waktu_laporan'] ?? '');
+                });
+
+                $laporan_terbaru = array_slice($laporan_list, 0, 5);
+            }
+
+            // Ambil detail desa untuk informasi tambahan
+            $desa_detail_url = buildApiUrlWilayahDetailByDesaId($id_desa);
+            $desa_response = apiRequest($desa_detail_url, 'GET', null, $headers);
+
+            $desa_info = null;
+            if ($desa_response['success'] && isset($desa_response['data'])) {
+                $desa_info = $desa_response['data'];
+            }
+
+            // Ambil statistik laporan untuk desa ini
+            $stats_url = API_LAPORANS_STATISTICS . '?id_desa=' . $id_desa;
+            $stats_response = apiRequest($stats_url, 'GET', null, $headers);
+
+            if ($stats_response['success'] && isset($stats_response['data'])) {
+                $laporan_stats = $stats_response['data'];
+            } else {
+                // Jika endpoint statistik tidak tersedia, buat statistik manual dari data yang ada
+                $laporan_stats = [
+                    'total_laporan' => $total_laporan,
+                    'total_warga_terdampak' => $total_warga_terdampak,
+                    'total_rumah_rusak' => $total_rumah_rusak,
+                    'laporan_perlu_verifikasi' => 0,
+                    'laporan_ditindak' => 0,
+                    'laporan_selesai' => 0,
+                    'laporan_ditolak' => 0,
+                    'weekly_stats' => [],
+                    'categories_stats' => [],
+                    'monthly_trend' => []
+                ];
+
+                // Hitung statistik berdasarkan status laporan
+                foreach ($laporan_list as $laporan) {
+                    $status = $laporan['status'] ?? '';
+                    switch ($status) {
+                        case 'Menunggu Verifikasi':
+                            $laporan_stats['laporan_perlu_verifikasi']++;
+                            break;
+                        case 'Diproses':
+                        case 'Tindak Lanjut':
+                            $laporan_stats['laporan_ditindak']++;
+                            break;
+                        case 'Selesai':
+                            $laporan_stats['laporan_selesai']++;
+                            break;
+                        case 'Ditolak':
+                            $laporan_stats['laporan_ditolak']++;
+                            break;
+                    }
+                }
+            }
+
+            // Ambil data logistik untuk desa (jika endpoint tersedia)
+            // Kita coba endpoint khusus logistik desa jika tersedia
+            $logistik_url = API_WILAYAH_DETAIL . '?id_desa=' . $id_desa . '&include=logistik';
+            $logistik_response = apiRequest($logistik_url, 'GET', null, $headers);
+
+            if ($logistik_response['success'] && isset($logistik_response['data'])) {
+                $logistik_status = $logistik_response['data'];
+            } else {
+                // Jika tidak ada endpoint logistik khusus, gunakan data umum
+                $logistik_status = [
+                    'total_distribusi' => 0,
+                    'status_terakhir' => 'Tidak ada data'
+                ];
+            }
+
+            $dashboardData = [
+                'total_laporan' => $total_laporan,
+                'total_warga_terdampak' => $total_warga_terdampak,
+                'total_rumah_rusak' => $total_rumah_rusak,
+                'logistik_status' => $logistik_status,
+                'laporan_terbaru' => $laporan_terbaru,
+                'desa_info' => $desa_info,
+                'laporan_stats' => $laporan_stats
+            ];
+
+            return [
+                'success' => true,
+                'data' => $dashboardData,
+                'message' => 'Data statistik desa berhasil diambil',
+                'errors' => []
+            ];
+
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'data' => null,
+                'message' => 'Error saat mengambil data statistik desa: ' . $e->getMessage(),
+                'errors' => [$e->getMessage()]
+            ];
+        }
+    }
 }
