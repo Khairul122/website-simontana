@@ -323,9 +323,9 @@ class DashboardService {
             $laporan_terbaru = [];
             $logistik_status = null;
             $laporan_stats = null;
+            $laporan_list = []; // Initialize as empty array to prevent foreach error
 
             if ($response['success'] && isset($response['data'])) {
-                $laporan_list = [];
 
                 // Ambil data laporan dari respons
                 if (isset($response['data']['data']) && is_array($response['data']['data'])) {
