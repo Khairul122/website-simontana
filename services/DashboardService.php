@@ -443,4 +443,93 @@ class DashboardService {
             ];
         }
     }
+
+    // Fungsi untuk mendapatkan statistik dashboard petugas BPBD
+    public function getDashboardPetugas() {
+        $headers = $this->getAuthHeaders();
+
+        try {
+            // Endpoint untuk mendapatkan statistik laporan
+            $url = API_LAPORANS_STATISTICS;
+            $response = apiRequest($url, 'GET', null, $headers);
+
+            if ($response['success'] && isset($response['data'])) {
+                // Jika endpoint statistik tersedia, gunakan data dari sana
+                return [
+                    'success' => true,
+                    'data' => $response['data'],
+                    'message' => 'Data statistik dashboard petugas berhasil diambil',
+                    'errors' => []
+                ];
+            } else {
+                // Jika endpoint statistik tidak tersedia, ambil dari endpoint laporan biasa dan hitung manual
+                $totalLaporan = $this->getTotalReports();
+                $laporanMenunggu = $this->getPendingReports();
+                $laporanDiproses = $this->getProcessedReports();
+                $laporanSelesai = $this->getCompletedReports();
+
+                $dashboardData = [
+                    'total_laporan' => $this->getCountFromResponse($totalLaporan),
+                    'laporan_perlu_verifikasi' => $this->getCountFromResponse($laporanMenunggu),
+                    'laporan_ditindak' => $this->getCountFromResponse($laporanDiproses),
+                    'laporan_selesai' => $this->getCountFromResponse($laporanSelesai)
+                ];
+
+                $response = [
+                    'success' => true,
+                    'data' => $dashboardData,
+                    'message' => 'Data statistik dashboard petugas berhasil diambil',
+                    'errors' => []
+                ];
+
+                // Tambahkan pesan error jika ada permintaan gagal
+                if (!$totalLaporan['success']) {
+                    $response['success'] = false;
+                    $response['errors'][] = "Gagal mengambil data total laporan: " . ($totalLaporan['message'] ?? 'Unknown error');
+                }
+
+                if (!$laporanMenunggu['success']) {
+                    $response['success'] = false;
+                    $response['errors'][] = "Gagal mengambil data laporan menunggu: " . ($laporanMenunggu['message'] ?? 'Unknown error');
+                }
+
+                if (!$laporanDiproses['success']) {
+                    $response['success'] = false;
+                    $response['errors'][] = "Gagal mengambil data laporan diproses: " . ($laporanDiproses['message'] ?? 'Unknown error');
+                }
+
+                if (!$laporanSelesai['success']) {
+                    $response['success'] = false;
+                    $response['errors'][] = "Gagal mengambil data laporan selesai: " . ($laporanSelesai['message'] ?? 'Unknown error');
+                }
+
+                return $response;
+            }
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'data' => null,
+                'message' => 'Error saat mengambil data dashboard petugas: ' . $e->getMessage(),
+                'errors' => [$e->getMessage()]
+            ];
+        }
+    }
+
+    private function getPendingReports() {
+        $headers = $this->getAuthHeaders();
+        // Filter laporan dengan status 'Menunggu Verifikasi' sesuai dokumentasi API
+        return apiRequest(API_LAPORANS . '?status=Menunggu%20Verifikasi', 'GET', null, $headers);
+    }
+
+    private function getProcessedReports() {
+        $headers = $this->getAuthHeaders();
+        // Filter laporan dengan status 'Diproses' atau 'Tindak Lanjut' sesuai dokumentasi API
+        return apiRequest(API_LAPORANS . '?status=Diproses', 'GET', null, $headers);
+    }
+
+    private function getCompletedReports() {
+        $headers = $this->getAuthHeaders();
+        // Filter laporan dengan status 'Selesai' sesuai dokumentasi API
+        return apiRequest(API_LAPORANS . '?status=Selesai', 'GET', null, $headers);
+    }
 }

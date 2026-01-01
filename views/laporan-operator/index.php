@@ -34,16 +34,22 @@
                       </thead>
                       <tbody>
                         <?php if (!empty($reports)): ?>
-                          <?php $no = (($pagination['current_page'] ?? 1) - 1) * 10 + 1; ?>
+                          <?php
+                          // Inisialisasi Nomor dengan Pagination Logic
+                          $nomor = 1;
+                          if (isset($pagination)) {
+                              $nomor = ($pagination['current_page'] - 1) * ($pagination['per_page'] ?? 10) + 1;
+                          }
+                          ?>
                           <?php foreach ($reports as $report): ?>
                             <tr>
-                              <td><?php echo $no++; ?></td>
+                              <td><?php echo $nomor++; ?></td>
                               <td><?php echo htmlspecialchars($report['judul_laporan'] ?? '-'); ?></td>
                               <td><?php echo htmlspecialchars($report['pelapor']['nama'] ?? '-'); ?></td>
                               <td><?php echo htmlspecialchars($report['kategori']['nama_kategori'] ?? '-'); ?></td>
                               <td><?php echo htmlspecialchars($report['desa']['nama'] ?? '-'); ?></td>
                               <td>
-                                <?php 
+                                <?php
                                 $status = $report['status'] ?? 'Draft';
                                 $badge_class = '';
                                 switch (strtolower($status)) {
@@ -68,8 +74,8 @@
                               </td>
                               <td><?php echo date('d M Y', strtotime($report['waktu_laporan'] ?? '')); ?></td>
                               <td>
-                                <a href="index.php?controller=LaporanOperator&action=detail&id=<?php echo $report['id']; ?>" class="btn btn-primary btn-sm">Detail</a>
-                                <a href="index.php?controller=LaporanOperator&action=edit-status&id=<?php echo $report['id']; ?>" class="btn btn-warning btn-sm">Edit Status</a>
+                                <a href="index.php?controller=LaporanOperator&action=detail&id=<?php echo $report['id'] ?? ''; ?>" class="btn btn-primary btn-sm">Detail</a>
+                                <a href="index.php?controller=LaporanOperator&action=edit-status&id=<?php echo $report['id'] ?? ''; ?>" class="btn btn-warning btn-sm">Edit Status</a>
                               </td>
                             </tr>
                           <?php endforeach; ?>

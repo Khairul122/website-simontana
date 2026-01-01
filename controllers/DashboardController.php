@@ -72,6 +72,30 @@ class DashboardController {
             return;
         }
 
+        // Ambil data statistik untuk dashboard petugas dengan error handling
+        $stats = $this->dashboardService->getDashboardPetugas();
+        $latestReports = $this->dashboardService->getLatestReports(5);
+        $weeklyStats = $this->dashboardService->getWeeklyReportStats();
+        $categories = $this->dashboardService->getCategories();
+
+        // Ambil data tambahan untuk chart
+        $chartData = $this->dashboardService->getChartData();
+
+        // Ambil data BMKG (Gempa Terbaru)
+        $bmkgData = $this->dashboardService->getBmkgData();
+        $bmkgGempaDirasakan = $this->dashboardService->getBmkgGempaDirasakan();
+
+        // Siapkan semua data untuk ditampilkan di view
+        $dashboardData = [
+            'stats' => $stats,
+            'latestReports' => $latestReports,
+            'weeklyStats' => $weeklyStats,
+            'categories' => $categories,
+            'chartData' => $chartData,
+            'bmkgData' => $bmkgData,
+            'bmkgGempaDirasakan' => $bmkgGempaDirasakan
+        ];
+
         $title = "Dashboard Petugas BPBD - SIMONTA BENCANA";
         include 'views/dashboard/petugas.php';
     }
