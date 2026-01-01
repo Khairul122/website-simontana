@@ -1,7 +1,7 @@
 <?php
-  $nama = isset($_SESSION['nama_lengkap']) ? $_SESSION['nama_lengkap'] : (isset($_SESSION['username']) ? $_SESSION['username'] : 'Pengguna');
-  $email = isset($_SESSION['email']) ? $_SESSION['email'] : 'email@example.com';
-  $role = isset($_SESSION['role']) ? $_SESSION['role'] : 'masyarakat';
+  $nama = isset($_SESSION['user']['nama']) ? $_SESSION['user']['nama'] : (isset($_SESSION['user']['username']) ? $_SESSION['user']['username'] : (isset($_SESSION['nama_lengkap']) ? $_SESSION['nama_lengkap'] : (isset($_SESSION['username']) ? $_SESSION['username'] : 'Pengguna')));
+  $email = isset($_SESSION['user']['email']) ? $_SESSION['user']['email'] : (isset($_SESSION['email']) ? $_SESSION['email'] : 'email@example.com');
+  $role = isset($_SESSION['user']['role']) ? $_SESSION['user']['role'] : (isset($_SESSION['role']) ? $_SESSION['role'] : 'masyarakat');
 ?>
 
 <nav class="navbar default-layout col-lg-12 col-12 p-0 fixed-top d-flex align-items-top flex-row">
@@ -30,22 +30,10 @@
             <p class="mb-1 text-muted"><?= $email ?></p>
             <p class="mb-0 text-muted text-small">Role: <span class="text-primary text-capitalize"><?= $role ?></span></p>
           </div>
-          <?php if ($role === 'admin'): ?>
-            <a class="dropdown-item" href="index.php?controller=profileadmin&action=index">
-              <i class="dropdown-item-icon mdi mdi-account text-primary me-2"></i>
-              Kelola Profil
-            </a>
-          <?php elseif ($role === 'petugas'): ?>
-            <a class="dropdown-item" href="index.php?controller=profilepetugas&action=index">
-              <i class="dropdown-item-icon mdi mdi-account text-primary me-2"></i>
-              Kelola Profil
-            </a>
-          <?php else: ?>
-            <a class="dropdown-item" href="index.php?controller=user&action=profile">
-              <i class="dropdown-item-icon mdi mdi-account text-primary me-2"></i>
-              Kelola Profil
-            </a>
-          <?php endif; ?>
+          <a class="dropdown-item" href="index.php?controller=Profile&action=index">
+            <i class="dropdown-item-icon mdi mdi-account text-primary me-2"></i>
+            Kelola Profil
+          </a>
           <a class="dropdown-item" href="index.php?controller=Auth&action=logout">
             <i class="dropdown-item-icon mdi mdi-power text-primary me-2"></i>
             Sign Out
