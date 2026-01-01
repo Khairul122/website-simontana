@@ -160,13 +160,16 @@
   
   <?php if (isset($_SESSION['toast'])): ?>
     <script>
-        // Use window.alert as requested by user
-        alert("<?php echo $_SESSION['toast']['title'] . ': ' . $_SESSION['toast']['message']; ?>");
+        // Clean strings to prevent JS errors
+        var title = "<?php echo addslashes($_SESSION['toast']['title'] ?? ''); ?>";
+        var message = "<?php echo addslashes($_SESSION['toast']['message'] ?? ''); ?>";
 
-        // Optional: Keep showToast if you want, but alert is priority
-        setTimeout(function() {
-            showToast('<?php echo $_SESSION['toast']['type']; ?>', '<?php echo $_SESSION['toast']['title']; ?>', '<?php echo $_SESSION['toast']['message']; ?>');
-        }, 500);
+        // Display native alert
+        if (title && title !== 'null') {
+            alert(title + "\n\n" + message);
+        } else {
+            alert(message);
+        }
         <?php unset($_SESSION['toast']); ?>
     </script>
   <?php endif; ?>

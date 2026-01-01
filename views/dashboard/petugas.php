@@ -399,41 +399,19 @@ include('template/header.php');
     console.log("🚀 Server Response:", dashboardData);
 
     // ==========================================
-    // TOAST NOTIFICATION SYSTEM
+    // TOAST NOTIFICATION SYSTEM (Replaced with native alert)
     // ==========================================
     function showToast(type, title, message) {
-        const toastContainer = document.getElementById('toastContainer');
-        if (!toastContainer) return;
+        // Clean strings to prevent JS errors
+        var cleanTitle = title || '';
+        var cleanMessage = message || '';
 
-        const toast = document.createElement('div');
-        toast.className = `custom-toast ${type}`;
-
-        toast.innerHTML = `
-            <div class="toast-icon">${type === 'success' ? '✓' : '!'}</div>
-            <div class="toast-content">
-                <div class="toast-title">${title}</div>
-                <div class="toast-message">${message}</div>
-            </div>
-            <button class="toast-close">&times;</button>
-            <div class="toast-progress"></div>
-        `;
-
-        toastContainer.appendChild(toast);
-
-        // Event listeners
-        const closeBtn = toast.querySelector('.toast-close');
-        closeBtn.addEventListener('click', () => {
-            toast.classList.add('hiding');
-            setTimeout(() => toast.remove(), 300);
-        });
-
-        // Auto-remove after 5 seconds
-        setTimeout(() => {
-            if (!toast.classList.contains('hiding')) {
-                toast.classList.add('hiding');
-                setTimeout(() => toast.remove(), 300);
-            }
-        }, 5000);
+        // Display native alert
+        if (cleanTitle && cleanTitle !== 'null') {
+            alert(cleanTitle + "\n\n" + cleanMessage);
+        } else {
+            alert(cleanMessage);
+        }
     }
 
     // ==========================================

@@ -209,38 +209,43 @@
         return toast;
       }
 
-      // Tampilkan toast jika ada dari session
+      // Tampilkan alert jika ada dari session
       <?php if (isset($_SESSION['toast'])): ?>
-      document.addEventListener('DOMContentLoaded', function() {
-        const toast = showToast(
-          '<?php echo addslashes($_SESSION['toast']['type']); ?>',
-          '<?php echo addslashes($_SESSION['toast']['title']); ?>',
-          '<?php echo addslashes($_SESSION['toast']['message']); ?>'
-        );
-        <?php unset($_SESSION['toast']); ?>
+      <script>
+          // Clean strings to prevent JS errors
+          var title = "<?php echo addslashes($_SESSION['toast']['title'] ?? ''); ?>";
+          var message = "<?php echo addslashes($_SESSION['toast']['message'] ?? ''); ?>";
 
-        // Jika redirect diperlukan setelah toast ditampilkan
-        <?php if (isset($should_redirect) && $should_redirect): ?>
-        setTimeout(() => {
-          // Redirect ke dashboard berdasarkan role
-          const role = '<?php echo $_SESSION['user_role'] ?? 'Warga'; ?>';
-          let redirectUrl = 'index.php?controller=Beranda&action=index'; // Default untuk Warga
-
-          switch(role) {
-            case 'Admin':
-            case 'PetugasBPBD':
-            case 'OperatorDesa':
-              redirectUrl = 'index.php?controller=Dashboard&action=index';
-              break;
-            default:
-              redirectUrl = 'index.php?controller=Beranda&action=index';
-              break;
+          // Display native alert
+          if (title && title !== 'null') {
+              alert(title + "\n\n" + message);
+          } else {
+              alert(message);
           }
+          <?php unset($_SESSION['toast']); ?>
 
-          window.location.href = redirectUrl;
-        }, 2000); // Tunggu 2 detik agar toast terlihat sebelum redirect
-        <?php endif; ?>
-      });
+          // Jika redirect diperlukan setelah alert ditampilkan
+          <?php if (isset($should_redirect) && $should_redirect): ?>
+          setTimeout(() => {
+              // Redirect ke dashboard berdasarkan role
+              const role = '<?php echo $_SESSION['user_role'] ?? 'Warga'; ?>';
+              let redirectUrl = 'index.php?controller=Beranda&action=index'; // Default untuk Warga
+
+              switch(role) {
+                case 'Admin':
+                case 'PetugasBPBD':
+                case 'OperatorDesa':
+                  redirectUrl = 'index.php?controller=Dashboard&action=index';
+                  break;
+                default:
+                  redirectUrl = 'index.php?controller=Beranda&action=index';
+                  break;
+              }
+
+              window.location.href = redirectUrl;
+          }, 2000); // Tunggu 2 detik agar alert terlihat sebelum redirect
+          <?php endif; ?>
+      </script>
       <?php endif; ?>
 
       // Jika tidak ada toast tapi redirect diperlukan

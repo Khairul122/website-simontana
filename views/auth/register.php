@@ -255,16 +255,21 @@
       }, 5000);
     }
 
-    // Tampilkan toast jika ada dari session
+    // Tampilkan alert jika ada dari session
     <?php if (isset($_SESSION['toast'])): ?>
-    document.addEventListener('DOMContentLoaded', function() {
-      showToast(
-        '<?php echo addslashes($_SESSION['toast']['type']); ?>',
-        '<?php echo addslashes($_SESSION['toast']['title']); ?>',
-        '<?php echo addslashes($_SESSION['toast']['message']); ?>'
-      );
-      <?php unset($_SESSION['toast']); ?>
-    });
+    <script>
+        // Clean strings to prevent JS errors
+        var title = "<?php echo addslashes($_SESSION['toast']['title'] ?? ''); ?>";
+        var message = "<?php echo addslashes($_SESSION['toast']['message'] ?? ''); ?>";
+
+        // Display native alert
+        if (title && title !== 'null') {
+            alert(title + "\n\n" + message);
+        } else {
+            alert(message);
+        }
+        <?php unset($_SESSION['toast']); ?>
+    </script>
     <?php endif; ?>
   </script>
 </body>

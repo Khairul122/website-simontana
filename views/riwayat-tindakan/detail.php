@@ -73,7 +73,7 @@
                             <p class="card-text">
                               <strong>Judul Laporan:</strong> <?php echo htmlspecialchars($riwayatTindakan['tindak_lanjut']['laporan']['judul_laporan'] ?? '-'); ?><br>
                               <strong>Alamat:</strong> <?php echo htmlspecialchars($riwayatTindakan['tindak_lanjut']['laporan']['alamat_lengkap'] ?? '-'); ?><br>
-                              <strong>Status Terkini:</strong> 
+                              <strong>Status Terkini:</strong>
                               <?php
                                 $status = $riwayatTindakan['tindak_lanjut']['status'] ?? '-';
                                 $badgeClass = '';
@@ -153,9 +153,19 @@
 
   <?php if (isset($_SESSION['toast'])): ?>
   <script>
-      alert("<?php echo $_SESSION['toast']['title'] . ': ' . $_SESSION['toast']['message']; ?>");
+      // Clean strings to prevent JS errors
+      var title = "<?php echo addslashes($_SESSION['toast']['title'] ?? ''); ?>";
+      var message = "<?php echo addslashes($_SESSION['toast']['message'] ?? ''); ?>";
+
+      // Display native alert
+      if (title && title !== 'null') {
+          alert(title + "\n\n" + message);
+      } else {
+          alert(message);
+      }
+      <?php unset($_SESSION['toast']); ?>
   </script>
-  <?php unset($_SESSION['toast']); endif; ?>
+  <?php endif; ?>
 
 </body>
 </html>

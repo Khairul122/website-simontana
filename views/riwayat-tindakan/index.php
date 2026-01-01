@@ -44,9 +44,9 @@
                         </tr>
                       </thead>
                       <tbody>
-                        <?php if (!empty($riwayatTindakanList)): ?>
+                        <?php if (!empty($riwayat)): ?>
                           <?php $no = 1; ?>
-                          <?php foreach ($riwayatTindakanList as $item): ?>
+                          <?php foreach ($riwayat as $item): ?>
                             <tr>
                               <td><?php echo $no++; ?></td>
                               <td><?php echo htmlspecialchars($item['petugas']['nama'] ?? '-'); ?></td>
@@ -86,7 +86,7 @@
                               <td>
                                 <a href="index.php?controller=RiwayatTindakan&action=detail&id=<?php echo $item['id']; ?>" class="btn btn-info btn-sm">Detail</a>
                                 <a href="index.php?controller=RiwayatTindakan&action=edit&id=<?php echo $item['id']; ?>" class="btn btn-warning btn-sm">Edit</a>
-                                <form method="POST" action="index.php?controller=RiwayatTindakan&action=delete&id=<?php echo $item['id']; ?>" style="display: inline;" 
+                                <form method="POST" action="index.php?controller=RiwayatTindakan&action=delete&id=<?php echo $item['id']; ?>" style="display: inline;"
                                       onsubmit="return confirm('Apakah Anda yakin ingin menghapus riwayat tindakan ini?');">
                                   <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
                                 </form>
@@ -113,9 +113,19 @@
 
   <?php if (isset($_SESSION['toast'])): ?>
   <script>
-      alert("<?php echo $_SESSION['toast']['title'] . ': ' . $_SESSION['toast']['message']; ?>");
+      // Clean strings to prevent JS errors
+      var title = "<?php echo addslashes($_SESSION['toast']['title'] ?? ''); ?>";
+      var message = "<?php echo addslashes($_SESSION['toast']['message'] ?? ''); ?>";
+
+      // Display native alert
+      if (title && title !== 'null') {
+          alert(title + "\n\n" + message);
+      } else {
+          alert(message);
+      }
+      <?php unset($_SESSION['toast']); ?>
   </script>
-  <?php unset($_SESSION['toast']); endif; ?>
+  <?php endif; ?>
 
 </body>
 </html>

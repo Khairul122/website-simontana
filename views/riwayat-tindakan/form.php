@@ -37,12 +37,16 @@
                           <label for="tindaklanjut_id">Tindak Lanjut *</label>
                           <select class="form-control" id="tindaklanjut_id" name="tindaklanjut_id" required>
                             <option value="">Pilih Tindak Lanjut</option>
-                            <?php foreach ($tindakLanjutList as $tindakLanjut): ?>
-                              <option value="<?php echo $tindakLanjut['id_tindaklanjut']; ?>"
-                                <?php echo (isset($riwayatTindakan) && $riwayatTindakan['tindaklanjut_id'] == $tindakLanjut['id_tindaklanjut']) ? 'selected' : ''; ?>>
-                                ID <?php echo $tindakLanjut['id_tindaklanjut']; ?> - <?php echo htmlspecialchars($tindakLanjut['laporan']['judul_laporan'] ?? $tindakLanjut['id_tindaklanjut']); ?> (<?php echo htmlspecialchars($tindakLanjut['status'] ?? ''); ?>)
-                              </option>
-                            <?php endforeach; ?>
+                            <?php if (!empty($tindakLanjutList)): ?>
+                              <?php foreach ($tindakLanjutList as $tindakLanjut): ?>
+                                <option value="<?php echo $tindakLanjut['id_tindaklanjut']; ?>"
+                                  <?php echo (isset($riwayatTindakan) && $riwayatTindakan['tindaklanjut_id'] == $tindakLanjut['id_tindaklanjut']) ? 'selected' : ''; ?>>
+                                  ID <?php echo $tindakLanjut['id_tindaklanjut']; ?> - <?php echo htmlspecialchars($tindakLanjut['laporan']['judul_laporan'] ?? $tindakLanjut['id_tindaklanjut']); ?> (<?php echo htmlspecialchars($tindakLanjut['status'] ?? ''); ?>)
+                                </option>
+                              <?php endforeach; ?>
+                            <?php else: ?>
+                              <option value="" disabled>Tidak ada data tindak lanjut tersedia</option>
+                            <?php endif; ?>
                           </select>
                         </div>
 
@@ -111,9 +115,19 @@
 
   <?php if (isset($_SESSION['toast'])): ?>
   <script>
-      alert("<?php echo $_SESSION['toast']['title'] . ': ' . $_SESSION['toast']['message']; ?>");
+      // Clean strings to prevent JS errors
+      var title = "<?php echo addslashes($_SESSION['toast']['title'] ?? ''); ?>";
+      var message = "<?php echo addslashes($_SESSION['toast']['message'] ?? ''); ?>";
+
+      // Display native alert
+      if (title && title !== 'null') {
+          alert(title + "\n\n" + message);
+      } else {
+          alert(message);
+      }
+      <?php unset($_SESSION['toast']); ?>
   </script>
-  <?php unset($_SESSION['toast']); endif; ?>
+  <?php endif; ?>
 
 </body>
 </html>

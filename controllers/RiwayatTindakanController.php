@@ -55,6 +55,7 @@ class RiwayatTindakanController {
         $response = $this->riwayatTindakanService->getAllTindakLanjut();
         $tindakLanjutList = [];
         if ($response['success']) {
+            // Handle both Paginated and Non-Paginated responses for safety
             $tindakLanjutList = $response['data']['data'] ?? $response['data'] ?? [];
         }
 
@@ -113,7 +114,7 @@ class RiwayatTindakanController {
         exit;
     }
 
-    public function edit($id) {
+    public function edit() {
         $currentUser = $this->authService->getCurrentUser();
 
         $id = $_GET['id'] ?? null;
@@ -124,9 +125,9 @@ class RiwayatTindakanController {
 
         $response = $this->riwayatTindakanService->getById($id);
         if ($response['success']) {
-            $riwayat = $response['data'];
+            $riwayatTindakan = $response['data'];
         } else {
-            $riwayat = null;
+            $riwayatTindakan = null;
             $error_message = $response['message'] ?? 'Gagal mengambil data riwayat tindakan';
         }
 
@@ -134,6 +135,7 @@ class RiwayatTindakanController {
         $response = $this->riwayatTindakanService->getAllTindakLanjut();
         $tindakLanjutList = [];
         if ($response['success']) {
+            // Handle both Paginated and Non-Paginated responses for safety
             $tindakLanjutList = $response['data']['data'] ?? $response['data'] ?? [];
         }
 
@@ -141,7 +143,7 @@ class RiwayatTindakanController {
         include 'views/riwayat-tindakan/form.php';
     }
 
-    public function update($id) {
+    public function update() {
         $id = $_GET['id'] ?? null;
         if (!$id) {
             header('Location: index.php?controller=RiwayatTindakan&action=index');
@@ -194,7 +196,7 @@ class RiwayatTindakanController {
         exit;
     }
 
-    public function delete($id) {
+    public function delete() {
         $id = $_GET['id'] ?? null;
         if (!$id) {
             header('Location: index.php?controller=RiwayatTindakan&action=index');
@@ -226,7 +228,7 @@ class RiwayatTindakanController {
         exit;
     }
 
-    public function detail($id) {
+    public function detail() {
         $currentUser = $this->authService->getCurrentUser();
 
         $id = $_GET['id'] ?? null;
@@ -237,9 +239,9 @@ class RiwayatTindakanController {
 
         $response = $this->riwayatTindakanService->getById($id);
         if ($response['success']) {
-            $riwayat = $response['data'];
+            $riwayatTindakan = $response['data'];
         } else {
-            $riwayat = null;
+            $riwayatTindakan = null;
             $error_message = $response['message'] ?? 'Gagal mengambil data riwayat tindakan';
         }
 
