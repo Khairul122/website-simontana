@@ -121,13 +121,12 @@ class TindakLanjutController {
             exit;
         }
 
-        // Data untuk disimpan
+        // Data untuk disimpan - match required JSON structure
         $data = [
             'laporan_id' => $laporanId,
-            'tanggal_tanggapan' => $tanggalTanggapan,
-            'status' => $status,
-            'keterangan' => $keterangan,
-            'id_petugas' => $currentUser['data']['id'] // Gunakan ID petugas yang sedang login
+            'id_petugas' => $_SESSION['user']['id'] ?? 0, // Get from Session
+            'tanggal_tanggapan' => date('Y-m-d H:i:s', strtotime($tanggalTanggapan)),
+            'status' => $status
         ];
 
         // Upload file jika ada
@@ -223,13 +222,10 @@ class TindakLanjutController {
             exit;
         }
 
-        // Data untuk update
+        // Data untuk update - match required JSON structure
         $data = [
-            'laporan_id' => $laporanId,
-            'tanggal_tanggapan' => $tanggalTanggapan,
-            'status' => $status,
-            'keterangan' => $keterangan,
-            'id_petugas' => $currentUser['data']['id'] // Gunakan ID petugas yang sedang login
+            'tanggal_tanggapan' => date('Y-m-d H:i:s', strtotime($tanggalTanggapan)),
+            'status' => $status
         ];
 
         // Upload file jika ada

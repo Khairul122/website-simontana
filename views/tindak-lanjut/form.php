@@ -160,6 +160,10 @@
   
   <?php if (isset($_SESSION['toast'])): ?>
     <script>
+        // Use window.alert as requested by user
+        alert("<?php echo $_SESSION['toast']['title'] . ': ' . $_SESSION['toast']['message']; ?>");
+
+        // Optional: Keep showToast if you want, but alert is priority
         setTimeout(function() {
             showToast('<?php echo $_SESSION['toast']['type']; ?>', '<?php echo $_SESSION['toast']['title']; ?>', '<?php echo $_SESSION['toast']['message']; ?>');
         }, 500);
