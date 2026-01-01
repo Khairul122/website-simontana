@@ -36,6 +36,12 @@ $userRole = $currentUser['role'] ?? 'Guest';
           <span class="menu-title">Tindak Lanjut</span>
         </a>
       </li>
+        <li class="nav-item">
+        <a class="nav-link" href="index.php?controller=RiwayatTindakan&action=index">
+          <i class="mdi mdi-speedometer menu-icon"></i>
+          <span class="menu-title">Riwayat Tindakan</span>
+        </a>
+      </li>
     <?php elseif ($userRole === 'OperatorDesa'): ?>
       <li class="nav-item">
         <a class="nav-link" href="index.php?controller=dashboard&action=operator">
