@@ -7,7 +7,7 @@
     
     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative p-4 md:p-6 lg:p-8">
 
-      <!-- Hero Header -->
+      
       <div class="rounded-3xl bg-teal-800 border-none shadow-card overflow-hidden text-white relative mb-8">
         <div class="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-br-[150px] pointer-events-none"></div>
         <div class="p-8 md:p-10 relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -42,7 +42,7 @@
       <?php endif; ?>
 
       <?php if (isset($dashboardData) && $dashboardData['success']): ?>
-      <!-- KPI Top Level -->
+      
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
          
          <div class="rounded-2xl bg-white border border-slate-200 p-6 flex items-center shadow-sm">
@@ -85,10 +85,10 @@
 
       </div>
 
-      <!-- Main Middle Layout Section -->
+      
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
          
-         <!-- Chart Laporan Dampak -->
+         
          <div class="lg:col-span-8 rounded-3xl bg-white border border-slate-200 shadow-card flex flex-col p-6 md:p-8">
             <h3 class="font-bold text-lg text-slate-800 mb-6 flex items-center gap-2">
                <div class="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center text-sm"><i class="fa-solid fa-chart-column"></i></div>
@@ -99,7 +99,7 @@
             </div>
          </div>
 
-         <!-- Status Laporan Tracker & Activity -->
+         
          <div class="lg:col-span-4 rounded-3xl bg-slate-800 border-none shadow-card overflow-hidden text-white flex flex-col relative p-6 md:p-8 shrink-0">
             <div class="absolute bottom-0 right-0 w-32 h-32 bg-white/5 rounded-tl-[100px] pointer-events-none"></div>
             
@@ -163,7 +163,7 @@
          </div>
       </div>
 
-      <!-- Quick Laporan Table -->
+      
       <div class="rounded-3xl bg-white border border-slate-200 shadow-card overflow-hidden">
         <div class="p-6 md:p-8 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
            <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">
@@ -243,7 +243,7 @@
 </div>
 
 <?php include 'template/script.php'; ?>
-<!-- Chart.js -->
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {

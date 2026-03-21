@@ -9,7 +9,7 @@
     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative">
       <div class="p-4 md:p-6 lg:p-8 w-full">
 
-        <!-- Page Header -->
+        
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div class="flex items-center gap-4">
             <a href="index.php?controller=Wilayah&action=index" class="flex items-center justify-center h-10 w-10 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-brand-600 hover:bg-brand-50 hover:border-brand-200 transition-all shadow-sm">
@@ -34,7 +34,7 @@
 
         <div class="rounded-2xl border border-slate-200 bg-white shadow-card overflow-hidden">
           
-          <!-- Advanced Filter Sidebar / Header -->
+          
           <div class="p-5 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between bg-slate-50/50 relative overflow-hidden gap-4">
              <div class="absolute -right-6 -top-12 text-slate-200 opacity-20 pointer-events-none transform rotate-12">
                <i class="fa-solid fa-map-location-dot text-9xl"></i>

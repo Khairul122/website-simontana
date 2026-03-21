@@ -33,11 +33,9 @@ class BmkgService {
         return apiRequest($url, 'GET', null, $headers);
     }
 
-    public function getPrakiraanCuaca($wilayahId) {
-        $url = API_BASE_URL . '/bmkg/prakiraan-cuaca?wilayah_id=' . urlencode($wilayahId);
-        $headers = getAuthHeaders($_SESSION['token'] ?? null);
-        return apiRequest($url, 'GET', null, $headers);
-    }
+
+
+
 
     public function getCacheStatus() {
         $url = API_BASE_URL . '/bmkg/cache/status';

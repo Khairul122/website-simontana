@@ -1,6 +1,6 @@
 <?php
 
-// Require konfigurasi dan service otentikasi
+
 require_once __DIR__ . '/../config/koneksi.php';
 
 class TindakLanjutService
@@ -10,13 +10,13 @@ class TindakLanjutService
 
     public function __construct()
     {
-        // Gabungkan konstanta global + endpoint spesifik
+        
         $this->apiEndpoint = API_TINDAK_LANJUT;
     }
 
-    /**
-     * Mendapatkan headers otentikasi
-     */
+    
+
+
     private function getHeaders()
     {
         $token = $_SESSION['token'] ?? null;
@@ -64,14 +64,14 @@ class TindakLanjutService
         return $mapped;
     }
 
-    /**
-     * Ambil semua tindak lanjut
-     */
+    
+
+
     public function getAll($filters = [])
     {
         $url = $this->apiEndpoint;
 
-        // Add query parameters if filters are provided
+        
         if (!empty($filters)) {
             $url .= '?' . http_build_query($filters);
         }
@@ -85,9 +85,9 @@ class TindakLanjutService
         return $response;
     }
 
-    /**
-     * Ambil tindak lanjut berdasarkan ID
-     */
+    
+
+
     public function getById($id)
     {
         $url = buildApiUrlTindakLanjutById($id);
@@ -100,21 +100,21 @@ class TindakLanjutService
         return $response;
     }
 
-    /**
-     * Buat tindak lanjut baru
-     */
+    
+
+
     public function create($data, $files = [])
     {
-        // Prepare multipart form data if files are provided
+        
         if (!empty($files)) {
             $multipartData = [];
 
-            // Add regular form fields
+            
             foreach ($data as $key => $value) {
                 $multipartData[$key] = $value;
             }
 
-            // Add file fields if provided
+            
             $fileFields = ['foto_kegiatan'];
 
             foreach ($fileFields as $field) {
@@ -127,7 +127,7 @@ class TindakLanjutService
                 }
             }
 
-            // Prepare request data for multipart
+            
             $requestData = [
                 'is_multipart' => true,
                 'data' => $multipartData
@@ -139,7 +139,7 @@ class TindakLanjutService
             }
             return $response;
         } else {
-            // No files, send as JSON
+            
             $headers = $this->getHeaders();
             $response = apiRequest($this->apiEndpoint, 'POST', $data, $headers);
             if ($response['success']) {
@@ -149,23 +149,23 @@ class TindakLanjutService
         }
     }
 
-    /**
-     * Update tindak lanjut
-     */
+    
+
+
     public function update($id, $data, $files = [])
     {
         $url = buildApiUrlTindakLanjutById($id);
 
-        // Prepare multipart form data if files are provided
+        
         if (!empty($files)) {
             $multipartData = [];
 
-            // Add regular form fields
+            
             foreach ($data as $key => $value) {
                 $multipartData[$key] = $value;
             }
 
-            // Add file fields if provided
+            
             $fileFields = ['foto_kegiatan'];
 
             foreach ($fileFields as $field) {
@@ -178,7 +178,7 @@ class TindakLanjutService
                 }
             }
 
-            // Prepare request data for multipart
+            
             $requestData = [
                 'is_multipart' => true,
                 'data' => $multipartData
@@ -190,7 +190,7 @@ class TindakLanjutService
             }
             return $response;
         } else {
-            // No files, send as JSON
+            
             $headers = $this->getHeaders();
             $response = apiRequest($url, 'PUT', $data, $headers);
             if ($response['success']) {
@@ -200,9 +200,9 @@ class TindakLanjutService
         }
     }
 
-    /**
-     * Hapus tindak lanjut
-     */
+    
+
+
     public function delete($id)
     {
         $url = buildApiUrlTindakLanjutById($id);
@@ -211,9 +211,9 @@ class TindakLanjutService
         return apiRequest($url, 'DELETE', null, $headers);
     }
 
-    /**
-     * Ambil semua laporan untuk dropdown
-     */
+    
+
+
     public function getAllLaporan()
     {
         $headers = $this->getHeaders();
@@ -224,9 +224,9 @@ class TindakLanjutService
         return $response;
     }
 
-    /**
-     * Ambil semua petugas untuk dropdown
-     */
+    
+
+
     public function getAllPetugas()
     {
         $headers = $this->getHeaders();

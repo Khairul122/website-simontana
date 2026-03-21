@@ -53,7 +53,7 @@ class RiwayatTindakanService {
     public function getAll($filters) {
         $url = $this->apiEndpoint;
         
-        // Pass filters as query params
+        
         if (!empty($filters)) {
             $url .= '?' . http_build_query($filters);
         }

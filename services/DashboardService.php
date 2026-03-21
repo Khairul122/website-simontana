@@ -22,17 +22,17 @@ class DashboardService {
         return apiDataList($data);
     }
     
-    // Fungsi untuk mendapatkan statistik dasbor admin
+    
     public function getAdminDashboardStats() {
         $headers = $this->getAuthHeaders();
 
         try {
-            // Endpoint untuk mendapatkan statistik laporan
+            
             $url = API_LAPORANS_STATISTICS;
             $response = apiRequest($url, 'GET', null, $headers);
 
             if ($response['success'] && isset($response['data'])) {
-                // Jika endpoint statistik tersedia, gunakan data dari sana
+                
                 return [
                     'success' => true,
                     'data' => $response['data'],
@@ -40,7 +40,7 @@ class DashboardService {
                     'errors' => []
                 ];
             } else {
-                // Jika endpoint statistik tidak tersedia, ambil dari endpoint laporan biasa dan hitung manual
+                
                 $totalLaporan = $this->getTotalReports();
                 $laporanBaru = $this->getNewReports();
                 $laporanDitangani = $this->getHandledReports();
@@ -58,7 +58,7 @@ class DashboardService {
                     'errors' => []
                 ];
 
-                // Tambahkan pesan error jika ada permintaan gagal
+                
                 if (!$totalLaporan['success']) {
                     $response['success'] = false;
                     $response['errors'][] = "Gagal mengambil data total laporan: " . ($totalLaporan['message'] ?? 'Unknown error');
@@ -93,20 +93,20 @@ class DashboardService {
 
     private function getNewReports() {
         $headers = $this->getAuthHeaders();
-        // Filter laporan dengan status 'Draft' sesuai dokumentasi API
+        
         return apiRequest(API_LAPORANS . '?status=Draft', 'GET', null, $headers);
     }
 
     private function getHandledReports() {
         $headers = $this->getAuthHeaders();
-        // Filter laporan dengan status 'Diproses' sesuai dokumentasi API
+        
         return apiRequest(API_LAPORANS . '?status=Diproses', 'GET', null, $headers);
     }
 
-    // Fungsi untuk mendapatkan data BMKG (Gempa Terbaru)
+    
     public function getBmkgData() {
         try {
-            // Endpoint BMKG public (tidak perlu authentication)
+            
             $response = apiRequest(API_BMKG_GEMPATERBARU, 'GET', null, []);
 
             if ($response['success'] && isset($response['data'])) {
@@ -134,7 +134,7 @@ class DashboardService {
         }
     }
 
-    // Fungsi untuk mendapatkan data gempa dirasakan
+    
     public function getBmkgGempaDirasakan() {
         try {
             $response = apiRequest(API_BMKG_GEMPA_DIRASAKAN, 'GET', null, []);
@@ -155,7 +155,7 @@ class DashboardService {
         }
     }
 
-    // Fungsi pembantu untuk menghitung jumlah dari respons API
+    
     private function getCountFromResponse($response) {
         if (!$response['success'] || !isset($response['data'])) {
             return 0;
@@ -166,16 +166,16 @@ class DashboardService {
             return count($list);
         }
 
-        // Jika respons berisi informasi jumlah secara eksplisit
+        
         if (isset($response['data']['total'])) {
             return $response['data']['total'];
         }
 
-        // Default kembalikan 0 jika tidak dapat menentukan jumlah
+        
         return 0;
     }
 
-    // Fungsi untuk memeriksa apakah API endpoint tersedia
+    
     public function checkAPIConnection() {
         $headers = $this->getAuthHeaders();
         $response = apiRequest(API_AUTH_ME, 'GET', null, $headers);
@@ -187,11 +187,11 @@ class DashboardService {
         ];
     }
     
-    // Fungsi untuk mendapatkan daftar laporan terbaru
+    
     public function getLatestReports($limit = 5) {
         $headers = $this->getAuthHeaders();
 
-        // Tambahkan parameter limit ke endpoint
+        
         $url = API_LAPORANS . "?limit={$limit}";
         $response = apiRequest($url, 'GET', null, $headers);
 
@@ -207,19 +207,19 @@ class DashboardService {
         ];
     }
     
-    // Fungsi untuk mendapatkan statistik laporan mingguan
+    
     public function getWeeklyReportStats() {
         $headers = $this->getAuthHeaders();
 
-        // endpoint khusus untuk statistik laporan mingguan
+        
         $response = apiRequest(API_LAPORANS . '/statistics?period=weekly', 'GET', null, $headers);
 
-        // Jika endpoint statistik mingguan tidak tersedia, coba endpoint umum
+        
         if (!$response['success'] || !isset($response['data'])) {
             $response = apiRequest(API_LAPORANS_STATISTICS, 'GET', null, $headers);
         }
 
-        // Format ulang respons untuk konsistensi
+        
         return [
             'success' => $response['success'],
             'data' => $response['data'],
@@ -228,19 +228,19 @@ class DashboardService {
         ];
     }
 
-    // Fungsi untuk mendapatkan statistik bulanan
+    
     public function getMonthlyReportStats() {
         $headers = $this->getAuthHeaders();
 
-        // endpoint khusus untuk statistik laporan bulanan
+        
         $response = apiRequest(API_LAPORANS . '/statistics?period=monthly', 'GET', null, $headers);
 
-        // Jika endpoint statistik bulanan tidak tersedia, coba endpoint umum
+        
         if (!$response['success'] || !isset($response['data'])) {
             $response = apiRequest(API_LAPORANS_STATISTICS, 'GET', null, $headers);
         }
 
-        // Format ulang respons untuk konsistensi
+        
         return [
             'success' => $response['success'],
             'data' => $response['data'],
@@ -249,13 +249,13 @@ class DashboardService {
         ];
     }
 
-    // Fungsi untuk mendapatkan data pengguna (untuk admin)
+    
     public function getUserStatistics() {
         $headers = $this->getAuthHeaders();
 
         $response = apiRequest(API_USERS_STATISTICS, 'GET', null, $headers);
 
-        // Format ulang respons untuk konsistensi
+        
         return [
             'success' => $response['success'],
             'data' => $response['data'],
@@ -264,13 +264,13 @@ class DashboardService {
         ];
     }
 
-    // Fungsi untuk mendapatkan data kategori bencana
+    
     public function getCategories() {
         $headers = $this->getAuthHeaders();
 
         $response = apiRequest(API_KATEGORI_BENCANA, 'GET', null, $headers);
 
-        // Format ulang respons untuk konsistensi
+        
         return [
             'success' => $response['success'],
             'data' => $response['data'],
@@ -279,13 +279,13 @@ class DashboardService {
         ];
     }
 
-    // Fungsi untuk mendapatkan data wilayah
+    
     public function getRegions() {
         $headers = $this->getAuthHeaders();
 
         $response = apiRequest(API_DESA, 'GET', null, $headers);
 
-        // Format ulang respons untuk konsistensi
+        
         return [
             'success' => $response['success'],
             'data' => $response['data'],
@@ -294,14 +294,14 @@ class DashboardService {
         ];
     }
 
-    // Fungsi untuk mendapatkan data untuk chart
+    
     public function getChartData() {
         $headers = $this->getAuthHeaders();
 
-        // Gunakan endpoint statistik laporan sesuai dokumentasi API
+        
         $response = apiRequest(API_LAPORANS_STATISTICS, 'GET', null, $headers);
 
-        // Format ulang respons untuk konsistensi
+        
         return [
             'success' => $response['success'],
             'data' => $response['data'],
@@ -310,13 +310,13 @@ class DashboardService {
         ];
     }
 
-    // Fungsi untuk mendapatkan statistik desa (untuk Operator Desa)
+    
     public function getStatistikDesa($id_desa) {
         $headers = $this->getAuthHeaders();
 
         try {
-            // Ambil total laporan untuk desa ini
-            $url = API_LAPORANS . '?id_desa=' . $id_desa . '&limit=100'; // Ambil semua laporan untuk perhitungan
+            
+            $url = API_LAPORANS . '?id_desa=' . $id_desa . '&limit=100'; 
             $response = apiRequest($url, 'GET', null, $headers);
 
             $total_laporan = 0;
@@ -325,23 +325,23 @@ class DashboardService {
             $laporan_terbaru = [];
             $logistik_status = null;
             $laporan_stats = null;
-            $laporan_list = []; // Initialize as empty array to prevent foreach error
+            $laporan_list = []; 
 
             if ($response['success'] && isset($response['data'])) {
 
-                // Ambil data laporan dari respons
+                
                 $laporan_list = $this->extractList($response['data']);
 
-                // Hitung total laporan
+                
                 $total_laporan = count($laporan_list);
 
-                // Hitung total warga terdampak dan rumah rusak
+                
                 foreach ($laporan_list as $laporan) {
                     $total_warga_terdampak += (int)($laporan['jumlah_korban'] ?? 0);
                     $total_rumah_rusak += (int)($laporan['jumlah_rumah_rusak'] ?? 0);
                 }
 
-                // Ambil 5 laporan terbaru berdasarkan tanggal
+                
                 usort($laporan_list, function($a, $b) {
                     return strtotime($b['waktu_laporan'] ?? '') - strtotime($a['waktu_laporan'] ?? '');
                 });
@@ -349,7 +349,7 @@ class DashboardService {
                 $laporan_terbaru = array_slice($laporan_list, 0, 5);
             }
 
-            // Ambil detail desa untuk informasi tambahan
+            
             $desa_detail_url = buildApiUrlWilayahDetailByDesaId($id_desa);
             $desa_response = apiRequest($desa_detail_url, 'GET', null, $headers);
 
@@ -358,14 +358,14 @@ class DashboardService {
                 $desa_info = $desa_response['data'];
             }
 
-            // Ambil statistik laporan untuk desa ini
+            
             $stats_url = API_LAPORANS_STATISTICS . '?id_desa=' . $id_desa;
             $stats_response = apiRequest($stats_url, 'GET', null, $headers);
 
             if ($stats_response['success'] && isset($stats_response['data'])) {
                 $laporan_stats = $stats_response['data'];
             } else {
-                // Jika endpoint statistik tidak tersedia, buat statistik manual dari data yang ada
+                
                 $laporan_stats = [
                     'total_laporan' => $total_laporan,
                     'total_warga_terdampak' => $total_warga_terdampak,
@@ -379,7 +379,7 @@ class DashboardService {
                     'monthly_trend' => []
                 ];
 
-                // Hitung statistik berdasarkan status laporan
+                
                 foreach ($laporan_list as $laporan) {
                     $status = $laporan['status'] ?? '';
                     switch ($status) {
@@ -400,15 +400,15 @@ class DashboardService {
                 }
             }
 
-            // Ambil data logistik untuk desa (jika endpoint tersedia)
-            // Kita coba endpoint khusus logistik desa jika tersedia
+            
+            
             $logistik_url = API_WILAYAH_DETAIL . '?id_desa=' . $id_desa . '&include=logistik';
             $logistik_response = apiRequest($logistik_url, 'GET', null, $headers);
 
             if ($logistik_response['success'] && isset($logistik_response['data'])) {
                 $logistik_status = $logistik_response['data'];
             } else {
-                // Jika tidak ada endpoint logistik khusus, gunakan data umum
+                
                 $logistik_status = [
                     'total_distribusi' => 0,
                     'status_terakhir' => 'Tidak ada data'
@@ -442,17 +442,17 @@ class DashboardService {
         }
     }
 
-    // Fungsi untuk mendapatkan statistik dashboard petugas BPBD
+    
     public function getDashboardPetugas() {
         $headers = $this->getAuthHeaders();
 
         try {
-            // Endpoint untuk mendapatkan statistik laporan
+            
             $url = API_LAPORANS_STATISTICS;
             $response = apiRequest($url, 'GET', null, $headers);
 
             if ($response['success'] && isset($response['data'])) {
-                // Jika endpoint statistik tersedia, gunakan data dari sana
+                
                 return [
                     'success' => true,
                     'data' => $response['data'],
@@ -460,7 +460,7 @@ class DashboardService {
                     'errors' => []
                 ];
             } else {
-                // Jika endpoint statistik tidak tersedia, ambil dari endpoint laporan biasa dan hitung manual
+                
                 $totalLaporan = $this->getTotalReports();
                 $laporanMenunggu = $this->getPendingReports();
                 $laporanDiproses = $this->getProcessedReports();
@@ -480,7 +480,7 @@ class DashboardService {
                     'errors' => []
                 ];
 
-                // Tambahkan pesan error jika ada permintaan gagal
+                
                 if (!$totalLaporan['success']) {
                     $response['success'] = false;
                     $response['errors'][] = "Gagal mengambil data total laporan: " . ($totalLaporan['message'] ?? 'Unknown error');
@@ -515,19 +515,19 @@ class DashboardService {
 
     private function getPendingReports() {
         $headers = $this->getAuthHeaders();
-        // Filter laporan dengan status 'Menunggu Verifikasi' sesuai dokumentasi API
+        
         return apiRequest(API_LAPORANS . '?status=Menunggu%20Verifikasi', 'GET', null, $headers);
     }
 
     private function getProcessedReports() {
         $headers = $this->getAuthHeaders();
-        // Filter laporan dengan status 'Diproses' atau 'Tindak Lanjut' sesuai dokumentasi API
+        
         return apiRequest(API_LAPORANS . '?status=Diproses', 'GET', null, $headers);
     }
 
     private function getCompletedReports() {
         $headers = $this->getAuthHeaders();
-        // Filter laporan dengan status 'Selesai' sesuai dokumentasi API
+        
         return apiRequest(API_LAPORANS . '?status=Selesai', 'GET', null, $headers);
     }
 }

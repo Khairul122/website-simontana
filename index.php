@@ -13,7 +13,7 @@ require_once 'config/globals.php';
 $controller = isset($_GET['controller']) ? $_GET['controller'] : 'Auth';
 $action = isset($_GET['action']) ? $_GET['action'] : 'login';
 
-// Pastikan $controller adalah string, bukan objek
+
 if (!is_string($controller)) {
     header('HTTP/1.1 400 Bad Request');
     echo '400 - Controller harus berupa string';
@@ -26,7 +26,7 @@ $action = preg_replace('/[^a-zA-Z0-9_]/', '', $action);
 $controllerFile = CONTROLLER_PATH . $controller . 'Controller.php';
 
 if (file_exists($controllerFile)) {
-    // Simpan nilai $controller sebelum require untuk mencegah override
+    
     $controllerName = $controller;
 
     require_once $controllerFile;
@@ -37,7 +37,7 @@ if (file_exists($controllerFile)) {
         $controllerObj = new $controllerClass();
 
         if (method_exists($controllerObj, $action)) {
-            // Method sekarang mengambil parameter dari $_GET, jadi panggil tanpa parameter
+            
             $controllerObj->$action();
         } else {
             header('HTTP/1.1 404 Not Found');

@@ -28,7 +28,7 @@ foreach ($reportRows as $reportItem) {
     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative">
       <div class="p-4 md:p-6 lg:p-8 w-full">
 
-        <!-- Page Header -->
+        
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
             <h1 class="font-display text-2xl md:text-3xl font-bold text-slate-900">Data Laporan Bencana</h1>
@@ -41,7 +41,7 @@ foreach ($reportRows as $reportItem) {
           </div>
         </div>
 
-        <!-- Metric Chips -->
+        
         <div class="flex flex-wrap items-center gap-3 mb-6">
           <div class="flex items-center gap-3 px-4 py-2 bg-white border border-slate-200 rounded-full shadow-sm">
             <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Semua Data</p>
@@ -64,7 +64,7 @@ foreach ($reportRows as $reportItem) {
           </div>
         </div>
 
-        <!-- Filter & Search Toolbar -->
+        
         <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-card mb-6">
           <form method="GET" class="flex flex-col md:flex-row flex-wrap gap-4 items-end">
             <input type="hidden" name="controller" value="LaporanAdmin">
@@ -119,7 +119,7 @@ foreach ($reportRows as $reportItem) {
           </form>
         </div>
 
-        <!-- Data Table -->
+        
         <div class="rounded-2xl border border-slate-200 bg-white shadow-card overflow-hidden">
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse" id="laporanTable">
@@ -227,7 +227,7 @@ foreach ($reportRows as $reportItem) {
             </table>
           </div>
 
-          <!-- Pagination -->
+          
           <?php if (!empty($pagination) && isset($pagination['last_page']) && $pagination['last_page'] > 1): ?>
           <div class="p-4 border-t border-slate-100 flex items-center justify-center bg-slate-50/50">
             <nav class="flex items-center gap-1">

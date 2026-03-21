@@ -59,7 +59,7 @@ function laporanPetugasEditStatusBadge($statusRaw) {
           
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            <!-- Main Form Card -->
+            
             <div class="lg:col-span-8">
               <div class="rounded-3xl bg-white border border-slate-200 shadow-card overflow-hidden">
                 <div class="bg-indigo-50 border-b border-indigo-100 p-6 md:px-8 md:py-6 flex items-start gap-4">
@@ -73,7 +73,7 @@ function laporanPetugasEditStatusBadge($statusRaw) {
                 </div>
 
                 <form method="POST" action="index.php?controller=LaporanPetugas&action=update&id=<?php echo (int) $laporan['id']; ?>" class="p-6 md:p-8 space-y-6">
-                  <!-- Status Select -->
+                  
                   <div>
                     <label for="status" class="block text-sm font-bold text-slate-700 mb-2">Pilar Status Proses <span class="text-red-500">*</span></label>
                     <div class="relative">
@@ -93,13 +93,13 @@ function laporanPetugasEditStatusBadge($statusRaw) {
                     </div>
                   </div>
 
-                  <!-- Keterangan -->
+                  
                   <div>
                     <label for="keterangan" class="block text-sm font-bold text-slate-700 mb-2">Berita Keterangan Progress Baru</label>
                     <textarea class="w-full rounded-xl border border-slate-300 bg-white p-4 text-slate-700 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-shadow placeholder-slate-400 resize-none" id="keterangan" name="keterangan" rows="5" placeholder="Tambahkan catatan progres kerja lapangan secara rinci di mari..."><?php echo htmlspecialchars($laporan['keterangan'] ?? ''); ?></textarea>
                   </div>
 
-                  <!-- Actions -->
+                  
                   <div class="pt-6 border-t border-slate-100 flex items-center justify-end gap-3">
                     <a href="index.php?controller=LaporanPetugas&action=detail&id=<?php echo (int) $laporan['id']; ?>" class="px-5 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-600 font-bold text-sm hover:bg-slate-50 transition shadow-sm">
                       Urungkan Balik
@@ -113,7 +113,7 @@ function laporanPetugasEditStatusBadge($statusRaw) {
               </div>
             </div>
 
-            <!-- Sidebar Info Card -->
+            
             <div class="lg:col-span-4">
               <div class="rounded-3xl bg-slate-800 text-white shadow-card overflow-hidden sticky top-6">
                  <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-bl-[100px] -mr-10 -mt-10 pointer-events-none"></div>

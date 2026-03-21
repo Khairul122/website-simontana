@@ -9,7 +9,7 @@
     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative">
       <div class="p-4 md:p-6 lg:p-8 w-full">
 
-        <!-- Page Header -->
+        
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
             <h1 class="font-display text-2xl md:text-3xl font-bold text-slate-900">Profil Pengguna</h1>
@@ -35,16 +35,16 @@
         <?php if (!empty($user)): ?>
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            <!-- Sidebar Profile Card -->
+            
             <div class="lg:col-span-4 xl:col-span-3">
               <div class="rounded-3xl bg-white border border-slate-200 shadow-card overflow-hidden sticky top-6">
-                <!-- Cover Image Background -->
+                
                 <div class="h-32 bg-gradient-to-br from-brand-600 to-indigo-700 relative overflow-hidden">
                    <div class="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
                 </div>
                 
                 <div class="px-6 pb-6 pt-0 relative flex flex-col items-center text-center mt--12">
-                  <!-- Avatar -->
+                  
                   <div class="w-24 h-24 rounded-full bg-white p-1.5 shadow-md relative z-10 -mt-12 mb-4 border border-slate-100">
                     <div class="w-full h-full rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-3xl font-black font-display uppercase">
                       <?php echo strtoupper(substr($user['nama'] ?? 'U', 0, 1)); ?>
@@ -97,7 +97,7 @@
               </div>
             </div>
 
-            <!-- Main Detail Card -->
+            
             <div class="lg:col-span-8 xl:col-span-9">
               <div class="rounded-3xl bg-white border border-slate-200 shadow-card overflow-hidden">
                 <div class="p-6 md:p-8 border-b border-slate-100 bg-slate-50/50">
@@ -108,7 +108,7 @@
                 <div class="p-6 md:p-8">
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     
-                    <!-- Nama Lengkap -->
+                    
                     <div>
                       <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-2">
                         <i class="fa-solid fa-id-card text-slate-300"></i> Nama Tertulis Lengkap
@@ -118,7 +118,7 @@
                       </div>
                     </div>
                     
-                    <!-- Username -->
+                    
                     <div>
                       <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-2">
                         <i class="fa-solid fa-fingerprint text-slate-300"></i> Nama Pengguna (Username)
@@ -128,7 +128,7 @@
                       </div>
                     </div>
                     
-                    <!-- Email -->
+                    
                     <div>
                       <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-2">
                         <i class="fa-solid fa-envelope text-slate-300"></i> Alamat Email Valid
@@ -141,7 +141,7 @@
                       </div>
                     </div>
                     
-                    <!-- Telepon -->
+                    
                     <div>
                       <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-2">
                         <i class="fa-solid fa-phone text-slate-300"></i> Nomor Telepon / HP
@@ -151,7 +151,7 @@
                       </div>
                     </div>
                     
-                    <!-- Alamat -->
+                    
                     <div class="md:col-span-2">
                       <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-2">
                         <i class="fa-solid fa-map-location-dot text-slate-300"></i> Alamat Domisili Aktif

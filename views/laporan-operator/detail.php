@@ -1,5 +1,5 @@
 <?php include('template/header.php'); ?>
-<!-- Leaflet CSS -->
+
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
 <div class="flex h-screen overflow-hidden bg-slate-50">
@@ -35,10 +35,10 @@
           
           <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
             
-            <!-- Kolom Kiri: Info Utama & Timeline -->
+            
             <div class="xl:col-span-2 flex flex-col gap-6">
               
-              <!-- Card: Info Dasar Laporan -->
+              
               <div class="rounded-3xl bg-white border border-slate-200 shadow-card overflow-hidden">
                 <div class="p-6 md:p-8">
                   <div class="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
@@ -70,7 +70,7 @@
                      <?php echo nl2br(htmlspecialchars($report['deskripsi'] ?? 'Laporan ini tidak memiliki deskripsi spesifik.')); ?>
                   </div>
                   
-                  <!-- Identitas Pelapor -->
+                  
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                      <div class="rounded-2xl border border-slate-100 p-4 bg-white shadow-sm flex items-start gap-4">
                         <div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center text-lg shrink-0"><i class="fa-solid fa-user-shield"></i></div>
@@ -91,10 +91,10 @@
                 </div>
               </div>
 
-              <!-- Card: Bukti Lampiran & Lokasi Map -->
+              
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
-                <!-- Peta Lokasi -->
+                
                 <div class="rounded-3xl bg-white border border-slate-200 shadow-card overflow-hidden flex flex-col">
                   <div class="p-5 border-b border-slate-100 bg-slate-50/50 flex items-center gap-3">
                      <div class="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center"><i class="fa-solid fa-map-pin"></i></div>
@@ -117,7 +117,7 @@
                   </div>
                 </div>
 
-                <!-- Foto Bukti -->
+                
                 <div class="rounded-3xl bg-white border border-slate-200 shadow-card overflow-hidden flex flex-col">
                   <div class="p-5 border-b border-slate-100 bg-slate-50/50 flex items-center gap-3">
                      <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center"><i class="fa-solid fa-camera-retro"></i></div>
@@ -144,11 +144,11 @@
 
             </div>
 
-            <!-- Kolom Kanan: Status & Riwayat (Sticky Sidebar) -->
+            
             <div class="xl:col-span-1">
                <div class="sticky top-6 flex flex-col gap-6">
                  
-                 <!-- State Card -->
+                 
                  <div class="rounded-3xl bg-slate-800 border-none shadow-card overflow-hidden text-white relative">
                    <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-bl-full -mr-10 -mt-10"></div>
                    <div class="p-6 relative z-10 text-center">
@@ -184,7 +184,7 @@
                    <?php endif; ?>
                  </div>
 
-                 <!-- Timeline History -->
+                 
                  <div class="rounded-3xl bg-white border border-slate-200 shadow-card overflow-hidden">
                    <div class="p-5 border-b border-slate-100 bg-slate-50/50 flex items-center gap-3">
                      <div class="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center"><i class="fa-solid fa-clock-rotate-left"></i></div>
@@ -207,7 +207,7 @@
                             }
                         ?>
 
-                        <!-- Initial Report Point -->
+                        
                         <div class="relative pl-6">
                             <div class="absolute w-4 h-4 bg-white border-4 border-slate-200 rounded-full -left-[-11px] top-1"></div>
                             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1"><?php echo date('d M Y H:i', strtotime($report['waktu_laporan'] ?? '')); ?></p>
@@ -215,7 +215,7 @@
                             <p class="text-xs text-slate-500 mt-1 line-clamp-2"><?php echo htmlspecialchars($report['judul_laporan'] ?? '-'); ?></p>
                         </div>
                         
-                        <!-- Monitoring History loop -->
+                        
                         <?php if (!empty($monitoring_data)): ?>
                           <?php foreach (array_reverse($monitoring_data) as $monitor): ?>
                             <div class="relative pl-6">
@@ -227,7 +227,7 @@
                           <?php endforeach; ?>
                         <?php endif; ?>
 
-                        <!-- Tindak Lanjut loop -->
+                        
                         <?php if (!empty($report['tindak_lanjut'])): ?>
                            <?php foreach (array_reverse($report['tindak_lanjut']) as $tindak): ?>
                               <div class="relative pl-6">
@@ -273,7 +273,7 @@
 
 <?php include 'template/script.php'; ?>
 
-<!-- Leaflet JS -->
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>

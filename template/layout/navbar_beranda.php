@@ -1,23 +1,23 @@
 <?php
-// Include required model files
+
 require_once 'models/ProfileModel.php';
 require_once 'models/LayananInformasiModel.php';
 require_once 'models/InformasiPublikModel.php';
 require_once 'models/TataKelolaModel.php';
 
-// Initialize database connection
+
 global $database;
 $db = $database->getConnection();
 
-// Fetch profile menu data
+
 $profileModel = new ProfileModel($db);
 $profile_menu = $profileModel->getProfilesForNavbar();
 
-// Fetch layanan informasi menu data
+
 $layananModel = new LayananInformasiModel($db);
 $allLayanan = $layananModel->getAllLayanan();
 
-// Group layanan by nama_layanan with 3-level support
+
 $layanan_menu = [];
 foreach ($allLayanan as $layanan) {
     $nama = $layanan['nama_layanan'];
@@ -29,9 +29,9 @@ foreach ($allLayanan as $layanan) {
     }
 
     if (!empty($sub)) {
-        // Ada sub_layanan
+        
         if (!empty($sub_2)) {
-            // Ada sub_layanan_2 (3 level)
+            
             if (!isset($layanan_menu[$nama][$sub])) {
                 $layanan_menu[$nama][$sub] = [];
             }
@@ -40,22 +40,22 @@ foreach ($allLayanan as $layanan) {
                 'sub_layanan_2' => $sub_2
             ];
         } else {
-            // Hanya sub_layanan (2 level)
+            
             if (!isset($layanan_menu[$nama][$sub])) {
                 $layanan_menu[$nama][$sub] = ['_direct_id' => $layanan['id_layanan']];
             }
         }
     } else {
-        // Tidak ada sub_layanan (1 level - direct link)
+        
         $layanan_menu[$nama]['_direct_id'] = $layanan['id_layanan'];
     }
 }
 
-// Fetch informasi publik menu data
+
 $informasiModel = new InformasiPublikModel($db);
 $allInformasi = $informasiModel->getAllInformasi();
 
-// Group informasi by nama_informasi_publik
+
 $informasi_menu = [];
 foreach ($allInformasi as $informasi) {
     $nama = $informasi['nama_informasi_publik'];
@@ -68,12 +68,12 @@ foreach ($allInformasi as $informasi) {
             'sub_informasi_publik' => $informasi['sub_informasi_publik']
         ];
     } else {
-        // Store ID for direct link if no sub_informasi_publik exists
+        
         $informasi_menu[$nama]['_direct_id'] = $informasi['id_informasi_publik'];
     }
 }
 
-// Fetch dokumen menu data from kategori table
+
 $query_dokumen = "SELECT id_kategori, nama_kategori FROM kategori ORDER BY nama_kategori ASC";
 $stmt_dokumen = $db->prepare($query_dokumen);
 $stmt_dokumen->execute();
@@ -569,17 +569,17 @@ $dokumen_menu = $stmt_dokumen->fetchAll(PDO::FETCH_ASSOC);
                         <?php if (!empty($layanan_menu)): ?>
                             <?php foreach ($layanan_menu as $nama_layanan => $items): ?>
                                 <?php
-                                // Cek apakah direct link (Level 1)
+                                
                                 if (isset($items['_direct_id'])) {
                                     $direct_id = $items['_direct_id'];
                                     ?>
-                                    <!-- Level 1: Tanpa Sub Layanan - Direct Link -->
+                                    
                                     <a href="index.php?controller=layananInformasi&action=viewDetail&id=<?php echo $direct_id; ?>" class="dropdown-kategori-direct">
                                         <?php echo htmlspecialchars($nama_layanan); ?>
                                     </a>
                                     <?php
                                 } else {
-                                    // Ada sub_layanan (Level 2 atau 3)
+                                    
                                     ?>
                                     <div class="dropdown-item-wrapper">
                                         <a href="#" class="dropdown-kategori">
@@ -589,16 +589,16 @@ $dokumen_menu = $stmt_dokumen->fetchAll(PDO::FETCH_ASSOC);
                                         <div class="dropdown-sub">
                                             <?php foreach ($items as $sub_layanan => $sub_items): ?>
                                                 <?php
-                                                // Cek apakah sub_layanan punya sub_layanan_2
+                                                
                                                 if (is_array($sub_items) && isset($sub_items['_direct_id'])) {
-                                                    // Level 2: Hanya sub_layanan (direct link)
+                                                    
                                                     ?>
                                                     <a href="index.php?controller=layananInformasi&action=viewDetail&id=<?php echo $sub_items['_direct_id']; ?>">
                                                         <?php echo htmlspecialchars($sub_layanan); ?>
                                                     </a>
                                                     <?php
                                                 } elseif (is_array($sub_items) && !isset($sub_items['_direct_id'])) {
-                                                    // Level 3: Ada sub_layanan_2
+                                                    
                                                     ?>
                                                     <div class="dropdown-sub-item-wrapper">
                                                         <a href="#" class="dropdown-sub-kategori">
@@ -637,14 +637,14 @@ $dokumen_menu = $stmt_dokumen->fetchAll(PDO::FETCH_ASSOC);
                         <?php if (!empty($informasi_menu)): ?>
                             <?php foreach ($informasi_menu as $nama_informasi => $items): ?>
                                 <?php
-                                // Cek apakah ada sub_informasi_publik atau direct link
+                                
                                 $has_sub = false;
                                 $direct_id = null;
 
                                 if (isset($items['_direct_id'])) {
                                     $direct_id = $items['_direct_id'];
                                 } else {
-                                    // Filter hanya item yang bukan _direct_id
+                                    
                                     $sub_items = array_filter($items, function ($key) {
                                         return $key !== '_direct_id';
                                     }, ARRAY_FILTER_USE_KEY);
@@ -656,7 +656,7 @@ $dokumen_menu = $stmt_dokumen->fetchAll(PDO::FETCH_ASSOC);
                                 ?>
 
                                 <?php if ($has_sub): ?>
-                                    <!-- Dengan Sub Informasi - Dropdown Bertingkat -->
+                                    
                                     <div class="dropdown-item-wrapper">
                                         <a href="#" class="dropdown-kategori">
                                             <?php echo htmlspecialchars($nama_informasi); ?>
@@ -673,7 +673,7 @@ $dokumen_menu = $stmt_dokumen->fetchAll(PDO::FETCH_ASSOC);
                                         </div>
                                     </div>
                                 <?php else: ?>
-                                    <!-- Tanpa Sub Informasi - Direct Link -->
+                                    
                                     <a href="index.php?controller=informasiPublik&action=viewDetail&id=<?php echo $direct_id; ?>" class="dropdown-kategori-direct">
                                         <?php echo htmlspecialchars($nama_informasi); ?>
                                     </a>
@@ -681,7 +681,7 @@ $dokumen_menu = $stmt_dokumen->fetchAll(PDO::FETCH_ASSOC);
                             <?php endforeach; ?>
                         <?php endif; ?>
 
-                        <!-- Dropdown Dokumen -->
+                        
                         <div class="dropdown-item-wrapper">
                             <a href="#" class="dropdown-kategori">
                                 Dokumen
@@ -706,7 +706,7 @@ $dokumen_menu = $stmt_dokumen->fetchAll(PDO::FETCH_ASSOC);
                     </a>
                     <div class="dropdown-content">
                         <?php
-                        // Fetch tata kelola data
+                        
                         $tataKelolaModel = new TataKelolaModel($db);
                         $tataKelolaList = $tataKelolaModel->getAllTataKelola();
                         ?>

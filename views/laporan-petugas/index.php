@@ -39,7 +39,7 @@ if (!is_array($reports)) {
     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative">
       <div class="p-4 md:p-6 lg:p-8 w-full">
 
-        <!-- Page Header -->
+        
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
             <h1 class="font-display text-2xl md:text-3xl font-bold text-slate-900">Laporan Bencana BPBD</h1>
@@ -62,7 +62,7 @@ if (!is_array($reports)) {
           </div>
         <?php endif; ?>
 
-        <!-- Filter Bar -->
+        
         <div class="rounded-2xl bg-white border border-slate-200 p-5 md:p-6 shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-end">
            <div class="w-full md:w-1/4">
              <label for="statusFilter" class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Status</label>
@@ -100,7 +100,7 @@ if (!is_array($reports)) {
            </div>
         </div>
 
-        <!-- Data Table -->
+        
         <div class="rounded-2xl border border-slate-200 bg-white shadow-card overflow-hidden">
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">

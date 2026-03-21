@@ -186,14 +186,14 @@
 <footer class="footer" data-aos="fade-up">
     <div class="container">
         <div class="row">
-            <!-- Kolom 1: Logo dan Informasi Singkat -->
+            
             <div class="col-lg-4 col-md-6 mb-5 mb-lg-0" data-aos="fade-right" data-aos-delay="100">
                 <div class="footer-logo">
                     <h4>PPID Madina</h4>
                 </div>
                 <p style="color: rgba(255, 255, 255, 0.85);">Pejabat Pengelola Informasi dan Dokumentasi Kabupaten Mandailing Natal, mewujudkan tata kelola pemerintahan yang terbuka dan akuntabel.</p>
                 
-                <!-- Informasi Kontak -->
+                
                 <div class="mt-4">
                     <div class="footer-contact-item">
                         <i class="fas fa-map-marker-alt"></i>
@@ -221,7 +221,7 @@
                 </div>
             </div>
 
-            <!-- Kolom 2: Link Terkait -->
+            
             <div class="col-lg-4 col-md-6 mb-5 mb-lg-0" data-aos="fade-up" data-aos-delay="200">
                 <h5>Link Terkait</h5>
                 <div class="quick-links">
@@ -236,12 +236,12 @@
                 </div>
             </div>
 
-            <!-- Kolom 3: Media Sosial dan Jam Operasional -->
+            
             <div class="col-lg-4 col-md-12" data-aos="fade-left" data-aos-delay="300">
                 <h5>Media Sosial</h5>
                 <div class="social-links">
                     <?php 
-                    // Ambil data media sosial dari database
+                    
                     $socialMedia = [];
                     if (isset($database)) {
                         global $database;
@@ -268,12 +268,12 @@
                                             break;
                                         case 'youtube':
                                             $iconClass = 'fab fa-youtube';
-                                            $social['url'] = $social['site']; // Menggunakan site sebagai url
+                                            $social['url'] = $social['site']; 
                                             if (isset($social['instagram_post'])) $social['url'] = $social['instagram_post'];
                                             break;
                                         case 'tiktok':
                                             $iconClass = 'fab fa-tiktok';
-                                            $social['url'] = $social['site']; // Menggunakan site sebagai url
+                                            $social['url'] = $social['site']; 
                                             break;
                                         default:
                                             $iconClass = 'fas fa-globe';
@@ -288,7 +288,7 @@
                                     }
                                 }
                             } catch (PDOException $e) {
-                                // Jika terjadi error, gunakan data default
+                                
                                 $socialMedia = [
                                     ['platform' => 'Facebook', 'url' => '#', 'icon' => 'fab fa-facebook-f'],
                                     ['platform' => 'Instagram', 'url' => '#', 'icon' => 'fab fa-instagram'],
@@ -325,7 +325,7 @@
                     <?php endif; ?>
                 </div>
 
-                <!-- Jam Operasional -->
+                
                 <div class="mt-4">
                     <h5 class="mb-3">Jam Operasional</h5>
                     <div class="footer-contact-item">
@@ -347,7 +347,7 @@
             </div>
         </div>
 
-        <!-- Copyright -->
+        
         <div class="copyright mt-5 pt-4 border-top" data-aos="fade-in" data-aos-delay="500">
             <div class="row align-items-center">
                 <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">

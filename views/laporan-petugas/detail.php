@@ -66,10 +66,10 @@ function laporanPetugasDetailStatusBadge($statusRaw) {
           
           <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
             
-            <!-- Kolom Kiri: Detil dan Peta -->
+            
             <div class="xl:col-span-2 flex flex-col gap-6">
               
-              <!-- Basic Info -->
+              
               <div class="rounded-3xl bg-white border border-slate-200 shadow-card overflow-hidden">
                 <div class="p-6 md:p-8">
                   <div class="flex flex-col md:flex-row justify-between gap-4 mb-6">
@@ -93,9 +93,9 @@ function laporanPetugasDetailStatusBadge($statusRaw) {
                      <?php echo nl2br(htmlspecialchars($laporan['deskripsi'] ?? 'Laporan ini tidak memiliki narasi spesifik.')); ?>
                   </div>
                   
-                  <!-- Meta Details Grid -->
+                  
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                     <!-- Pelapor -->
+                     
                      <div class="rounded-2xl border border-slate-100 p-4 bg-white flex items-start gap-4">
                         <div class="w-10 h-10 rounded-full bg-slate-50 text-slate-400 border border-slate-100 flex items-center justify-center shrink-0"><i class="fa-solid fa-user"></i></div>
                         <div>
@@ -106,7 +106,7 @@ function laporanPetugasDetailStatusBadge($statusRaw) {
                         </div>
                      </div>
                      
-                     <!-- Lokasi Teks -->
+                     
                      <div class="rounded-2xl border border-slate-100 p-4 bg-white flex items-start gap-4">
                         <div class="w-10 h-10 rounded-full bg-red-50 text-red-500 border border-red-100 flex items-center justify-center shrink-0"><i class="fa-solid fa-map-location-dot"></i></div>
                         <div>
@@ -120,7 +120,7 @@ function laporanPetugasDetailStatusBadge($statusRaw) {
                 </div>
               </div>
 
-              <!-- Peta Interaktif -->
+              
               <div class="rounded-3xl bg-white border border-slate-200 shadow-card overflow-hidden">
                  <div class="p-5 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between gap-3">
                     <div class="flex items-center gap-3">
@@ -140,11 +140,11 @@ function laporanPetugasDetailStatusBadge($statusRaw) {
 
             </div>
 
-            <!-- Kolom Kanan: Status & Riwayat (Sticky) -->
+            
             <div class="xl:col-span-1">
                <div class="sticky top-6 flex flex-col gap-6">
                  
-                 <!-- Status & Quick Action Card -->
+                 
                  <div class="rounded-3xl bg-slate-800 text-white shadow-card overflow-hidden relative">
                    <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-bl-[100px] -mr-10 -mt-10 pointer-events-none"></div>
                    
@@ -161,7 +161,7 @@ function laporanPetugasDetailStatusBadge($statusRaw) {
                            }
                         }
                         
-                        // color matching for text highlight 
+                        
                         $colorClassText = 'text-white';
                         if(strpos($badge, 'blue-50') !== false) $colorClassText = 'text-blue-400';
                         if(strpos($badge, 'indigo-50') !== false) $colorClassText = 'text-indigo-400';
@@ -177,7 +177,7 @@ function laporanPetugasDetailStatusBadge($statusRaw) {
                       <p class="text-xs text-slate-400 font-medium tracking-wide">Laporan Dibuat: <?php echo date('d M Y - H:i', strtotime($laporan['waktu_laporan'] ?? 'now')); ?></p>
                    </div>
                    
-                   <!-- Quick Actions Formulir Mini -->
+                   
                    <div class="p-4 bg-white/5 border-t border-white/10 flex flex-col gap-2 relative z-10">
                       <p class="text-[10px] text-center uppercase tracking-widest font-bold text-slate-400 mb-1">Aksi Cepat Petugas Lapangan</p>
                       
@@ -195,7 +195,7 @@ function laporanPetugasDetailStatusBadge($statusRaw) {
                    </div>
                  </div>
 
-                 <!-- Riwayat Tindak Lanjut Card -->
+                 
                  <div class="rounded-3xl bg-white border border-slate-200 shadow-card overflow-hidden">
                    <div class="p-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
                      <div class="flex items-center gap-3">
@@ -226,7 +226,7 @@ function laporanPetugasDetailStatusBadge($statusRaw) {
                    </div>
                  </div>
                  
-                 <!-- Riwayat Monitoring Card -->
+                 
                  <?php if (!empty($laporan['monitoring']) && is_array($laporan['monitoring'])): ?>
                     <div class="rounded-3xl bg-white border border-slate-200 shadow-card overflow-hidden">
                       <div class="p-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">

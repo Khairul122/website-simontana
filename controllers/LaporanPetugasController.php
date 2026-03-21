@@ -9,17 +9,17 @@ class LaporanPetugasController {
     public function __construct() {
         $this->authService = new AuthService();
         
-        // Pastikan pengguna sudah login
+        
         $currentUser = $this->authService->getCurrentUser();
         if (!$currentUser['success']) {
             header('Location: index.php?controller=Auth&action=login');
             exit;
         }
 
-        // Pastikan role adalah PetugasBPBD
+        
         $userRole = $currentUser['data']['role'] ?? '';
         if ($userRole !== 'PetugasBPBD') {
-            // Jika bukan PetugasBPBD, redirect ke halaman sesuai role
+            
             $this->redirectToRoleDashboard($userRole);
             exit;
         }
@@ -30,7 +30,7 @@ class LaporanPetugasController {
     public function index() {
         $currentUser = $this->authService->getCurrentUser();
         
-        // Ambil filter dari query string
+        
         $filters = [];
         if (isset($_GET['status']) && !empty($_GET['status'])) {
             $filters['status'] = $_GET['status'];
@@ -42,7 +42,7 @@ class LaporanPetugasController {
             $filters['search'] = $_GET['search'];
         }
 
-        // Ambil data laporan dari service
+        
         $response = $this->laporanService->getAll($filters);
 
         if ($response['success']) {
@@ -59,7 +59,7 @@ class LaporanPetugasController {
     public function detail() {
         $currentUser = $this->authService->getCurrentUser();
 
-        // Ambil ID dari parameter GET
+        
         $id = $_GET['id'] ?? null;
 
         if (!$id) {
@@ -67,7 +67,7 @@ class LaporanPetugasController {
             exit;
         }
 
-        // Ambil detail laporan dari service
+        
         $response = $this->laporanService->getById($id);
 
         if ($response['success']) {
@@ -84,7 +84,7 @@ class LaporanPetugasController {
     public function edit() {
         $currentUser = $this->authService->getCurrentUser();
 
-        // Ambil ID dari parameter GET
+        
         $id = $_GET['id'] ?? null;
 
         if (!$id) {
@@ -92,7 +92,7 @@ class LaporanPetugasController {
             exit;
         }
 
-        // Ambil detail laporan dari service
+        
         $response = $this->laporanService->getById($id);
 
         if ($response['success']) {
@@ -107,7 +107,7 @@ class LaporanPetugasController {
     }
 
     public function update() {
-        // Ambil ID dari parameter GET
+        
         $id = $_GET['id'] ?? null;
 
         if (!$id) {
@@ -122,24 +122,24 @@ class LaporanPetugasController {
 
         $currentUser = $this->authService->getCurrentUser();
 
-        // Ambil data dari form
+        
         $status = $_POST['status'] ?? '';
         $keterangan = $_POST['keterangan'] ?? '';
 
-        // Validasi input
+        
         if (empty($status)) {
             setDialog('Gagal', 'Status harus dipilih', 'error');
             header('Location: index.php?controller=LaporanPetugas&action=edit&id=' . $id);
             exit;
         }
 
-        // Data untuk update
+        
         $data = [
             'status' => $status,
             'keterangan' => $keterangan
         ];
 
-        // Update status laporan
+        
         $response = $this->laporanService->updateStatus($id, $data);
 
         if ($response['success']) {
@@ -153,7 +153,7 @@ class LaporanPetugasController {
     }
 
     public function updateToProses() {
-        // Ambil ID dari parameter GET
+        
         $id = $_GET['id'] ?? null;
 
         if (!$id) {
@@ -168,7 +168,7 @@ class LaporanPetugasController {
 
         $currentUser = $this->authService->getCurrentUser();
 
-        // Update status laporan ke Diproses
+        
         $response = $this->laporanService->updateToProses($id);
 
         if ($response['success']) {
@@ -182,7 +182,7 @@ class LaporanPetugasController {
     }
 
     public function updateToSelesai() {
-        // Ambil ID dari parameter GET
+        
         $id = $_GET['id'] ?? null;
 
         if (!$id) {
@@ -197,15 +197,15 @@ class LaporanPetugasController {
 
         $currentUser = $this->authService->getCurrentUser();
 
-        // Ambil data dari form
+        
         $keterangan = $_POST['keterangan'] ?? '';
 
-        // Data untuk update
+        
         $data = [
             'keterangan' => $keterangan
         ];
 
-        // Update status laporan ke Selesai
+        
         $response = $this->laporanService->updateToSelesai($id, $data);
 
         if ($response['success']) {
@@ -219,7 +219,7 @@ class LaporanPetugasController {
     }
 
     public function updateToDitolak() {
-        // Ambil ID dari parameter GET
+        
         $id = $_GET['id'] ?? null;
 
         if (!$id) {
@@ -234,15 +234,15 @@ class LaporanPetugasController {
 
         $currentUser = $this->authService->getCurrentUser();
 
-        // Ambil data dari form
+        
         $keterangan = $_POST['keterangan'] ?? '';
 
-        // Data untuk update
+        
         $data = [
             'keterangan' => $keterangan
         ];
 
-        // Update status laporan ke Ditolak
+        
         $response = $this->laporanService->updateToDitolak($id, $data);
 
         if ($response['success']) {
@@ -255,7 +255,7 @@ class LaporanPetugasController {
         exit;
     }
 
-    // Fungsi umum untuk redirect berdasarkan role (untuk validasi akses)
+    
     private function redirectToRoleDashboard($role) {
         switch ($role) {
             case 'Admin':

@@ -16,7 +16,7 @@ $currentDesaId = $user['id_desa'] ?? null;
     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative">
       <div class="p-4 md:p-6 lg:p-8 w-full">
 
-        <!-- Header -->
+        
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div class="flex items-center gap-4">
             <a href="index.php?controller=User&action=index" class="flex items-center justify-center h-10 w-10 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-brand-600 hover:bg-brand-50 hover:border-brand-200 transition-all shadow-sm">
@@ -41,7 +41,7 @@ $currentDesaId = $user['id_desa'] ?? null;
           <form id="userForm" method="POST" action="index.php?controller=User&action=<?php echo $isEditMode ? ('update&id=' . $userId) : 'store'; ?>">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
               
-              <!-- Left Column: Credentials -->
+              
               <div class="rounded-2xl bg-white border border-slate-200 shadow-card overflow-hidden h-fit">
                 <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                   <h3 class="font-bold text-slate-800 flex items-center gap-2">
@@ -107,7 +107,7 @@ $currentDesaId = $user['id_desa'] ?? null;
                 </div>
               </div>
 
-              <!-- Right Column: Location Mapping -->
+              
               <div class="rounded-2xl bg-white border border-slate-200 shadow-card overflow-hidden h-fit">
                 <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                   <h3 class="font-bold text-slate-800 flex items-center gap-2">
@@ -172,7 +172,7 @@ $currentDesaId = $user['id_desa'] ?? null;
                 </div>
               </div>
 
-              <!-- Save Strip Container Footer -->
+              
               <div class="lg:col-span-2 rounded-2xl bg-white border border-slate-200 shadow-card p-4 flex items-center justify-end gap-3">
                 <a href="index.php?controller=User&action=index" class="px-6 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors">
                   Batal
@@ -194,7 +194,7 @@ $currentDesaId = $user['id_desa'] ?? null;
 
 <?php include 'template/script.php'; ?>
 
-<!-- AJAX Wilayah Logic remains intact with same DOM target IDs -->
+
 <script>
   (function () {
     const isEditMode = <?php echo json_encode($isEditMode); ?>;

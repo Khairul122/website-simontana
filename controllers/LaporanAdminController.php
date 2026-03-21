@@ -26,12 +26,12 @@ class LaporanAdminController
         }
     }
 
-    /**
-     * Tampilkan halaman index (daftar laporan bencana)
-     */
+    
+
+
     public function index()
     {
-        // Ambil filter dari query string
+        
         $filters = [
             'status' => $_GET['status'] ?? '',
             'search' => $_GET['search'] ?? '',
@@ -39,7 +39,7 @@ class LaporanAdminController
             'page' => $_GET['page'] ?? 1
         ];
 
-        // Hapus filter kosong
+        
         $filters = array_filter($filters, function($value) {
             return $value !== '';
         });
@@ -58,15 +58,15 @@ class LaporanAdminController
         include __DIR__ . '/../views/laporan-admin/index.php';
     }
 
-    /**
-     * Tampilkan halaman detail laporan
-     */
+    
+
+
     public function detail()
     {
-        // Ambil ID dari query string
+        
         $id = $_GET['id'] ?? null;
 
-        // Validasi ID
+        
         if (!$id) {
             setDialog('Error', 'ID laporan tidak ditemukan', 'error');
             header('Location: index.php?controller=LaporanAdmin&action=index');
@@ -92,17 +92,17 @@ class LaporanAdminController
         include __DIR__ . '/../views/laporan-admin/detail.php';
     }
 
-    /**
-     * Tampilkan form edit laporan
-     */
+    
+
+
     public function edit()
     {
         $this->requireAdmin();
 
-        // Ambil ID dari query string
+        
         $id = $_GET['id'] ?? null;
 
-        // Validasi ID
+        
         if (!$id) {
             setDialog('Error', 'ID laporan tidak ditemukan', 'error');
             header('Location: index.php?controller=LaporanAdmin&action=index');
@@ -181,17 +181,17 @@ class LaporanAdminController
         include __DIR__ . '/../views/laporan-admin/update.php';
     }
 
-    /**
-     * Update data laporan
-     */
+    
+
+
     public function update()
     {
         $this->requireAdmin();
 
-        // Ambil ID dari query string
+        
         $id = $_GET['id'] ?? null;
 
-        // Validasi ID
+        
         if (!$id) {
             header('Location: index.php?controller=LaporanAdmin&action=index');
             exit;
@@ -202,20 +202,20 @@ class LaporanAdminController
             exit();
         }
 
-        // Ambil data dari form
+        
         $judul = trim($_POST['judul_laporan'] ?? $_POST['judul'] ?? '');
         $deskripsi = trim($_POST['deskripsi'] ?? '');
         $tingkat_kedaruratan = trim($_POST['tingkat_keparahan'] ?? $_POST['tingkat_kedaruratan'] ?? '');
         $alamat = trim($_POST['alamat_lengkap'] ?? $_POST['alamat'] ?? '');
 
-        // Validasi
+        
         if (empty($judul) || empty($deskripsi) || empty($tingkat_kedaruratan)) {
             setDialog('Gagal', 'Judul, deskripsi, dan tingkat kedaruratan wajib diisi', 'error');
             header('Location: index.php?controller=LaporanAdmin&action=edit&id=' . $id);
             exit();
         }
 
-        // Data untuk dikirim ke API
+        
         $data = [
             'judul_laporan' => $judul,
             'deskripsi' => $deskripsi,
@@ -224,7 +224,7 @@ class LaporanAdminController
             'id_desa' => trim($_POST['id_desa'] ?? '')
         ];
 
-        // Cek apakah ada file yang diupload
+        
         $files = [];
         $fileFields = ['foto_bukti_1', 'foto_bukti_2', 'foto_bukti_3', 'video_bukti'];
 
@@ -234,7 +234,7 @@ class LaporanAdminController
             }
         }
 
-        // Panggil service
+        
         $response = $this->service->update($id, $data, $files);
 
         if ($response['success']) {
@@ -247,17 +247,17 @@ class LaporanAdminController
         exit();
     }
 
-    /**
-     * Hapus data laporan
-     */
+    
+
+
     public function delete()
     {
         $this->requireAdmin();
 
-        // Ambil ID dari query string
+        
         $id = $_GET['id'] ?? null;
 
-        // Validasi ID
+        
         if (!$id) {
             header('Location: index.php?controller=LaporanAdmin&action=index');
             exit;
@@ -268,7 +268,7 @@ class LaporanAdminController
             exit();
         }
 
-        // Panggil service
+        
         $response = $this->service->delete($id);
 
         if ($response['success']) {

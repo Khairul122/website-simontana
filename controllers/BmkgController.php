@@ -1,20 +1,23 @@
 <?php
 require_once 'services/AuthService.php';
 require_once 'services/BmkgService.php';
-require_once 'services/WilayahService.php';
+require_once 'services/WeatherService.php';
+require_once 'services/CuacaWilayahDatasetService.php';
 
 class BmkgController {
     private $authService;
     private $bmkgService;
-    private $wilayahService;
+    private $weatherService;
+    private $cuacaWilayahService;
 
     public function __construct() {
         $this->authService = new AuthService();
         $this->bmkgService = new BmkgService();
-        $this->wilayahService = new WilayahService();
+        $this->weatherService = new WeatherService();
+        $this->cuacaWilayahService = new CuacaWilayahDatasetService();
 
-        // Allow public access for viewing data?
-        // Let's protect it just for internal users for now (Admin, Petugas, Operator)
+        
+        
         $currentUser = $this->authService->getCurrentUser();
         if (!$currentUser['success']) {
             header('Location: index.php?controller=Auth&action=login');
@@ -25,19 +28,50 @@ class BmkgController {
     public function index() {
         $currentUser = $this->authService->getCurrentUser();
         
-        $tsunamiCall = $this->bmkgService->getPeringatanTsunami();
+        
         $summaryCall = $this->bmkgService->getSummary();
+        $terbaruCall = $this->bmkgService->getGempaTerbaru();
         $terkiniCall = $this->bmkgService->getGempaTerkini();
         $dirasakanCall = $this->bmkgService->getGempaDirasakan();
+        $diniCuacaCall = $this->weatherService->getPeringatanDiniCuaca();
 
-        $peringatanTsunami = $tsunamiCall['success'] ? $tsunamiCall['data'] : null;
+        
         $summary = $summaryCall['success'] ? $summaryCall['data'] : null;
-        $gempaTerkini = $terkiniCall['success'] ? $terkiniCall['data'] : [];
-        $gempaDirasakan = $dirasakanCall['success'] ? $dirasakanCall['data'] : [];
+        if (!$summary && $terbaruCall['success']) {
+            
+            $gtRaw = $terbaruCall['data']['Infogempa']['gempa'] ?? null;
+            if ($gtRaw) {
+                $summary = ['gempa_terbaru' => $gtRaw];
+            }
+        } elseif ($summary && isset($summary['gempa_terbaru']['Infogempa'])) {
+            
+            $summary['gempa_terbaru'] = $summary['gempa_terbaru']['Infogempa']['gempa'] ?? $summary['gempa_terbaru'];
+        }
 
-        // In case API returns direct arrays or nested 'data' objects
-        if (isset($gempaTerkini['data'])) $gempaTerkini = $gempaTerkini['data'];
-        if (isset($gempaDirasakan['data'])) $gempaDirasakan = $gempaDirasakan['data'];
+        
+        $gempaTerkini = [];
+        if ($terkiniCall['success']) {
+            $gempaTerkini = $terkiniCall['data']['Infogempa']['gempa'] ?? [];
+        }
+
+        $gempaDirasakan = [];
+        if ($dirasakanCall['success']) {
+            $gempaDirasakan = $dirasakanCall['data']['Infogempa']['gempa'] ?? [];
+        }
+
+        
+        $peringatanTsunami = null;
+        if (!empty($summary['gempa_terbaru'])) {
+            $potensi = $summary['gempa_terbaru']['Potensi'] ?? '';
+            if (stripos($potensi, 'tsunami') !== false && stripos($potensi, 'tidak') === false) {
+                $peringatanTsunami = [
+                    'status' => 'Waspada/Awas',
+                    'keterangan' => $potensi
+                ];
+            }
+        }
+
+        $peringatanDiniCuaca = $diniCuacaCall['success'] ? $diniCuacaCall['data'] : null;
 
         $title = "Pusat Data Gempa BMKG - SIMONTA";
         include 'views/bmkg/index.php';
@@ -45,17 +79,17 @@ class BmkgController {
 
     public function cuaca() {
         $currentUser = $this->authService->getCurrentUser();
-        $wilayahId = isset($_GET['wilayah_id']) ? (int)$_GET['wilayah_id'] : null;
+        $wilayahId = isset($_GET['wilayah_id']) ? $_GET['wilayah_id'] : null;
         
-        // Fetch all provinces for dropdown
-        $provinsiCall = $this->wilayahService->getAllProvinsi();
+        
+        $provinsiCall = $this->cuacaWilayahService->getProvinsi();
         $provinsiList = $provinsiCall['success'] ? $provinsiCall['data'] : [];
 
         $cuacaData = null;
         $error_message = null;
 
         if ($wilayahId) {
-            $cuacaCall = $this->bmkgService->getPrakiraanCuaca($wilayahId);
+            $cuacaCall = $this->weatherService->getPrakiraanCuaca($wilayahId);
             if ($cuacaCall['success']) {
                 $cuacaData = $cuacaCall['data'];
             } else {
@@ -65,6 +99,53 @@ class BmkgController {
 
         $title = "Prakiraan Cuaca BMKG - SIMONTA";
         include 'views/bmkg/cuaca.php';
+    }
+
+    public function getCuacaProvinsi() {
+        $response = $this->cuacaWilayahService->getProvinsi();
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => $response['success'],
+            'message' => $response['message'] ?? '',
+            'data' => $response['data'] ?? []
+        ]);
+        exit;
+    }
+
+    public function getCuacaKabupatenByProvinsi() {
+        $provinsiId = trim((string) ($_GET['id'] ?? ''));
+        $response = $this->cuacaWilayahService->getKabupatenByProvinsi($provinsiId);
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => $response['success'],
+            'message' => $response['message'] ?? '',
+            'data' => $response['data'] ?? []
+        ]);
+        exit;
+    }
+
+    public function getCuacaKecamatanByKabupaten() {
+        $kabupatenId = trim((string) ($_GET['id'] ?? ''));
+        $response = $this->cuacaWilayahService->getKecamatanByKabupaten($kabupatenId);
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => $response['success'],
+            'message' => $response['message'] ?? '',
+            'data' => $response['data'] ?? []
+        ]);
+        exit;
+    }
+
+    public function getCuacaDesaByKecamatan() {
+        $kecamatanId = trim((string) ($_GET['id'] ?? ''));
+        $response = $this->cuacaWilayahService->getDesaByKecamatan($kecamatanId);
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => $response['success'],
+            'message' => $response['message'] ?? '',
+            'data' => $response['data'] ?? []
+        ]);
+        exit;
     }
 
     public function cache() {

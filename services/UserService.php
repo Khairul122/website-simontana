@@ -1,6 +1,6 @@
 <?php
 
-// Require konfigurasi dan service otentikasi
+
 require_once dirname(__DIR__) . '/config/koneksi.php';
 
 class UserService
@@ -9,23 +9,23 @@ class UserService
 
     public function __construct()
     {
-        // Gabungkan konstanta global + endpoint spesifik
+        
         $this->apiEndpoint = API_BASE_URL . '/users';
     }
 
-    /**
-     * Mendapatkan headers otentikasi
-     */
+    
+
+
     private function getHeaders()
     {
-        // Ensure session is started
+        
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
 
         $token = $_SESSION['token'] ?? null;
 
-        // Return null if no token is found to prevent unauthorized requests
+        
         if (!$token) {
             return null;
         }
@@ -33,14 +33,14 @@ class UserService
         return getAuthHeaders($token);
     }
 
-    /**
-     * Ambil semua pengguna
-     */
+    
+
+
     public function getAll()
     {
         $headers = $this->getHeaders();
 
-        // Return error response if no headers (no token)
+        
         if (!$headers) {
             return [
                 'success' => false,
@@ -57,14 +57,14 @@ class UserService
         return $response;
     }
 
-    /**
-     * Ambil pengguna berdasarkan ID
-     */
+    
+
+
     public function getById($id)
     {
         $headers = $this->getHeaders();
 
-        // Return error response if no headers (no token)
+        
         if (!$headers) {
             return [
                 'success' => false,
@@ -77,14 +77,14 @@ class UserService
         return apiRequest($url, 'GET', null, $headers);
     }
 
-    /**
-     * Buat pengguna baru
-     */
+    
+
+
     public function create($data)
     {
         $headers = $this->getHeaders();
 
-        // Return error response if no headers (no token)
+        
         if (!$headers) {
             return [
                 'success' => false,
@@ -97,14 +97,14 @@ class UserService
         return apiRequest($url, 'POST', $data, $headers);
     }
 
-    /**
-     * Update pengguna
-     */
+    
+
+
     public function update($id, $data)
     {
         $headers = $this->getHeaders();
 
-        // Return error response if no headers (no token)
+        
         if (!$headers) {
             return [
                 'success' => false,
@@ -117,14 +117,14 @@ class UserService
         return apiRequest($url, 'PUT', $data, $headers);
     }
 
-    /**
-     * Hapus pengguna
-     */
+    
+
+
     public function delete($id)
     {
         $headers = $this->getHeaders();
 
-        // Return error response if no headers (no token)
+        
         if (!$headers) {
             return [
                 'success' => false,

@@ -15,7 +15,7 @@ $initial = strtoupper(substr((string)$nama, 0, 1));
   <div class="max-w-full mx-auto">
     <div class="py-3 px-4 lg:px-8 mx-4 lg:mx-0 flex items-center justify-between">
       
-      <!-- Mobile menu button & Brand -->
+      
       <div class="flex items-center gap-4">
         <button id="mobileMenuBtn" class="lg:hidden text-slate-500 hover:text-slate-700 focus:outline-none">
           <i class="fa-solid fa-bars text-xl"></i>
@@ -26,7 +26,7 @@ $initial = strtoupper(substr((string)$nama, 0, 1));
         </div>
       </div>
 
-      <!-- Right controls -->
+      
       <div class="flex items-center gap-4">
         
         <div class="hidden md:flex items-center gap-2 rounded-full border border-brand-200 bg-brand-50 px-3 py-1">
@@ -37,7 +37,7 @@ $initial = strtoupper(substr((string)$nama, 0, 1));
           <span class="text-xs font-bold text-brand-700 tracking-wide uppercase"><?php echo htmlspecialchars($roleLabel); ?></span>
         </div>
 
-        <!-- User Profile Dropdown -->
+        
         <div class="relative" id="userDropdownWrapper">
           <button id="userDropdownBtn" class="flex items-center gap-2 rounded-full border border-slate-200 bg-white p-1 pr-3 hover:bg-slate-50 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-1">
             <div class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-white font-bold text-sm">
@@ -47,7 +47,7 @@ $initial = strtoupper(substr((string)$nama, 0, 1));
             <i class="fa-solid fa-chevron-down text-xs text-slate-400 ml-1"></i>
           </button>
 
-          <!-- Dropdown Menu -->
+          
           <div id="userDropdownMenu" class="hidden absolute right-0 mt-2 w-56 origin-top-right rounded-xl bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden animate-fade-in">
             <div class="border-b border-slate-100 p-4">
               <p class="text-sm font-bold text-slate-900"><?php echo htmlspecialchars($nama); ?></p>

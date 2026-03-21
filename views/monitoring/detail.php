@@ -31,7 +31,7 @@ $detailId = monitoringDetailId($item);
     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative">
       <div class="p-4 md:p-6 lg:p-8 w-full">
 
-        <!-- Header -->
+        
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div class="flex items-center gap-4">
             <a href="index.php?controller=Monitoring&action=index" class="flex items-center justify-center h-10 w-10 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-brand-600 hover:bg-brand-50 hover:border-brand-200 transition-all shadow-sm">
@@ -72,7 +72,7 @@ $detailId = monitoringDetailId($item);
                   </h3>
                 </div>
                 <div class="p-6">
-                  <!-- Info Strip -->
+                  
                   <div class="rounded-xl bg-slate-50 border border-slate-200 p-4 mb-6 flex flex-wrap gap-x-6 gap-y-3">
                     <div>
                       <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">ID Ref</span>
@@ -88,7 +88,7 @@ $detailId = monitoringDetailId($item);
                     </div>
                   </div>
 
-                  <!-- Details -->
+                  
                   <div class="space-y-4">
                     <div>
                       <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5">Waktu Monitoring</p>
@@ -114,7 +114,7 @@ $detailId = monitoringDetailId($item);
               </div>
             </div>
 
-            <!-- Side Card -->
+            
             <div class="lg:col-span-1">
               <div class="rounded-2xl bg-white border border-slate-200 shadow-card p-6 sticky top-24">
                 <h3 class="font-bold text-slate-800 mb-4 pb-3 border-b border-slate-100 flex items-center gap-2">

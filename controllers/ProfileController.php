@@ -10,7 +10,7 @@ class ProfileController {
         $this->authService = new AuthService();
         $this->profileService = new ProfileService();
 
-        // Pastikan pengguna sudah login
+        
         $currentUser = $this->authService->getCurrentUser();
         if (!$currentUser['success']) {
             header('Location: index.php?controller=Auth&action=login');
@@ -21,7 +21,7 @@ class ProfileController {
     public function index() {
         $currentUser = $this->authService->getCurrentUser();
 
-        // Ambil data profil dari service
+        
         $response = $this->profileService->getProfile();
 
         if ($response['success']) {

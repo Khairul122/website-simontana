@@ -22,7 +22,7 @@ function tindakStatusTheme($statusRaw) {
     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative">
       <div class="p-4 md:p-6 lg:p-8 w-full">
 
-        <!-- Header -->
+        
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div class="flex items-center gap-4">
             <a href="index.php?controller=TindakLanjut&action=index" class="flex items-center justify-center h-10 w-10 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-brand-600 hover:bg-brand-50 hover:border-brand-200 transition-all shadow-sm">
@@ -59,7 +59,7 @@ function tindakStatusTheme($statusRaw) {
             
             <div class="lg:col-span-2 space-y-6">
               
-              <!-- Main Info Card -->
+              
               <div class="rounded-2xl bg-white border border-slate-200 shadow-card overflow-hidden">
                 <div class="p-6 border-b border-slate-100 flex items-center justify-between">
                   <h3 class="font-bold text-slate-800 flex items-center gap-2">
@@ -70,7 +70,7 @@ function tindakStatusTheme($statusRaw) {
                   </span>
                 </div>
                 <div class="p-6">
-                  <!-- Info Strip -->
+                  
                   <div class="rounded-xl bg-slate-50 border border-slate-200 p-4 mb-6 flex flex-wrap gap-x-8 gap-y-3">
                     <div>
                       <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">Asal Laporan</span>
@@ -82,7 +82,7 @@ function tindakStatusTheme($statusRaw) {
                     </div>
                   </div>
 
-                  <!-- Details -->
+                  
                   <div class="space-y-4">
                     <div>
                       <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Waktu Update Status</p>
@@ -97,7 +97,7 @@ function tindakStatusTheme($statusRaw) {
                 </div>
               </div>
 
-              <!-- Media Bukti dari Laporan -->
+              
               <div class="rounded-2xl bg-white border border-slate-200 shadow-card overflow-hidden">
                 <div class="p-6 border-b border-slate-100">
                   <h3 class="font-bold text-slate-800 flex items-center gap-2">
@@ -144,10 +144,10 @@ function tindakStatusTheme($statusRaw) {
 
             </div>
 
-            <!-- Right Column -->
+            
             <div class="lg:col-span-1 space-y-6">
               
-              <!-- Location Map -->
+              
               <div class="rounded-2xl bg-white border border-slate-200 shadow-card overflow-hidden">
                 <div class="p-5 border-b border-slate-100 flex items-center justify-between">
                   <h3 class="font-bold text-slate-800 flex items-center gap-2">
@@ -176,7 +176,7 @@ function tindakStatusTheme($statusRaw) {
                 </div>
               </div>
 
-              <!-- Quick Actions -->
+              
               <div class="rounded-2xl bg-white border border-slate-200 shadow-card p-5">
                 <h3 class="font-bold text-slate-800 mb-4 pb-3 border-b border-slate-100 flex items-center gap-2">
                   <i class="fa-solid fa-link text-slate-400 text-sm"></i> Tautan Navigasi
@@ -216,7 +216,7 @@ function tindakStatusTheme($statusRaw) {
   </div>
 </div>
 
-<!-- Modal Fullscreen Media -->
+
 <div id="mediaModal" class="fixed inset-0 z-[100] hidden bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
   <button onclick="closeFullscreen()" class="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition backdrop-blur-md">
     <i class="fa-solid fa-xmark text-xl"></i>

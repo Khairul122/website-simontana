@@ -1,6 +1,6 @@
 <?php include('template/header.php'); ?>
 
-<!-- Leaflet CSS -->
+
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
 <?php
@@ -52,7 +52,7 @@
     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative">
       <div class="p-4 md:p-6 lg:p-8 w-full">
 
-        <!-- Page Header -->
+        
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div class="flex items-center gap-4">
             <a href="index.php?controller=LaporanAdmin&action=index" class="flex items-center justify-center h-10 w-10 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-brand-600 hover:bg-brand-50 hover:border-brand-200 transition-all shadow-sm">
@@ -70,7 +70,7 @@
           </div>
         </div>
 
-        <!-- Status Bar -->
+        
         <div class="rounded-2xl border <?php echo $statusBgHeader; ?> p-4 md:p-6 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm relative overflow-hidden">
           <div class="absolute -right-10 -top-10 w-32 h-32 bg-white/40 rounded-full blur-2xl"></div>
           <div class="relative z-10 flex items-center gap-4">
@@ -94,10 +94,10 @@
 
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
           
-          <!-- Left Column (Detail Info) -->
+          
           <div class="xl:col-span-2 space-y-6">
             
-            <!-- Main Info Card -->
+            
             <div class="rounded-2xl bg-white border border-slate-200 shadow-card overflow-hidden">
               <div class="p-6 border-b border-slate-100">
                 <h3 class="font-bold text-slate-800 flex items-center gap-2">
@@ -133,7 +133,7 @@
               </div>
             </div>
 
-            <!-- Evidence Card -->
+            
             <div class="rounded-2xl bg-white border border-slate-200 shadow-card overflow-hidden">
               <div class="p-6 border-b border-slate-100">
                 <h3 class="font-bold text-slate-800 flex items-center gap-2">
@@ -191,7 +191,7 @@
 
           </div>
 
-          <!-- Right Column (Location Info) -->
+          
           <div class="xl:col-span-1 space-y-6">
             
             <div class="rounded-2xl bg-white border border-slate-200 shadow-card overflow-hidden">
@@ -201,7 +201,7 @@
                 </h3>
               </div>
               
-              <!-- Map Container -->
+              
               <div class="w-full h-[400px] relative z-0">
                 <div id="map" class="w-full h-full bg-slate-100"></div>
               </div>
@@ -232,7 +232,7 @@
   </div>
 </div>
 
-<!-- Modal Fullscreen Media -->
+
 <div id="mediaModal" class="fixed inset-0 z-[100] hidden bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
   <button onclick="closeFullscreen()" class="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition backdrop-blur-md">
     <i class="fa-solid fa-xmark text-xl"></i>
@@ -244,7 +244,7 @@
 
 <?php include 'template/script.php'; ?>
 
-<!-- Leaflet JS -->
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>

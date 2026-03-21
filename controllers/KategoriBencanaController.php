@@ -13,9 +13,9 @@ class KategoriBencanaController
         $this->service = new KategoriBencanaService();
     }
 
-    /**
-     * Cek role user, hanya Admin yang bisa akses
-     */
+    
+
+
     private function checkRole()
     {
         if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'Admin') {
@@ -24,9 +24,9 @@ class KategoriBencanaController
         }
     }
 
-    /**
-     * Tampilkan halaman index (daftar kategori bencana)
-     */
+    
+
+
     public function index()
     {
         $this->checkRole();
@@ -42,13 +42,13 @@ class KategoriBencanaController
             $fetchError = $response['message'] ?? 'Terjadi kesalahan pada server.';
         }
 
-        // Load view
+        
         include __DIR__ . '/../views/kategori-bencana/index.php';
     }
 
-    /**
-     * Tampilkan form create
-     */
+    
+
+
     public function create()
     {
         $this->checkRole();
@@ -59,17 +59,17 @@ class KategoriBencanaController
         include __DIR__ . '/../views/kategori-bencana/form.php';
     }
 
-    /**
-     * Tampilkan form edit
-     */
+    
+
+
     public function edit()
     {
         $this->checkRole();
 
-        // Ambil ID dari query string
+        
         $id = $_GET['id'] ?? null;
 
-        // Validasi ID
+        
         if (!$id) {
             setDialog('Error', 'ID tidak ditemukan', 'error');
             header('Location: index.php?controller=KategoriBencana&action=index');
@@ -97,9 +97,9 @@ class KategoriBencanaController
         include __DIR__ . '/../views/kategori-bencana/form.php';
     }
 
-    /**
-     * Simpan data baru
-     */
+    
+
+
     public function store()
     {
         $this->checkRole();
@@ -109,26 +109,26 @@ class KategoriBencanaController
             exit();
         }
 
-        // Ambil data dari form
+        
         $nama_kategori = trim($_POST['nama_kategori'] ?? '');
         $deskripsi = trim($_POST['deskripsi'] ?? '');
         $icon = trim($_POST['icon'] ?? '');
 
-        // Validasi
+        
         if (empty($nama_kategori)) {
             setDialog('Error', 'Nama kategori wajib diisi', 'error');
             header('Location: index.php?controller=KategoriBencana&action=create');
             exit();
         }
 
-        // Data untuk dikirim ke API
+        
         $data = [
             'nama_kategori' => $nama_kategori,
             'deskripsi' => $deskripsi,
             'icon' => $icon
         ];
 
-        // Panggil service
+        
         $response = $this->service->create($data);
 
         if ($response['success']) {
@@ -139,17 +139,17 @@ class KategoriBencanaController
         exit();
     }
 
-    /**
-     * Update data
-     */
+    
+
+
     public function update()
     {
         $this->checkRole();
 
-        // Ambil ID dari query string
+        
         $id = $_GET['id'] ?? null;
 
-        // Validasi ID
+        
         if (!$id) {
             header('Location: index.php?controller=KategoriBencana&action=index');
             exit;
@@ -160,26 +160,26 @@ class KategoriBencanaController
             exit();
         }
 
-        // Ambil data dari form
+        
         $nama_kategori = trim($_POST['nama_kategori'] ?? '');
         $deskripsi = trim($_POST['deskripsi'] ?? '');
         $icon = trim($_POST['icon'] ?? '');
 
-        // Validasi
+        
         if (empty($nama_kategori)) {
             setDialog('Error', 'Nama kategori wajib diisi', 'error');
             header('Location: index.php?controller=KategoriBencana&action=edit&id=' . $id);
             exit();
         }
 
-        // Data untuk dikirim ke API
+        
         $data = [
             'nama_kategori' => $nama_kategori,
             'deskripsi' => $deskripsi,
             'icon' => $icon
         ];
 
-        // Panggil service
+        
         $response = $this->service->update($id, $data);
 
         if ($response['success']) {
@@ -190,17 +190,17 @@ class KategoriBencanaController
         exit();
     }
 
-    /**
-     * Hapus data
-     */
+    
+
+
     public function delete()
     {
         $this->checkRole();
 
-        // Ambil ID dari query string
+        
         $id = $_GET['id'] ?? null;
 
-        // Validasi ID
+        
         if (!$id) {
             header('Location: index.php?controller=KategoriBencana&action=index');
             exit;
@@ -211,7 +211,7 @@ class KategoriBencanaController
             exit();
         }
 
-        // Panggil service
+        
         $response = $this->service->delete($id);
 
         if ($response['success']) {

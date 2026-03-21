@@ -31,7 +31,7 @@ class AuthService {
             'password' => $password
         ];
 
-        // Tidak perlu header otentikasi untuk login
+        
         $response = apiRequest(API_AUTH_LOGIN, 'POST', $data);
 
         if ($response['success']) {
@@ -51,7 +51,7 @@ class AuthService {
     }
 
     public function register($userData) {
-        // Tidak perlu header otentikasi untuk register
+        
         $response = apiRequest(API_AUTH_REGISTER, 'POST', $userData);
 
         if ($response['success']) {
@@ -75,7 +75,7 @@ class AuthService {
             $headers = getAuthHeaders($_SESSION['token']);
             $response = apiRequest(API_AUTH_LOGOUT, 'POST', null, $headers);
 
-            // Hapus session lokal terlepas dari apakah API logout sukses atau tidak
+            
             session_destroy();
 
             return $response;
@@ -91,14 +91,14 @@ class AuthService {
 
     public function getCurrentUser() {
         if (isset($_SESSION['token']) && isset($_SESSION['user'])) {
-            // Kembalikan data user dari session
+            
             return [
                 'success' => true,
                 'message' => 'Data user ditemukan',
                 'data' => $_SESSION['user']
             ];
         } else {
-            // Coba panggil API untuk mendapatkan data user
+            
             if (isset($_SESSION['token'])) {
                 $headers = getAuthHeaders($_SESSION['token']);
                 $response = apiRequest(API_AUTH_ME, 'GET', null, $headers);
@@ -117,7 +117,7 @@ class AuthService {
                         'data' => $userData
                     ];
                 } else {
-                    // Jika API gagal, hapus session
+                    
                     unset($_SESSION['token']);
                     unset($_SESSION['user']);
                     return [

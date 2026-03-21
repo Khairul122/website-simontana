@@ -46,7 +46,7 @@ function riwayatDetailStatusBadge($statusRaw) {
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
            <div class="lg:col-span-2 space-y-6">
               
-              <!-- Info Eksekutif -->
+              
               <div class="bg-white rounded-3xl border border-slate-200 shadow-card p-6 md:p-8">
                  <div class="flex flex-wrap items-center gap-3 mb-6">
                     <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 flex-shrink-0 border border-slate-200 text-slate-600 rounded-lg text-xs font-bold font-mono"><i class="fa-solid fa-hashtag text-slate-400"></i> RIW-<?php echo str_pad($riwayatTindakan['id'] ?? 0, 5, "0", STR_PAD_LEFT); ?></span>
@@ -76,7 +76,7 @@ function riwayatDetailStatusBadge($statusRaw) {
                  </div>
               </div>
 
-              <!-- Info Laporan Terkait -->
+              
               <div class="bg-white rounded-3xl border border-slate-200 shadow-card p-6 md:p-8">
                  <h3 class="font-bold text-lg text-slate-800 mb-6 flex items-center gap-2"><i class="fa-solid fa-link text-indigo-500"></i> Merujuk Laporan Terkait</h3>
                  
@@ -92,7 +92,7 @@ function riwayatDetailStatusBadge($statusRaw) {
 
            </div>
            
-           <!-- Samping Kanan Ringkasan -->
+           
            <div class="col-lg-1 space-y-6">
               <div class="bg-white rounded-3xl border border-slate-200 shadow-card p-6 overflow-hidden relative">
                  <div class="absolute -right-6 -bottom-6 text-slate-50 opacity-40 pointer-events-none"><i class="fa-solid fa-clock-rotate-left text-9xl"></i></div>

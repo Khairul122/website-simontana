@@ -19,7 +19,7 @@ $desaList = is_array($desaList ?? null) ? $desaList : [];
     
     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative p-4 md:p-6 lg:p-8">
 
-      <!-- Breadcrumbs & Header -->
+      
       <nav class="flex mb-4 text-[11px] font-bold uppercase tracking-widest text-slate-500" aria-label="Breadcrumb">
         <ol class="inline-flex items-center space-x-1 md:space-x-2">
           <li class="inline-flex items-center"><a href="index.php" class="hover:text-brand-600 transition-colors">Dashboard</a></li>
@@ -51,7 +51,7 @@ $desaList = is_array($desaList ?? null) ? $desaList : [];
             <h3 class="font-bold text-lg text-slate-800 mb-6 flex items-center gap-2 border-b border-slate-100 pb-3"><i class="fa-solid fa-layer-group text-slate-400"></i> Informasi Utama & Wilayah</h3>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <!-- Left Column: Location & Basic -->
+              
               <div class="space-y-5">
                  <div>
                     <label for="judul_laporan" class="block text-sm font-bold text-slate-700 mb-2">Judul Referensi Laporan</label>
@@ -110,7 +110,7 @@ $desaList = is_array($desaList ?? null) ? $desaList : [];
 
               </div>
 
-              <!-- Right Column: Details & Impact -->
+              
               <div class="space-y-5">
                  
                  <div>
@@ -181,7 +181,7 @@ $desaList = is_array($desaList ?? null) ? $desaList : [];
               <?php } ?>
             </div>
 
-            <!-- Video Section if Needed -->
+            
             <div class="mt-6 pt-6 border-t border-slate-100">
                <label class="block text-sm font-bold text-slate-700 mb-2">Klip Lampiran Video Pendek</label>
                <div class="flex flex-col md:flex-row gap-6">

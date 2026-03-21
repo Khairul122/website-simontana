@@ -13,7 +13,7 @@ $desaList = is_array($desaList ?? null) ? $desaList : [];
     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative">
       <div class="p-4 md:p-6 lg:p-8 w-full">
 
-        <!-- Header -->
+        
         <div class="flex items-center gap-4 mb-6">
           <a href="index.php?controller=LaporanAdmin&action=index" class="flex items-center justify-center h-10 w-10 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-brand-600 hover:bg-brand-50 hover:border-brand-200 transition-all shadow-sm">
             <i class="fa-solid fa-arrow-left"></i>
@@ -37,10 +37,10 @@ $desaList = is_array($desaList ?? null) ? $desaList : [];
         <form action="index.php?controller=LaporanAdmin&action=store" method="POST" enctype="multipart/form-data">
           <div class="flex flex-col xl:flex-row gap-6">
             
-            <!-- Main Content Form -->
+            
             <div class="flex-1 space-y-6">
               
-              <!-- Identitas Section -->
+              
               <div class="rounded-2xl bg-white border border-slate-200 p-6 md:p-8 shadow-card overflow-hidden relative">
                 <div class="absolute top-0 left-0 w-1.5 h-full bg-brand-500"></div>
                 
@@ -74,7 +74,7 @@ $desaList = is_array($desaList ?? null) ? $desaList : [];
                 </div>
               </div>
 
-              <!-- Lokasi dan Dampak Section -->
+              
               <div class="rounded-2xl bg-white border border-slate-200 p-6 md:p-8 shadow-card overflow-hidden relative">
                 <div class="absolute top-0 left-0 w-1.5 h-full bg-amber-500"></div>
 
@@ -139,7 +139,7 @@ $desaList = is_array($desaList ?? null) ? $desaList : [];
                 </div>
               </div>
 
-              <!-- Media/Dokumentasi Section -->
+              
               <div class="rounded-2xl bg-white border border-slate-200 p-6 md:p-8 shadow-card overflow-hidden relative">
                 <div class="absolute top-0 left-0 w-1.5 h-full bg-indigo-500"></div>
 
@@ -186,7 +186,7 @@ $desaList = is_array($desaList ?? null) ? $desaList : [];
               </div>
             </div>
 
-            <!-- Sticky Sidebar Panel -->
+            
             <div class="xl:w-80 shrink-0">
               <div class="sticky top-24 rounded-2xl bg-brand-50 border border-brand-200 p-6 shadow-sidebar">
                 

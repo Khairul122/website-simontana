@@ -20,7 +20,7 @@ $withoutIcon = max(0, count($kategoriRows) - $withIcon);
     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative">
       <div class="p-4 md:p-6 lg:p-8 w-full">
 
-        <!-- Page Header -->
+        
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
             <h1 class="font-display text-2xl md:text-3xl font-bold text-slate-900">Kategori Bencana</h1>
@@ -43,7 +43,7 @@ $withoutIcon = max(0, count($kategoriRows) - $withIcon);
           </div>
         <?php endif; ?>
 
-        <!-- KPI Cards -->
+        
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6">
           <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm flex items-center gap-4 border-l-4 border-l-slate-400">
             <div class="w-12 h-12 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-layer-group"></i></div>
@@ -68,7 +68,7 @@ $withoutIcon = max(0, count($kategoriRows) - $withIcon);
           </div>
         </div>
 
-        <!-- Data Table -->
+        
         <div class="rounded-2xl border border-slate-200 bg-white shadow-card overflow-hidden">
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">

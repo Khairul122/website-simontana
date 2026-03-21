@@ -9,14 +9,14 @@ class RiwayatTindakanController {
     public function __construct() {
         $this->authService = new AuthService();
 
-        // Check if user is logged in
+        
         $currentUser = $this->authService->getCurrentUser();
         if (!$currentUser['success']) {
             header('Location: index.php?controller=Auth&action=login');
             exit;
         }
 
-        // Only allow roles: 'Admin', 'PetugasBPBD', 'OperatorDesa'
+        
         $userRole = $currentUser['data']['role'] ?? '';
         if (!in_array($userRole, ['Admin', 'PetugasBPBD', 'OperatorDesa'], true)) {
             setDialog('Akses Ditolak', 'Anda tidak memiliki akses ke fitur riwayat tindakan.', 'error');
@@ -51,7 +51,7 @@ class RiwayatTindakanController {
     public function create() {
         $currentUser = $this->authService->getCurrentUser();
 
-        // Fetch $tindakLanjutList from service
+        
         $response = $this->riwayatTindakanService->getAllTindakLanjut();
         $tindakLanjutList = [];
         if ($response['success']) {
@@ -70,13 +70,13 @@ class RiwayatTindakanController {
 
         $currentUser = $this->authService->getCurrentUser();
 
-        // Payload: tindaklanjut_id, keterangan, waktu_tindakan (formatted Y-m-d H:i:s), id_petugas (from session)
+        
         $tindakLanjutId = $_POST['tindaklanjut_id'] ?? '';
         $keterangan = $_POST['keterangan'] ?? '';
         $waktuTindakan = $_POST['waktu_tindakan'] ?? '';
         $idPetugas = $_SESSION['user']['id'] ?? 0;
 
-        // Validation
+        
         if (empty($tindakLanjutId) || empty($keterangan) || empty($waktuTindakan)) {
             setDialog('Gagal', 'Tindak lanjut, keterangan, dan waktu tindakan harus diisi', 'error');
             header('Location: index.php?controller=RiwayatTindakan&action=create');
@@ -119,7 +119,7 @@ class RiwayatTindakanController {
             $error_message = $response['message'] ?? 'Gagal mengambil data riwayat tindakan';
         }
 
-        // Fetch $tindakLanjutList from service
+        
         $response = $this->riwayatTindakanService->getAllTindakLanjut();
         $tindakLanjutList = [];
         if ($response['success']) {
@@ -144,12 +144,12 @@ class RiwayatTindakanController {
 
         $currentUser = $this->authService->getCurrentUser();
 
-        // Payload: tindaklanjut_id, keterangan, waktu_tindakan (formatted Y-m-d H:i:s)
+        
         $tindakLanjutId = $_POST['tindaklanjut_id'] ?? '';
         $keterangan = $_POST['keterangan'] ?? '';
         $waktuTindakan = $_POST['waktu_tindakan'] ?? '';
 
-        // Validation
+        
         if (empty($tindakLanjutId) || empty($keterangan) || empty($waktuTindakan)) {
             setDialog('Gagal', 'Tindak lanjut, keterangan, dan waktu tindakan harus diisi', 'error');
             header('Location: index.php?controller=RiwayatTindakan&action=edit&id=' . $id);

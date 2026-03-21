@@ -16,7 +16,7 @@ $formAction = $isEditMode
     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative">
       <div class="p-4 md:p-6 lg:p-8 w-full">
 
-        <!-- Header -->
+        
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div class="flex items-center gap-4">
             <a href="index.php?controller=TindakLanjut&action=index" class="flex items-center justify-center h-10 w-10 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-brand-600 hover:bg-brand-50 hover:border-brand-200 transition-all shadow-sm">
@@ -46,7 +46,7 @@ $formAction = $isEditMode
               <form method="POST" action="<?php echo $formAction; ?>" enctype="multipart/form-data" class="p-6">
                 
                 <div class="space-y-6">
-                  <!-- Laporan Target -->
+                  
                   <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Laporan Target Insiden <span class="text-red-500">*</span></label>
                     <?php if ($isEditMode): ?>
@@ -72,7 +72,7 @@ $formAction = $isEditMode
                     <?php endif; ?>
                   </div>
 
-                  <!-- Waktu -->
+                  
                   <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Waktu Pembaruan / Keberangkatan <span class="text-red-500">*</span></label>
                     <input
@@ -84,7 +84,7 @@ $formAction = $isEditMode
                     >
                   </div>
 
-                  <!-- Status -->
+                  
                   <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Stage Penanganan Berjalan <span class="text-red-500">*</span></label>
                     <div class="relative w-full md:w-2/3">
@@ -99,7 +99,7 @@ $formAction = $isEditMode
                     </div>
                   </div>
 
-                  <!-- Keterangan -->
+                  
                   <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Log Operasi Lapangan (Opsional)</label>
                     <textarea 
@@ -111,7 +111,7 @@ $formAction = $isEditMode
                   </div>
                 </div>
 
-                <!-- Actions -->
+                
                 <div class="mt-8 pt-5 border-t border-slate-100 flex items-center justify-end gap-3">
                   <a href="index.php?controller=TindakLanjut&action=index" class="px-5 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors">
                     Batal

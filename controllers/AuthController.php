@@ -20,7 +20,7 @@ class AuthController {
     }
 
     public function login() {
-        // Jika user sudah login, redirect ke dashboard
+        
         $currentUser = $this->authService->getCurrentUser();
         if ($currentUser['success'] && isset($currentUser['data'])) {
             $role = $currentUser['data']['role'] ?? $currentUser['data']['user']['role'] ?? 'Warga';
@@ -28,20 +28,20 @@ class AuthController {
             return;
         }
 
-        // Jika ada redirect setelah login berhasil
+        
         if (isset($_SESSION['redirect_after_login']) && $_SESSION['redirect_after_login']) {
             $role = $_SESSION['user_role'] ?? 'Warga';
             unset($_SESSION['redirect_after_login']);
             unset($_SESSION['user_role']);
 
-            // Tampilkan halaman login dengan toast dan redirect script
+            
             $title = "Login - SIMONTA BENCANA";
             $should_redirect = true;
             include dirname(__DIR__) . '/views/auth/login.php';
             return;
         }
 
-        // Tampilkan halaman login
+        
         $title = "Login - SIMONTA BENCANA";
         $should_redirect = false;
         include dirname(__DIR__) . '/views/auth/login.php';
@@ -61,7 +61,7 @@ class AuthController {
             $response = $this->authService->login($username, $password);
 
             if ($response['success']) {
-                // Login berhasil - ambil role user dan redirect ke dashboard
+                
                 $userData = apiDataEntity($response['data']);
                 $userRole = $userData['user']['role'] ?? $userData['role'] ?? 'Warga';
 
@@ -70,10 +70,10 @@ class AuthController {
                 $this->redirectToDashboard($userRole);
                 exit;
             } else {
-                // Login gagal - tampilkan pesan error
+                
                 $errorMessage = $response['message'] ?? 'Username atau password salah';
 
-                // Jika ada detail error dari API, ambil pesan pertama
+                
                 if (isset($response['errors']) && is_array($response['errors'])) {
                     $errors = $response['errors'];
                     $firstError = reset($errors);
@@ -99,7 +99,7 @@ class AuthController {
     }
 
     public function register() {
-        // Tampilkan halaman register
+        
         $title = "Register - SIMONTA BENCANA";
         $desaList = [];
 
@@ -125,7 +125,7 @@ class AuthController {
             $alamat = $_POST['alamat'] ?? '';
             $id_desa = $_POST['id_desa'] ?? '';
 
-            // Validasi input
+            
             if (empty($nama) || empty($username) || empty($email) || empty($password)) {
                 setToast('error', 'Gagal', 'Semua field wajib diisi');
                 header('Location: index.php?controller=Auth&action=register');
@@ -153,15 +153,15 @@ class AuthController {
             $response = $this->authService->register($userData);
 
             if ($response['success']) {
-                // Register berhasil, tampilkan pesan dan arahkan ke login
+                
                 setToast('success', 'Berhasil', 'Registrasi berhasil. Silakan login');
                 header('Location: index.php?controller=Auth&action=login');
                 return;
             } else {
-                // Register gagal
+                
                 $message = $response['message'] ?? 'Registrasi gagal';
 
-                // Jika ada detail error dari API, ambil pesan yang paling relevan
+                
                 if (isset($response['errors']) && is_array($response['errors'])) {
                     $firstError = reset($response['errors']);
                     $message = is_array($firstError) ? ($firstError[0] ?? $message) : $firstError;
@@ -247,7 +247,7 @@ class AuthController {
     }
 
     private function redirectToDashboard($role) {
-        // Redirect berdasarkan role pengguna
+        
         switch ($role) {
             case 'Admin':
                 header('Location: index.php?controller=Dashboard&action=admin');

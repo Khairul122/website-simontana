@@ -53,6 +53,6 @@
 </script>
 <?php unset($_SESSION['toast']); endif; ?>
 
-<!-- Close body and html tags from header -->
+
 </body>
 </html>

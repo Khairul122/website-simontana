@@ -26,7 +26,7 @@ foreach ($users as $u) {
     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative">
       <div class="p-4 md:p-6 lg:p-8 w-full">
 
-        <!-- Page Header -->
+        
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
             <h1 class="font-display text-2xl md:text-3xl font-bold text-slate-900">User Account & Role</h1>
@@ -58,7 +58,7 @@ foreach ($users as $u) {
           </div>
         <?php endif; ?>
 
-        <!-- KPI Cards -->
+        
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm border-l-4 border-l-rose-500 flex items-end justify-between">
             <div>
@@ -90,7 +90,7 @@ foreach ($users as $u) {
           </div>
         </div>
 
-        <!-- Data Table -->
+        
         <div class="rounded-2xl border border-slate-200 bg-white shadow-card overflow-hidden">
           <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
             <h2 class="font-bold text-slate-800 text-base"><i class="fa-solid fa-address-book text-slate-400 mr-2"></i> Direktori Kontak & Akses (<?php echo count($users); ?>)</h2>

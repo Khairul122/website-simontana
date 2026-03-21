@@ -6,7 +6,7 @@ $pageTitle = $isEditMode ? 'Edit Informasi Kabupaten' : 'Input Kabupaten / Kota'
 $saveLabel = $isEditMode ? 'Simpan Perubahan' : 'Registrasi Kabupaten';
 $idKabupaten = (int) ($kabupaten['id'] ?? 0);
 
-// Preset Provinsi if coming from index view filter wrapper
+
 $selectedProvinsiId = $_GET['provinsi_id'] ?? null;
 if ($selectedProvinsiId === null && isset($kabupaten['id_provinsi'])) {
   $selectedProvinsiId = $kabupaten['id_provinsi'];
@@ -25,7 +25,7 @@ if ($selectedProvinsiId === null && isset($kabupaten['id_parent'])) {
     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative">
       <div class="p-4 md:p-6 lg:p-8 w-full">
 
-        <!-- Header -->
+        
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div class="flex items-center gap-4">
             <a href="index.php?controller=Wilayah&action=indexKabupaten<?php echo $selectedProvinsiId ? ('&provinsi_id=' . urlencode((string)$selectedProvinsiId)) : ''; ?>" class="flex items-center justify-center h-10 w-10 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-brand-600 hover:bg-brand-50 hover:border-brand-200 transition-all shadow-sm">
@@ -57,7 +57,7 @@ if ($selectedProvinsiId === null && isset($kabupaten['id_parent'])) {
                   <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
                 </div>
                 <?php if ($isEditMode): ?>
-                  <!-- Bind disabled element with hidden field to persist logic -->
+                  
                   <input type="hidden" name="id_provinsi" value="<?php echo htmlspecialchars((string)$selectedProvinsiId); ?>">
                   <p class="text-xs text-amber-600 mt-1.5 font-medium"><i class="fa-solid fa-lock mr-1"></i> Data induk tidak dapat diganti jika mode edit.</p>
                 <?php endif; ?>

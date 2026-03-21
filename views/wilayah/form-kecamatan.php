@@ -32,7 +32,7 @@ if ($selectedKabupatenId === null && isset($kecamatan['id_parent'])) {
     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative">
       <div class="p-4 md:p-6 lg:p-8 w-full">
 
-        <!-- Header -->
+        
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div class="flex items-center gap-4">
             <a href="index.php?controller=Wilayah&action=indexKecamatan<?php echo $selectedKabupatenId ? ('&kabupaten_id=' . urlencode((string)$selectedKabupatenId)) : ''; ?>" class="flex items-center justify-center h-10 w-10 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-brand-600 hover:bg-brand-50 hover:border-brand-200 transition-all shadow-sm">

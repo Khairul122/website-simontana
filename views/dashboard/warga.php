@@ -1,6 +1,6 @@
 <?php include('template/header.php'); ?>
 
-<!-- layout wrapper -->
+
 <div class="flex h-screen overflow-hidden bg-slate-50">
   
   <?php include 'template/sidebar.php'; ?>
@@ -11,7 +11,7 @@
     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative">
       <div class="p-4 md:p-6 lg:p-8 w-full">
 
-        <!-- Welcome Banner -->
+        
         <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-brand-700 to-brand-900 text-white shadow-float p-8 mb-8">
           <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
           <div class="absolute -right-16 -top-16 w-64 h-64 bg-white/10 rounded-full blur-2xl"></div>
@@ -34,7 +34,7 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <!-- Kategori Bencana Widget -->
+          
           <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-card hover:shadow-lg transition-shadow">
             <div class="flex items-center gap-4 mb-4">
               <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl shrink-0">
@@ -50,7 +50,7 @@
             <p class="text-xs text-slate-500">Tersedia untuk dilaporkan oleh masyarakat.</p>
           </div>
 
-          <!-- BMKG Info Widget -->
+          
           <div class="md:col-span-2 rounded-2xl border border-brand-200 bg-brand-50 p-6 shadow-card relative overflow-hidden group">
             <div class="absolute right-0 top-0 w-32 h-32 bg-brand-100 rounded-bl-[100px] -z-0 transition-transform group-hover:scale-110"></div>
             
@@ -98,7 +98,7 @@
           </div>
         </div>
 
-        <!-- Latest Reports -->
+        
         <div class="rounded-2xl border border-slate-200 bg-white shadow-card overflow-hidden">
           <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
             <div>

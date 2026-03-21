@@ -27,7 +27,7 @@ function navIconActive($controllers, $current) {
 
 <aside class="sidebar-container w-64 h-full bg-white border-r border-slate-200 flex flex-col shrink-0">
   
-  <!-- Brand Area -->
+  
   <div class="h-16 flex items-center gap-3 px-5 border-b border-slate-200">
     <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand-600 to-brand-800 text-white font-bold text-lg shadow-inner">S</div>
     <div class="flex flex-col">
@@ -36,20 +36,20 @@ function navIconActive($controllers, $current) {
     </div>
   </div>
 
-  <!-- Menu Area -->
+  
   <div class="flex-1 overflow-y-auto py-4 px-3 space-y-1 scrollbar-hide">
     
     <div class="px-3 mb-2 mt-2">
       <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Navigasi Utama</p>
     </div>
 
-    <!-- Global Public Hub -->
+    
     <a href="index.php?controller=Bmkg&action=index" class="group flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all <?= navActive(['Bmkg'], $currentController) ?>">
       <i class="fa-solid fa-cloud-bolt w-5 text-center text-lg <?= navIconActive(['Bmkg'], $currentController) ?> text-indigo-500"></i>
       <span class="text-sm font-semibold tracking-wide">Pusat Data BMKG</span>
     </a>
 
-    <!-- Admin Roles -->
+    
     <?php if ($userRole === 'Admin'): ?>
       
       <a href="index.php?controller=Dashboard&action=admin" class="group flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all <?= navActive(['Dashboard'], $currentController) ?>">
@@ -110,7 +110,7 @@ function navIconActive($controllers, $current) {
       </a>
     <?php endif; ?>
 
-    <!-- Warga Specific -->
+    
     <?php if ($userRole === 'Warga'): ?>
       <div class="px-3 mb-2 mt-6">
         <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Aksi</p>
@@ -125,7 +125,7 @@ function navIconActive($controllers, $current) {
       </a>
     <?php endif; ?>
 
-    <!-- Operator/Petugas Roles Shared -->
+    
     <?php if (in_array($userRole, ['PetugasBPBD', 'OperatorDesa'], true)): ?>
       <div class="px-3 mb-2 mt-6">
         <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Operasional</p>

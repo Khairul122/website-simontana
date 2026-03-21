@@ -12,9 +12,9 @@ class UserController
         $this->service = new UserService();
     }
 
-    /**
-     * Cek role user, hanya Admin yang bisa akses
-     */
+    
+
+
     private function checkRole()
     {
         if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'Admin') {
@@ -23,23 +23,23 @@ class UserController
         }
     }
 
-    /**
-     * Handle unauthorized response - clear session and redirect to login
-     */
+    
+
+
     private function handleUnauthorized()
     {
         clearSession();
 
         setToast('error', 'Sesi Habis', 'Sesi Anda telah berakhir, silakan login kembali.');
 
-        // Redirect to login page
+        
         header('Location: index.php?controller=Auth&action=login');
         exit();
     }
 
-    /**
-     * Check if response indicates unauthorized access
-     */
+    
+
+
     private function isUnauthorized($response)
     {
         return ($response['http_code'] === 401 ||
@@ -48,16 +48,16 @@ class UserController
                   stripos($response['message'], 'token') !== false)));
     }
 
-    /**
-     * Tampilkan halaman index (daftar pengguna)
-     */
+    
+
+
     public function index()
     {
         $this->checkRole();
 
         $response = $this->service->getAll();
 
-        // Handle unauthorized response
+        
         if ($this->isUnauthorized($response)) {
             $this->handleUnauthorized();
         }
@@ -74,13 +74,13 @@ class UserController
             ];
         }
 
-        // Load view
+        
         include dirname(__DIR__) . '/views/user/index.php';
     }
 
-    /**
-     * Tampilkan form create
-     */
+    
+
+
     public function create()
     {
         $this->checkRole();
@@ -88,7 +88,7 @@ class UserController
         $isEdit = false;
         $user = null;
 
-        // Ambil data wilayah untuk dropdown
+        
         $provinsiList = $this->getAllProvinsi();
         $kabupatenList = [];
         $kecamatanList = [];
@@ -97,17 +97,17 @@ class UserController
         include dirname(__DIR__) . '/views/user/form.php';
     }
 
-    /**
-     * Tampilkan form edit
-     */
+    
+
+
     public function edit()
     {
         $this->checkRole();
 
-        // Ambil ID dari query string
+        
         $id = $_GET['id'] ?? null;
 
-        // Validasi ID
+        
         if (!$id) {
             header('Location: index.php?controller=User&action=index');
             exit;
@@ -115,7 +115,7 @@ class UserController
 
         $response = $this->service->getById($id);
 
-        // Handle unauthorized response
+        
         if ($this->isUnauthorized($response)) {
             $this->handleUnauthorized();
         }
@@ -129,30 +129,30 @@ class UserController
         $user = $response['data'];
         $isEdit = true;
 
-        // Jika pengguna memiliki id_desa, kita perlu mendapatkan data wilayah lengkap
+        
         if (!empty($user['id_desa'])) {
-            // Kita perlu mengambil data wilayah lengkap secara manual karena API mungkin tidak menyediakan nested data
+            
             $user['desa'] = $this->getWilayahDetail($user['id_desa']);
         }
 
-        // Ambil data wilayah untuk dropdown
+        
         $provinsiList = $this->getAllProvinsi();
         $kabupatenList = [];
         $kecamatanList = [];
         $desaList = [];
 
-        // Jika user memiliki desa, kita bisa memuat provinsi list untuk kebutuhan tampilan
+        
         if (!empty($user['id_desa'])) {
-            // Load provinsi list untuk ditampilkan di form
+            
             $provinsiList = $this->getAllProvinsi();
         }
 
         include dirname(__DIR__) . '/views/user/form.php';
     }
 
-    /**
-     * Fungsi untuk mendapatkan detail wilayah lengkap berdasarkan id_desa
-     */
+    
+
+
     private function getWilayahDetail($id_desa)
     {
         require_once dirname(__DIR__) . '/services/WilayahService.php';
@@ -167,9 +167,9 @@ class UserController
         return $response['data'];
     }
 
-    /**
-     * Fungsi untuk mendapatkan semua provinsi
-     */
+    
+
+
     private function getAllProvinsi()
     {
         require_once dirname(__DIR__) . '/services/WilayahService.php';
@@ -184,9 +184,9 @@ class UserController
         return $response['data'];
     }
 
-    /**
-     * Fungsi untuk mendapatkan kabupaten berdasarkan provinsi
-     */
+    
+
+
     private function getKabupatenByProvinsi($provinsiId)
     {
         require_once dirname(__DIR__) . '/services/WilayahService.php';
@@ -201,9 +201,9 @@ class UserController
         return $response['data'];
     }
 
-    /**
-     * Fungsi untuk mendapatkan kecamatan berdasarkan kabupaten
-     */
+    
+
+
     private function getKecamatanByKabupaten($kabupatenId)
     {
         require_once dirname(__DIR__) . '/services/WilayahService.php';
@@ -218,9 +218,9 @@ class UserController
         return $response['data'];
     }
 
-    /**
-     * Fungsi untuk mendapatkan desa berdasarkan kecamatan
-     */
+    
+
+
     private function getDesaByKecamatan($kecamatanId)
     {
         require_once dirname(__DIR__) . '/services/WilayahService.php';
@@ -235,9 +235,9 @@ class UserController
         return $response['data'];
     }
 
-    /**
-     * Simpan data baru
-     */
+    
+
+
     public function store()
     {
         $this->checkRole();
@@ -247,7 +247,7 @@ class UserController
             exit();
         }
 
-        // Ambil data dari form
+        
         $nama = trim($_POST['nama'] ?? '');
         $username = trim($_POST['username'] ?? '');
         $email = trim($_POST['email'] ?? '');
@@ -257,14 +257,14 @@ class UserController
         $password = trim($_POST['password'] ?? '');
         $id_desa = trim($_POST['id_desa'] ?? '');
 
-        // Validasi input wajib
+        
         if (empty($nama) || empty($username) || empty($role) || empty($password)) {
             setDialog('Error', 'Semua field wajib diisi (kecuali alamat, no_telepon dan id_desa)', 'error');
             header('Location: index.php?controller=User&action=create');
             exit();
         }
 
-        // Data untuk dikirim ke API
+        
         $data = [
             'nama' => $nama,
             'username' => $username,
@@ -277,10 +277,10 @@ class UserController
             'password_confirmation' => $password
         ];
 
-        // Panggil service
+        
         $response = $this->service->create($data);
 
-        // Handle unauthorized response
+        
         if ($this->isUnauthorized($response)) {
             $this->handleUnauthorized();
         }
@@ -293,17 +293,17 @@ class UserController
         exit();
     }
 
-    /**
-     * Update data
-     */
+    
+
+
     public function update()
     {
         $this->checkRole();
 
-        // Ambil ID dari query string
+        
         $id = $_GET['id'] ?? null;
 
-        // Validasi ID
+        
         if (!$id) {
             header('Location: index.php?controller=User&action=index');
             exit;
@@ -314,7 +314,7 @@ class UserController
             exit();
         }
 
-        // Ambil data dari form
+        
         $nama = trim($_POST['nama'] ?? '');
         $username = trim($_POST['username'] ?? '');
         $email = trim($_POST['email'] ?? '');
@@ -324,14 +324,14 @@ class UserController
         $password = trim($_POST['password'] ?? '');
         $id_desa = trim($_POST['id_desa'] ?? '');
 
-        // Validasi input wajib
+        
         if (empty($nama) || empty($username) || empty($role)) {
             setDialog('Error', 'Nama, username, dan role wajib diisi', 'error');
             header('Location: index.php?controller=User&action=edit&id=' . $id);
             exit();
         }
 
-        // Data untuk dikirim ke API
+        
         $data = [
             'nama' => $nama,
             'username' => $username,
@@ -342,16 +342,16 @@ class UserController
             'id_desa' => $id_desa
         ];
 
-        // Tambahkan password ke data hanya jika diisi
+        
         if (!empty($password)) {
             $data['password'] = $password;
             $data['password_confirmation'] = $password;
         }
 
-        // Panggil service
+        
         $response = $this->service->update($id, $data);
 
-        // Handle unauthorized response
+        
         if ($this->isUnauthorized($response)) {
             $this->handleUnauthorized();
         }
@@ -364,17 +364,17 @@ class UserController
         exit();
     }
 
-    /**
-     * Hapus data
-     */
+    
+
+
     public function delete()
     {
         $this->checkRole();
 
-        // Ambil ID dari query string
+        
         $id = $_GET['id'] ?? null;
 
-        // Validasi ID
+        
         if (!$id) {
             header('Location: index.php?controller=User&action=index');
             exit;
@@ -385,10 +385,10 @@ class UserController
             exit();
         }
 
-        // Panggil service
+        
         $response = $this->service->delete($id);
 
-        // Handle unauthorized response
+        
         if ($this->isUnauthorized($response)) {
             $this->handleUnauthorized();
         }

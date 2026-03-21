@@ -9,17 +9,17 @@ class TindakLanjutController {
     public function __construct() {
         $this->authService = new AuthService();
         
-        // Pastikan pengguna sudah login
+        
         $currentUser = $this->authService->getCurrentUser();
         if (!$currentUser['success']) {
             header('Location: index.php?controller=Auth&action=login');
             exit;
         }
 
-        // Pastikan role adalah Admin, PetugasBPBD, atau OperatorDesa
+        
         $userRole = $currentUser['data']['role'] ?? '';
         if (!in_array($userRole, ['Admin', 'PetugasBPBD', 'OperatorDesa'], true)) {
-            // Jika role tidak diizinkan, redirect ke halaman sesuai role
+            
             $this->redirectToRoleDashboard($userRole);
             exit;
         }
@@ -30,7 +30,7 @@ class TindakLanjutController {
     public function index() {
         $currentUser = $this->authService->getCurrentUser();
         
-        // Ambil filter dari query string
+        
         $filters = [];
         if (isset($_GET['status']) && !empty($_GET['status'])) {
             $filters['status'] = $_GET['status'];
@@ -42,7 +42,7 @@ class TindakLanjutController {
             $filters['search'] = $_GET['search'];
         }
 
-        // Ambil data tindak lanjut dari service
+        
         $response = $this->tindakLanjutService->getAll($filters);
 
         if ($response['success']) {
@@ -59,7 +59,7 @@ class TindakLanjutController {
     public function detail() {
         $currentUser = $this->authService->getCurrentUser();
         
-        // Ambil ID dari parameter GET
+        
         $id = $_GET['id'] ?? null;
         
         if (!$id) {
@@ -67,7 +67,7 @@ class TindakLanjutController {
             exit;
         }
         
-        // Ambil detail tindak lanjut dari service
+        
         $response = $this->tindakLanjutService->getById($id);
 
         if ($response['success']) {
@@ -84,7 +84,7 @@ class TindakLanjutController {
     public function create() {
         $currentUser = $this->authService->getCurrentUser();
 
-        // Ambil data laporan dan petugas untuk dropdown
+        
         $laporanResponse = $this->tindakLanjutService->getAllLaporan();
         $petugasResponse = $this->tindakLanjutService->getAllPetugas();
 
@@ -103,34 +103,34 @@ class TindakLanjutController {
 
         $currentUser = $this->authService->getCurrentUser();
         
-        // Ambil data dari form
+        
         $laporanId = $_POST['laporan_id'] ?? '';
         $tanggalTanggapan = $_POST['tanggal_tanggapan'] ?? '';
         $status = $_POST['status'] ?? '';
         $keterangan = $_POST['keterangan'] ?? '';
         
-        // Validasi input
+        
         if (empty($laporanId) || empty($tanggalTanggapan) || empty($status)) {
             setDialog('Gagal', 'Laporan, tanggal tanggapan, dan status harus diisi', 'error');
             header('Location: index.php?controller=TindakLanjut&action=create');
             exit;
         }
 
-        // Data untuk disimpan - match required JSON structure
+        
         $data = [
             'laporan_id' => $laporanId,
-            'id_petugas' => $_SESSION['user']['id'] ?? 0, // Get from Session
+            'id_petugas' => $_SESSION['user']['id'] ?? 0, 
             'tanggal_tanggapan' => date('Y-m-d H:i:s', strtotime($tanggalTanggapan)),
             'status' => $status
         ];
 
-        // Upload file jika ada
+        
         $files = [];
         if (isset($_FILES['foto_kegiatan']) && $_FILES['foto_kegiatan']['error'] === UPLOAD_ERR_OK) {
             $files['foto_kegiatan'] = $_FILES['foto_kegiatan'];
         }
 
-        // Simpan tindak lanjut
+        
         $response = $this->tindakLanjutService->create($data, $files);
 
         if ($response['success']) {
@@ -146,7 +146,7 @@ class TindakLanjutController {
     public function edit() {
         $currentUser = $this->authService->getCurrentUser();
         
-        // Ambil ID dari parameter GET
+        
         $id = $_GET['id'] ?? null;
         
         if (!$id) {
@@ -154,7 +154,7 @@ class TindakLanjutController {
             exit;
         }
         
-        // Ambil detail tindak lanjut dari service
+        
         $response = $this->tindakLanjutService->getById($id);
 
         if ($response['success']) {
@@ -164,7 +164,7 @@ class TindakLanjutController {
             $error_message = $response['message'] ?? 'Gagal mengambil detail tindak lanjut';
         }
 
-        // Ambil data laporan dan petugas untuk dropdown
+        
         $laporanResponse = $this->tindakLanjutService->getAllLaporan();
         $petugasResponse = $this->tindakLanjutService->getAllPetugas();
 
@@ -176,7 +176,7 @@ class TindakLanjutController {
     }
 
     public function update() {
-        // Ambil ID dari parameter GET
+        
         $id = $_GET['id'] ?? null;
         
         if (!$id) {
@@ -191,32 +191,32 @@ class TindakLanjutController {
 
         $currentUser = $this->authService->getCurrentUser();
         
-        // Ambil data dari form
+        
         $laporanId = $_POST['laporan_id'] ?? '';
         $tanggalTanggapan = $_POST['tanggal_tanggapan'] ?? '';
         $status = $_POST['status'] ?? '';
         $keterangan = $_POST['keterangan'] ?? '';
         
-        // Validasi input
+        
         if (empty($tanggalTanggapan) || empty($status)) {
             setDialog('Gagal', 'Tanggal tanggapan dan status harus diisi', 'error');
             header('Location: index.php?controller=TindakLanjut&action=edit&id=' . $id);
             exit;
         }
 
-        // Data untuk update - match required JSON structure
+        
         $data = [
             'tanggal_tanggapan' => date('Y-m-d H:i:s', strtotime($tanggalTanggapan)),
             'status' => $status
         ];
 
-        // Upload file jika ada
+        
         $files = [];
         if (isset($_FILES['foto_kegiatan']) && $_FILES['foto_kegiatan']['error'] === UPLOAD_ERR_OK) {
             $files['foto_kegiatan'] = $_FILES['foto_kegiatan'];
         }
 
-        // Update tindak lanjut
+        
         $response = $this->tindakLanjutService->update($id, $data, $files);
 
         if ($response['success']) {
@@ -230,7 +230,7 @@ class TindakLanjutController {
     }
 
     public function delete() {
-        // Ambil ID dari parameter GET
+        
         $id = $_GET['id'] ?? null;
         
         if (!$id) {
@@ -245,7 +245,7 @@ class TindakLanjutController {
 
         $currentUser = $this->authService->getCurrentUser();
         
-        // Hapus tindak lanjut
+        
         $response = $this->tindakLanjutService->delete($id);
 
         if ($response['success']) {
@@ -258,7 +258,7 @@ class TindakLanjutController {
         exit;
     }
 
-    // Fungsi umum untuk redirect berdasarkan role (untuk validasi akses)
+    
     private function redirectToRoleDashboard($role) {
         switch ($role) {
             case 'Admin':

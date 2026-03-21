@@ -7,7 +7,7 @@
     <?php include 'template/navbar.php'; ?>
     
     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative">
-      <div class="p-4 md:p-6 lg:p-8 w-full max-w-4xl mx-auto"> <!-- keeping this container a bit constrained for forms to look nice -->
+      <div class="p-4 md:p-6 lg:p-8 w-full max-w-4xl mx-auto"> 
 
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
@@ -32,7 +32,7 @@
         <?php if (!empty($report)): ?>
           <div class="rounded-3xl bg-white border border-slate-200 shadow-card overflow-hidden">
              
-            <!-- Recap Header Box -->
+            
             <div class="bg-indigo-50 border-b border-indigo-100 p-6 md:px-8 md:py-6 flex items-start gap-5">
                <div class="w-12 h-12 rounded-xl bg-white text-indigo-500 flex items-center justify-center text-xl shrink-0 shadow-sm border border-indigo-100">
                   <i class="fa-solid fa-file-invoice"></i>
@@ -47,7 +47,7 @@
               <input type="hidden" name="id" value="<?php echo (int)$report['id']; ?>">
 
               <div class="space-y-6">
-                <!-- Status Row -->
+                
                 <div>
                   <label for="status" class="block text-sm font-bold text-slate-700 mb-2">Status Penanganan <span class="text-red-500">*</span></label>
                   <div class="relative">
@@ -65,7 +65,7 @@
                   <p class="text-xs text-slate-500 mt-2 font-medium">Ubah ke <b>Diverifikasi</b> jika laporan dinyatakan sah. Jika tergolong SPAM, ubah ke <b>Ditolak</b>.</p>
                 </div>
 
-                <!-- Catatan Verifikasi -->
+                
                 <div>
                   <label for="catatan_verifikasi" class="block text-sm font-bold text-slate-700 mb-2">Catatan Operator</label>
                   <textarea class="w-full rounded-xl border border-slate-300 bg-white p-4 text-slate-700 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-shadow placeholder-slate-400 resize-none" id="catatan_verifikasi" name="catatan_verifikasi" rows="4" placeholder="Jelaskan alasan verifikasi atau penolakan ini untuk rujukan tim di lapangan..."><?php echo htmlspecialchars($report['catatan_verifikasi'] ?? ''); ?></textarea>
@@ -73,7 +73,7 @@
                 </div>
               </div>
 
-              <!-- Submit Button -->
+              
               <div class="mt-8 pt-6 border-t border-slate-100 flex items-center justify-end gap-3">
                 <a href="index.php?controller=LaporanOperator&action=detail&id=<?php echo $report['id']; ?>" class="px-5 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-600 font-bold text-sm hover:bg-slate-50 transition shadow-sm">
                   Batalkan

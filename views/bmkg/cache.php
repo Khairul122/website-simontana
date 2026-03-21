@@ -6,7 +6,7 @@
     <?php include 'template/navbar.php'; ?>
     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative p-4 md:p-6 lg:p-8">
 
-      <!-- Header -->
+      
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 md:mb-8">
         <div>
           <h1 class="font-display text-2xl md:text-3xl font-bold text-slate-800">Manajemen Cache Data BMKG</h1>

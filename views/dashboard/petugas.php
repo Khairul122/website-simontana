@@ -1,7 +1,7 @@
 <?php
-// ==========================================
-// HELPER FUNCTION - Indonesian Date Formatter
-// ==========================================
+
+
+
 function formatTanggalIndo($dateString) {
     if (empty($dateString)) {
         return '-';
@@ -27,7 +27,7 @@ include('template/header.php');
     <?php include 'template/navbar.php'; ?>
     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative p-4 md:p-6 lg:p-8">
       
-      <!-- Welcome Hero -->
+      
       <div class="rounded-3xl bg-indigo-900 border-none shadow-card overflow-hidden text-white relative mb-6">
         <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-bl-[150px] pointer-events-none"></div>
         <div class="absolute bottom-0 left-10 w-32 h-32 bg-indigo-500/20 rounded-t-full filter blur-2xl pointer-events-none"></div>
@@ -58,7 +58,7 @@ include('template/header.php');
         </div>
       <?php endif; ?>
 
-      <!-- KPI Cards -->
+      
       <?php if (isset($stats) && isset($stats['success']) && $stats['success']): ?>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
          <div class="rounded-2xl bg-white border border-slate-200 p-6 flex flex-col shadow-sm relative overflow-hidden group hover:border-brand-300 transition-colors">
@@ -96,7 +96,7 @@ include('template/header.php');
       </div>
       <?php endif; ?>
 
-      <!-- BMKG Widget -->
+      
       <?php if (isset($bmkgData) && $bmkgData['success']): ?>
       <div class="rounded-3xl bg-gradient-to-r from-rose-700 to-rose-900 border-none shadow-card overflow-hidden text-white relative mb-8">
         <div class="absolute top-0 right-0 h-full w-1/3 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-repeat pointer-events-none"></div>
@@ -126,7 +126,7 @@ include('template/header.php');
       </div>
       <?php endif; ?>
 
-      <!-- Charts Section -->
+      
       <?php if (isset($weeklyStats) && $weeklyStats['success']): ?>
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div class="rounded-3xl bg-white border border-slate-200 shadow-card p-6 md:p-8">
@@ -150,7 +150,7 @@ include('template/header.php');
       </div>
       <?php endif; ?>
 
-      <!-- Daftar Laporan Table -->
+      
       <div class="rounded-3xl bg-white border border-slate-200 shadow-card overflow-hidden">
         <div class="p-6 md:p-8 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
            <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">
@@ -223,7 +223,7 @@ include('template/header.php');
 
 <?php include 'template/script.php'; ?>
 
-<!-- Chart.js -->
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
   const dashboardData = {

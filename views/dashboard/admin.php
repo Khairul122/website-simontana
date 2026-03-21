@@ -35,7 +35,7 @@ $categorySeries = is_array($weeklyPayload['categories_stats'] ?? null) ? $weekly
 $bmkgGempa = (isset($bmkgData['data']['Magnitude'])) ? $bmkgData['data'] : null;
 ?>
 
-<!-- layout wrapper -->
+
 <div class="container-scroller h-screen flex overflow-hidden bg-slate-50">
   
   <?php include 'template/sidebar.php'; ?>
@@ -46,7 +46,7 @@ $bmkgGempa = (isset($bmkgData['data']['Magnitude'])) ? $bmkgData['data'] : null;
     <main class="main-panel flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative">
       <div class="content-wrapper p-4 md:p-6 lg:p-8 w-full">
 
-        <!-- Top Welcome Header -->
+        
         <div class="relative overflow-hidden rounded-2xl bg-white border border-slate-200 shadow-card p-6 md:p-8 mb-6 animate-fade-in group">
           <div class="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-brand-50 transition-transform duration-700 ease-out group-hover:scale-110"></div>
           <div class="absolute -right-8 -bottom-12 h-32 w-32 rounded-full bg-brand-100/50 transition-transform duration-500 ease-out delay-75 group-hover:scale-125"></div>
@@ -83,10 +83,10 @@ $bmkgGempa = (isset($bmkgData['data']['Magnitude'])) ? $bmkgData['data'] : null;
           </div>
         <?php endif; ?>
 
-        <!-- KPIs -->
+        
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
           
-          <!-- KPI 1 -->
+          
           <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-card hover:-translate-y-1 hover:shadow-lg transition-all transform duration-300">
             <div class="flex items-start justify-between">
               <div>
@@ -99,7 +99,7 @@ $bmkgGempa = (isset($bmkgData['data']['Magnitude'])) ? $bmkgData['data'] : null;
             </div>
           </div>
 
-          <!-- KPI 2 -->
+          
           <div class="rounded-2xl border border-red-200 bg-red-50/50 p-5 shadow-card hover:-translate-y-1 hover:shadow-lg transition-all transform duration-300 delay-75">
             <div class="flex items-start justify-between">
               <div>
@@ -115,7 +115,7 @@ $bmkgGempa = (isset($bmkgData['data']['Magnitude'])) ? $bmkgData['data'] : null;
             <?php endif; ?>
           </div>
 
-          <!-- KPI 3 -->
+          
           <div class="rounded-2xl border border-amber-200 bg-amber-50/50 p-5 shadow-card hover:-translate-y-1 hover:shadow-lg transition-all transform duration-300 delay-100">
             <div class="flex items-start justify-between">
               <div>
@@ -128,7 +128,7 @@ $bmkgGempa = (isset($bmkgData['data']['Magnitude'])) ? $bmkgData['data'] : null;
             </div>
           </div>
 
-          <!-- KPI 4 -->
+          
           <div class="rounded-2xl border border-emerald-200 bg-emerald-50/50 p-5 shadow-card hover:-translate-y-1 hover:shadow-lg transition-all transform duration-300 delay-150">
             <div class="flex items-start justify-between">
               <div>
@@ -143,10 +143,10 @@ $bmkgGempa = (isset($bmkgData['data']['Magnitude'])) ? $bmkgData['data'] : null;
 
         </div>
 
-        <!-- Main Content Grid -->
+        
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
           
-          <!-- Recent Reports Table -->
+          
           <div class="xl:col-span-2 rounded-2xl border border-slate-200 bg-white shadow-card flex flex-col h-full">
             <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
               <div>
@@ -211,10 +211,10 @@ $bmkgGempa = (isset($bmkgData['data']['Magnitude'])) ? $bmkgData['data'] : null;
             </div>
           </div>
 
-          <!-- BMKG & Urgent Actions Widget -->
+          
           <div class="xl:col-span-1 flex flex-col gap-6">
             
-            <!-- BMKG Widget -->
+            
             <div class="rounded-2xl bg-gradient-to-br from-[#1e1b4b] to-[#312e81] border border-transparent shadow-card p-1 relative overflow-hidden text-white flex-1">
               <div class="absolute right-0 top-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
               
@@ -260,7 +260,7 @@ $bmkgGempa = (isset($bmkgData['data']['Magnitude'])) ? $bmkgData['data'] : null;
               </div>
             </div>
 
-            <!-- Urgent action alert -->
+            
             <?php if ($laporanTertunda > 0): ?>
             <div class="rounded-2xl border border-red-200 bg-red-50 p-6 shadow-card">
               <div class="flex items-center justify-between mb-2">
@@ -278,7 +278,7 @@ $bmkgGempa = (isset($bmkgData['data']['Magnitude'])) ? $bmkgData['data'] : null;
           </div>
         </div>
 
-        <!-- Charts Grid -->
+        
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-card h-[380px] flex flex-col">
             <h2 class="font-bold text-slate-800 text-lg mb-1">Tren Laporan Mingguan</h2>

@@ -6,7 +6,7 @@
     <?php include 'template/navbar.php'; ?>
     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative p-4 md:p-6 lg:p-8">
 
-      <!-- Header -->
+      
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
           <h1 class="text-2xl md:text-3xl font-display font-bold text-slate-800">Pusat Informasi BMKG Terkini</h1>
@@ -20,7 +20,7 @@
         </div>
       </div>
 
-      <!-- Tsunami Warning Alert -->
+      
       <?php if (!empty($peringatanTsunami) && isset($peringatanTsunami['status']) && strtolower($peringatanTsunami['status']) !== 'tidak ada peringatan'): ?>
         <div class="rounded-2xl border border-red-300 bg-red-100 p-6 mb-8 shadow-sm flex gap-4 animate-pulse">
           <div class="w-12 h-12 rounded-xl bg-red-600 text-white flex items-center justify-center shrink-0 text-xl shadow-lg"><i class="fa-solid fa-water"></i></div>
@@ -29,9 +29,42 @@
             <p class="text-sm font-medium text-red-700"><?php echo htmlspecialchars($peringatanTsunami['keterangan'] ?? 'Terdeteksi potensi tsunami. Harap waspada dan ikuti arahan resmi.'); ?></p>
           </div>
         </div>
+      <?php else: ?>
+        <div class="rounded-2xl border border-emerald-100 bg-emerald-50/50 p-4 mb-8 flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 text-sm"><i class="fa-solid fa-circle-check"></i></div>
+            <p class="text-xs font-bold text-emerald-700 uppercase tracking-wide">Status Tsunami: Tidak ada peringatan tsunami aktif saat ini.</p>
+        </div>
       <?php endif; ?>
 
-      <!-- Gempa Terbaru (Single Most Recent) -->
+      
+      <?php if (!empty($peringatanDiniCuaca['alerts'])): ?>
+        <div class="bg-white rounded-3xl border border-amber-200 shadow-card p-6 md:p-8 mb-8 relative overflow-hidden">
+           <h2 class="font-bold text-lg text-slate-800 mb-6 flex items-center gap-2"><i class="fa-solid fa-cloud-bolt text-amber-500"></i> Peringatan Dini Cuaca Nasional (Nowcast)</h2>
+           <div class="space-y-4 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
+             <?php foreach ($peringatanDiniCuaca['alerts'] as $alert): ?>
+             <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm">
+                <div class="flex items-start gap-4">
+                   <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center shrink-0 border border-amber-200 text-lg shadow-inner"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                   <div class="flex-1">
+                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                        <h3 class="text-sm md:text-base font-bold text-amber-900"><?php echo htmlspecialchars($alert['title'] ?? ''); ?></h3>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-amber-700 bg-amber-200/50 px-2 py-1 rounded border border-amber-300 self-start sm:self-auto"><?php echo date('d M Y H:i', strtotime($alert['pubDate'] ?? 'now')); ?></span>
+                     </div>
+                     <p class="text-xs md:text-sm font-medium text-amber-800 leading-relaxed max-w-4xl"><?php echo htmlspecialchars($alert['description'] ?? ''); ?></p>
+                     <?php if (!empty($alert['link'])): ?>
+                     <div class="mt-3">
+                         <a href="<?php echo htmlspecialchars($alert['link']); ?>" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-bold text-amber-700 hover:text-amber-900 bg-amber-100 hover:bg-amber-200 transition-colors px-3 py-1.5 rounded-lg border border-amber-200"><i class="fa-solid fa-arrow-up-right-from-square"></i> Rilis BMGK Resmi</a>
+                     </div>
+                     <?php endif; ?>
+                   </div>
+                </div>
+             </div>
+             <?php endforeach; ?>
+           </div>
+        </div>
+      <?php endif; ?>
+
+      
       <?php if (!empty($summary['gempa_terbaru'])): $gt = $summary['gempa_terbaru']; ?>
         <div class="bg-white rounded-3xl border border-slate-200 shadow-card p-6 md:p-8 mb-8 relative overflow-hidden">
            <div class="absolute right-0 top-0 w-64 h-full bg-slate-50/50 skew-x-12 -mr-16 border-l border-slate-100 pointer-events-none"></div>
@@ -73,10 +106,14 @@
                  </div>
               </div>
 
-              <!-- Shakemap Image Container -->
+              
               <div class="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 overflow-hidden flex items-center justify-center h-64 lg:h-auto min-h-[250px]">
-                 <?php if (!empty($gt['Shakemap'])): ?>
-                    <img src="https://data.bmkg.go.id/DataMKG/TEWS/<?php echo $gt['Shakemap']; ?>" alt="Peta Guncangan BMKG" class="w-full h-full object-cover shadow-sm hover:scale-105 transition-transform duration-500 cursor-zoom-in" onclick="window.open(this.src, '_blank')">
+                 <?php if (!empty($gt['Shakemap'])): 
+                    $shakemapUrl = (strpos($gt['Shakemap'], 'http') === 0) 
+                       ? $gt['Shakemap'] 
+                       : "https://data.bmkg.go.id/DataMKG/TEWS/" . $gt['Shakemap'];
+                 ?>
+                    <img src="<?php echo $shakemapUrl; ?>" alt="Peta Guncangan BMKG" class="w-full h-full object-cover shadow-sm hover:scale-105 transition-transform duration-500 cursor-zoom-in" onclick="window.open(this.src, '_blank')">
                  <?php else: ?>
                     <div class="text-center text-slate-400">
                        <i class="fa-solid fa-map text-4xl mb-2 opacity-50"></i>
@@ -88,10 +125,10 @@
         </div>
       <?php endif; ?>
 
-      <!-- Daftar Gempa Besar Terkini && Gempa Dirasakan Split -->
+      
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8">
         
-        <!-- Gempa ≥ M 5.0 -->
+        
         <div class="bg-white rounded-3xl border border-slate-200 shadow-card flex flex-col overflow-hidden">
            <div class="p-6 border-b border-slate-100 flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center text-lg"><i class="fa-solid fa-triangle-exclamation"></i></div>
@@ -125,7 +162,7 @@
            </div>
         </div>
 
-        <!-- Gempa Dirasakan -->
+        
         <div class="bg-white rounded-3xl border border-slate-200 shadow-card flex flex-col overflow-hidden">
            <div class="p-6 border-b border-slate-100 flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-500 flex items-center justify-center text-lg"><i class="fa-solid fa-house-chimney-crack"></i></div>

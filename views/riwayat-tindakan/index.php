@@ -19,7 +19,7 @@ $rows = is_array($riwayat ?? null) ? $riwayat : [];
     <?php include 'template/navbar.php'; ?>
     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative p-4 md:p-6 lg:p-8">
       
-      <!-- Page Header -->
+      
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
           <h1 class="text-2xl md:text-3xl font-display font-bold text-slate-800">Riwayat Tindakan Lapangan</h1>
@@ -44,7 +44,7 @@ $rows = is_array($riwayat ?? null) ? $riwayat : [];
         <div class="text-sm text-brand-800">Total riwayat tercatat: <strong><?php echo count($rows); ?> laporan</strong>. Data ini dipakai untuk evaluasi performa respons lapangan.</div>
       </div>
 
-      <!-- Table Section -->
+      
       <div class="bg-white rounded-3xl border border-slate-200 shadow-card overflow-hidden">
         <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div class="relative w-full max-w-md">
@@ -122,7 +122,7 @@ $rows = is_array($riwayat ?? null) ? $riwayat : [];
           </table>
         </div>
         
-        <!-- Pagination Placeholder -->
+        
         <div class="p-4 border-t border-slate-100 flex items-center justify-between text-sm text-slate-500">
            <div>Menampilkan <span class="font-bold text-slate-700"><?php echo count($rows); ?></span> data riwayat</div>
         </div>

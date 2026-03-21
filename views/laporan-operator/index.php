@@ -9,7 +9,7 @@
     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative">
       <div class="p-4 md:p-6 lg:p-8 w-full">
 
-        <!-- Page Header -->
+        
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
             <h1 class="font-display text-2xl md:text-3xl font-bold text-slate-900">Daftar Laporan Operator</h1>
@@ -32,7 +32,7 @@
           </div>
         <?php endif; ?>
 
-        <!-- Data Table -->
+        
         <div class="rounded-2xl border border-slate-200 bg-white shadow-card overflow-hidden">
           <div class="p-5 md:p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/50">
              <h3 class="font-bold text-lg text-slate-800">Daftar Laporan Bencana</h3>
@@ -122,7 +122,7 @@
             </table>
           </div>
           
-          <!-- Pagination -->
+          
           <?php if (!empty($pagination) && $pagination['last_page'] > 1): ?>
             <div class="p-5 border-t border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-4">
                <p class="text-sm text-slate-500 font-medium">

@@ -37,7 +37,7 @@ $countWithoutCoord = max(0, $countTotal - $countWithCoord);
     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative">
       <div class="p-4 md:p-6 lg:p-8 w-full">
 
-        <!-- Page Header -->
+        
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
             <h1 class="font-display text-2xl md:text-3xl font-bold text-slate-900">Monitoring Lapangan</h1>
@@ -60,7 +60,7 @@ $countWithoutCoord = max(0, $countTotal - $countWithCoord);
           </div>
         <?php endif; ?>
 
-        <!-- KPI Cards -->
+        
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6">
           <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm flex items-center gap-4">
             <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-satellite-dish"></i></div>
@@ -85,7 +85,7 @@ $countWithoutCoord = max(0, $countTotal - $countWithCoord);
           </div>
         </div>
 
-        <!-- Data Table -->
+        
         <div class="rounded-2xl border border-slate-200 bg-white shadow-card overflow-hidden">
           <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
             <h2 class="font-bold text-slate-800 text-base"><i class="fa-solid fa-list-check text-slate-400 mr-2"></i> Daftar Log Monitoring</h2>

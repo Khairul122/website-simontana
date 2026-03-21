@@ -9,7 +9,7 @@
     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative">
       <div class="p-4 md:p-6 lg:p-8 w-full">
 
-        <!-- Header -->
+        
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
             <h1 class="font-display text-2xl md:text-3xl font-bold text-slate-900 leading-tight">Manajemen Geospasial & Wilayah</h1>
@@ -17,10 +17,10 @@
           </div>
         </div>
 
-        <!-- Navigation Cards -->
+        
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           
-          <!-- Provinsi -->
+          
           <div class="group rounded-3xl bg-white border border-slate-200 shadow-sm hover:shadow-card hover:border-brand-200 transition-all duration-300 flex flex-col overflow-hidden relative">
             <div class="absolute top-0 right-0 p-4 opacity-5 pointer-events-none transition-transform group-hover:scale-110 duration-500">
               <i class="fa-solid fa-map text-8xl"></i>
@@ -43,7 +43,7 @@
             </div>
           </div>
 
-          <!-- Kabupaten -->
+          
           <div class="group rounded-3xl bg-white border border-slate-200 shadow-sm hover:shadow-card hover:border-indigo-200 transition-all duration-300 flex flex-col overflow-hidden relative">
             <div class="absolute top-0 right-0 p-4 opacity-5 pointer-events-none transition-transform group-hover:scale-110 duration-500">
               <i class="fa-solid fa-map-location-dot text-8xl"></i>
@@ -66,7 +66,7 @@
             </div>
           </div>
 
-          <!-- Kecamatan -->
+          
           <div class="group rounded-3xl bg-white border border-slate-200 shadow-sm hover:shadow-card hover:border-emerald-200 transition-all duration-300 flex flex-col overflow-hidden relative">
             <div class="absolute top-0 right-0 p-4 opacity-5 pointer-events-none transition-transform group-hover:scale-110 duration-500">
               <i class="fa-solid fa-draw-polygon text-8xl"></i>
@@ -89,7 +89,7 @@
             </div>
           </div>
 
-          <!-- Desa -->
+          
           <div class="group rounded-3xl bg-white border border-slate-200 shadow-sm hover:shadow-card hover:border-amber-200 transition-all duration-300 flex flex-col overflow-hidden relative">
             <div class="absolute top-0 right-0 p-4 opacity-5 pointer-events-none transition-transform group-hover:scale-110 duration-500">
               <i class="fa-solid fa-house-flag text-8xl"></i>

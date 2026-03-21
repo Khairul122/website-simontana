@@ -37,7 +37,7 @@ foreach ($rows as $metricRow) {
     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative">
       <div class="p-4 md:p-6 lg:p-8 w-full">
 
-        <!-- Page Header -->
+        
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
             <h1 class="font-display text-2xl md:text-3xl font-bold text-slate-900">Operasi Tindak Lanjut</h1>
@@ -60,7 +60,7 @@ foreach ($rows as $metricRow) {
           </div>
         <?php endif; ?>
 
-        <!-- Active Operations KPI -->
+        
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div class="rounded-xl bg-white border border-slate-200 p-4 shadow-sm">
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Data</p>
@@ -80,7 +80,7 @@ foreach ($rows as $metricRow) {
           </div>
         </div>
 
-        <!-- Filter & Search Panel -->
+        
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-end">
           <div class="w-full md:w-64 shrink-0">
             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Filter Tahapan</label>
@@ -116,7 +116,7 @@ foreach ($rows as $metricRow) {
           </div>
         </div>
 
-        <!-- Table View -->
+        
         <div class="rounded-2xl border border-slate-200 bg-white shadow-card overflow-hidden">
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
