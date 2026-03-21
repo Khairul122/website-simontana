@@ -204,8 +204,7 @@ foreach ($users as $u) {
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    
-    // Delegation for delete buttons
+
     document.addEventListener('click', function(event) {
       const button = event.target.closest('.btn-delete');
       if (!button) return;
@@ -248,7 +247,6 @@ foreach ($users as $u) {
       }
     });
 
-    // Handle toast params
     const urlParams = new URLSearchParams(window.location.search);
     if(urlParams.has('success') && typeof Swal !== 'undefined') {
         Swal.fire({

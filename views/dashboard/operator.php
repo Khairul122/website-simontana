@@ -248,8 +248,7 @@
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const dataReportChart = <?php echo json_encode($dashboardData['data']['laporan_terbaru'] ?? []); ?>;
-    
-    // Safety check ensuring we only have valid canvas container
+
     const ctxCanvas = document.getElementById('reportChart');
     if (ctxCanvas && dataReportChart.length > 0) {
        const lbl = dataReportChart.map(i => i.judul_laporan ? (i.judul_laporan.substring(0,20) + (i.judul_laporan.length > 20 ? '...' : '')) : 'Incident');
@@ -290,7 +289,7 @@
           }
        });
     } else if (ctxCanvas) {
-       // Destroy the non-useful canvas visually
+
        ctxCanvas.parentElement.innerHTML = '<div class="absolute inset-0 flex items-center justify-center"><p class="text-xs font-bold text-slate-400 bg-slate-50 px-4 py-2 rounded-xl border border-slate-100 flex items-center gap-2"><i class="fa-solid fa-ban"></i> Data Chart Belum Ada.</p></div>';
     }
   });

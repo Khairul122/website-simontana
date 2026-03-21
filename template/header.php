@@ -31,7 +31,7 @@
               400: '#f87171',
               500: '#ef4444',
               600: '#dc2626',
-              700: '#b91c1c',  /* Primary UI Red */
+              700: '#b91c1c',  
               800: '#991b1b',
               900: '#7f1d1d'
             },
@@ -69,13 +69,13 @@
   </script>
 
   <style>
-    /* Global scrollbar */
+    
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-    /* Fix utility classes for old views temporarily */
+    
     .container-scroller { display: flex; height: 100vh; overflow: hidden; background-color: #f8fafc; }
     .page-body-wrapper { display: flex; flex: 1; flex-direction: column; overflow: hidden; }
     .main-panel { flex: 1; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; }
@@ -86,7 +86,7 @@
       .page-body-wrapper { flex-direction: column; }
     }
 
-    /* Custom classes */
+    
     .glass-nav { 
       background: rgba(255, 255, 255, 0.85); 
       backdrop-filter: blur(12px); 

@@ -223,7 +223,7 @@
 
 <?php include 'template/script.php'; ?>
 <script>
-// --- Hierarchical Manual Search Script ---
+
 async function fetchWilayahOptions(url, selectId, nextSelectIds = []) {
     const selectEl = document.getElementById(selectId);
     if (!selectEl) return;
@@ -231,7 +231,6 @@ async function fetchWilayahOptions(url, selectId, nextSelectIds = []) {
     selectEl.innerHTML = '<option value="">Memuat...</option>';
     selectEl.disabled = true;
 
-    // Reset and disable subsequent dropdowns
     nextSelectIds.forEach(id => {
         const el = document.getElementById(id);
         if (el) {
@@ -240,7 +239,6 @@ async function fetchWilayahOptions(url, selectId, nextSelectIds = []) {
         }
     });
 
-    // Disable submit button during load
     const btnCari = document.getElementById('btnManualCari');
     if (btnCari) btnCari.disabled = true;
 
@@ -289,7 +287,6 @@ function loadDesa() {
     }
 }
 
-// Enable/disable submit button based on Desa selection
 document.addEventListener('DOMContentLoaded', function() {
     const desaEl = document.getElementById('id_desa');
     const btnCari = document.getElementById('btnManualCari');

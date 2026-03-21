@@ -248,7 +248,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-  // Setup Modal Image Fullscreen
+
   function openFullscreen(src, type) {
     if(type === 'image') {
       document.getElementById('modalImage').src = src;
@@ -264,9 +264,8 @@
     document.body.style.overflow = 'auto';
   }
 
-  // Initialize Maps
   document.addEventListener("DOMContentLoaded", function() {
-      // Safe parsing of PHP variables
+
       var latRaw = "<?php echo $laporan['latitude'] ?? ''; ?>";
       var lngRaw = "<?php echo $laporan['longitude'] ?? ''; ?>";
       var latitude = parseFloat(latRaw);
@@ -289,7 +288,6 @@
       }
   });
 
-  // Close modal on escape
   document.addEventListener('keydown', function(event){
     if(event.key === "Escape"){
       closeFullscreen();

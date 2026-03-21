@@ -161,7 +161,6 @@ $rows = is_array($riwayat ?? null) ? $riwayat : [];
     });
   }
 
-  // Simple search filter
   document.getElementById('searchInput').addEventListener('keyup', function() {
       let filter = this.value.toLowerCase();
       let rows = document.querySelectorAll('#dataTable tbody tr');

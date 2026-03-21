@@ -135,7 +135,7 @@
         flex: 1;
     }
 
-    /* Responsive Design */
+    
     @media (max-width: 768px) {
         .footer {
             padding: 40px 0 20px;
@@ -171,7 +171,7 @@
         }
     }
 
-    /* Wave effect on top of footer */
+    
     .footer::before {
         content: "";
         position: absolute;

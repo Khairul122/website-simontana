@@ -231,7 +231,7 @@ include('template/header.php');
   };
 
   document.addEventListener('DOMContentLoaded', function() {
-      // 1. Bar Chart Setup
+
       const barCtx = document.getElementById('barChart');
       if (barCtx && dashboardData.weeklyStats && dashboardData.weeklyStats.success) {
           const weeklyStats = dashboardData.weeklyStats.data?.weekly_stats || {};
@@ -265,7 +265,6 @@ include('template/header.php');
           });
       }
 
-      // 2. Doughnut Chart Setup
       const dogCtx = document.getElementById('doughnutChart');
       if (dogCtx && dashboardData.weeklyStats && dashboardData.weeklyStats.success) {
           const catStats = dashboardData.weeklyStats.data?.categories_stats || {};

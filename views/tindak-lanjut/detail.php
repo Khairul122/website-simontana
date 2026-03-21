@@ -230,7 +230,7 @@ function tindakStatusTheme($statusRaw) {
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-  // Image Viewer Modal
+
   function openFullscreen(src) {
     document.getElementById('modalImage').src = src;
     document.getElementById('modalImage').classList.remove('hidden');
@@ -250,15 +250,13 @@ function tindakStatusTheme($statusRaw) {
     }
   });
 
-  // Maps Init
   document.addEventListener('DOMContentLoaded', function () {
     const mapElement = document.getElementById('map');
     if (!mapElement || typeof L === 'undefined') return;
 
     var latRaw = "<?php echo (string)($tindakLanjut['laporan']['latitude'] ?? ''); ?>";
     var lngRaw = "<?php echo (string)($tindakLanjut['laporan']['longitude'] ?? ''); ?>";
-    
-    // Default Jakarta center if none
+
     const latitude = Number(latRaw) || -6.2;
     const longitude = Number(lngRaw) || 106.816666;
 

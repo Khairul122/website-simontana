@@ -170,7 +170,7 @@ function navIconActive($controllers, $current) {
 </aside>
 
 <script>
-  // Script untuk menutup sidebar jika click diluar sidebar pada mode mobile
+
   document.addEventListener('click', function(e) {
     if (document.body.classList.contains('sidebar-open')) {
       const sidebar = document.querySelector('.sidebar-container');

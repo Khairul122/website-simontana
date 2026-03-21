@@ -307,8 +307,7 @@ $bmkgGempa = (isset($bmkgData['data']['Magnitude'])) ? $bmkgData['data'] : null;
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     if (typeof Chart === 'undefined') return;
-    
-    // Set global chart defaults to match Tailwind typography
+
     Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
     Chart.defaults.color = "#64748b";
     
@@ -370,7 +369,6 @@ $bmkgGempa = (isset($bmkgData['data']['Magnitude'])) ? $bmkgData['data'] : null;
       const safeLabels = labels.length ? labels : ['Belum ada data'];
       const safeValues = values.length ? values : [1];
 
-      // Beautiful disaster-themed palette
       const colors = ['#dc2626', '#f59e0b', '#0f766e', '#1d4ed8', '#7c2d12', '#475569'];
 
       new Chart(doughnutCtx, {

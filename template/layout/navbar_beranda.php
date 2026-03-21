@@ -97,7 +97,7 @@ $dokumen_menu = $stmt_dokumen->fetchAll(PDO::FETCH_ASSOC);
         background-color: var(--light-bg);
     }
 
-    /* Top Info Bar Styles */
+    
     .top-info-bar {
         background-color: #e5e7eb;
         padding: 8px 0;
@@ -133,7 +133,7 @@ $dokumen_menu = $stmt_dokumen->fetchAll(PDO::FETCH_ASSOC);
         align-items: center;
     }
 
-    /* Navbar Styles */
+    
     .navbar-custom {
         background: #000000;
         padding: 0;
@@ -223,7 +223,7 @@ $dokumen_menu = $stmt_dokumen->fetchAll(PDO::FETCH_ASSOC);
         cursor: pointer;
     }
 
-    /* Dropdown Styles */
+    
     .dropdown-wrapper {
         position: relative;
         display: inline-block;
@@ -238,7 +238,7 @@ $dokumen_menu = $stmt_dokumen->fetchAll(PDO::FETCH_ASSOC);
         padding: 10px 15px;
     }
 
-    /* Universal Chevron Styling - Sama untuk semua level */
+    
     .dropdown-icon,
     .kategori-icon,
     .sub-kategori-icon {
@@ -262,7 +262,7 @@ $dokumen_menu = $stmt_dokumen->fetchAll(PDO::FETCH_ASSOC);
         opacity: 1;
     }
 
-    /* Level 1 Dropdown (Kategori) */
+    
     .dropdown-content {
         display: none;
         position: absolute;
@@ -278,7 +278,7 @@ $dokumen_menu = $stmt_dokumen->fetchAll(PDO::FETCH_ASSOC);
         display: block;
     }
 
-    /* Dropdown Item Wrapper */
+    
     .dropdown-item-wrapper {
         position: relative;
     }
@@ -304,7 +304,7 @@ $dokumen_menu = $stmt_dokumen->fetchAll(PDO::FETCH_ASSOC);
         opacity: 1;
     }
 
-    /* Level 2 Dropdown (Sub Layanan) */
+    
     .dropdown-sub {
         display: none;
         position: absolute;
@@ -339,7 +339,7 @@ $dokumen_menu = $stmt_dokumen->fetchAll(PDO::FETCH_ASSOC);
         border-bottom: none;
     }
 
-    /* Sub Item Wrapper (untuk level 3) */
+    
     .dropdown-sub-item-wrapper {
         position: relative;
     }
@@ -365,7 +365,7 @@ $dokumen_menu = $stmt_dokumen->fetchAll(PDO::FETCH_ASSOC);
         opacity: 1;
     }
 
-    /* Level 3 Dropdown (Sub Layanan 2) */
+    
     .dropdown-sub-2 {
         display: none;
         position: absolute;
@@ -400,7 +400,7 @@ $dokumen_menu = $stmt_dokumen->fetchAll(PDO::FETCH_ASSOC);
         border-bottom: none;
     }
 
-    /* Direct Link (Tanpa Sub) */
+    
     .dropdown-kategori-direct {
         display: block;
         padding: 12px 20px;
@@ -416,7 +416,7 @@ $dokumen_menu = $stmt_dokumen->fetchAll(PDO::FETCH_ASSOC);
         padding-left: 30px;
     }
 
-    /* Mobile Responsive */
+    
     @media (max-width: 768px) {
         .dropdown-content {
             position: static;
@@ -476,7 +476,7 @@ $dokumen_menu = $stmt_dokumen->fetchAll(PDO::FETCH_ASSOC);
         }
     }
 
-    /* Responsive Design */
+    
     @media (max-width: 992px) {
         .top-info-bar {
             display: none;
@@ -776,9 +776,9 @@ $dokumen_menu = $stmt_dokumen->fetchAll(PDO::FETCH_ASSOC);
 
 
 <script>
-    // Initialize mobile menu functionality
+
     document.addEventListener('DOMContentLoaded', function() {
-        // Mobile menu toggle
+
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const navLinks = document.getElementById('navLinks');
 
@@ -788,7 +788,6 @@ $dokumen_menu = $stmt_dokumen->fetchAll(PDO::FETCH_ASSOC);
             });
         }
 
-        // Close mobile menu when clicking outside
         document.addEventListener('click', function(event) {
             if (navLinks && mobileMenuBtn && 
                 !navLinks.contains(event.target) && 
@@ -797,8 +796,7 @@ $dokumen_menu = $stmt_dokumen->fetchAll(PDO::FETCH_ASSOC);
             }
         });
 
-        // Mobile dropdown handling
-        // Main dropdown toggle
+
         const mainLinks = document.querySelectorAll('.nav-link-main');
         mainLinks.forEach(function(link) {
             link.addEventListener('click', function(e) {
@@ -812,7 +810,6 @@ $dokumen_menu = $stmt_dokumen->fetchAll(PDO::FETCH_ASSOC);
             });
         });
 
-        // Category toggle for mobile (Level 2)
         const kategoriLinks = document.querySelectorAll('.dropdown-kategori');
         kategoriLinks.forEach(function(link) {
             link.addEventListener('click', function(e) {
@@ -826,7 +823,6 @@ $dokumen_menu = $stmt_dokumen->fetchAll(PDO::FETCH_ASSOC);
             });
         });
 
-        // Sub Category toggle for mobile (Level 3)
         const subKategoriLinks = document.querySelectorAll('.dropdown-sub-kategori');
         subKategoriLinks.forEach(function(link) {
             link.addEventListener('click', function(e) {

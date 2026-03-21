@@ -265,7 +265,7 @@ foreach ($reportRows as $reportItem) {
 <?php include 'template/script.php'; ?>
 
 <script>
-  // Select all checkbox functionality
+
   document.getElementById('selectAll').addEventListener('change', function() {
     const checkboxes = document.querySelectorAll('.row-checkbox');
     checkboxes.forEach(checkbox => {
@@ -273,7 +273,6 @@ foreach ($reportRows as $reportItem) {
     });
   });
 
-  // Search logic (live filtering client-side for visible rows)
   document.getElementById('search').addEventListener('keyup', function() {
     const searchTerm = this.value.toLowerCase();
     const rows = document.querySelectorAll('#laporanTable tbody tr');
@@ -283,10 +282,9 @@ foreach ($reportRows as $reportItem) {
     });
   });
 
-  // Table Sorting logic
   document.querySelectorAll('#laporanTable th.sortable').forEach((header, index) => {
     header.addEventListener('click', function() {
-      // Index is +1 because of checkbox column check
+
       sortTable(index + 1);
     });
   });
@@ -319,7 +317,6 @@ foreach ($reportRows as $reportItem) {
     rows.forEach(row => tbody.appendChild(row));
   }
 
-  // Bulk Delete
   function bulkDelete() {
     const selectedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
     if (selectedCheckboxes.length === 0) {
@@ -365,7 +362,6 @@ foreach ($reportRows as $reportItem) {
     });
   }
 
-  // Single Delete
   document.addEventListener('submit', function(event) {
     const form = event.target.closest('.delete-laporan-form');
     if (!form) return;
