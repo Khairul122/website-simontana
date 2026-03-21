@@ -6,6 +6,7 @@ require_once __DIR__ . '/../config/koneksi.php';
 class TindakLanjutService
 {
     private $apiEndpoint;
+    private array $idKeys = ['id_tindaklanjut', 'tindaklanjut_id', 'id'];
 
     public function __construct()
     {
@@ -22,6 +23,47 @@ class TindakLanjutService
         return getAuthHeaders($token);
     }
 
+    private function mapItem(array $item): array
+    {
+        $id = apiResolveId($item, $this->idKeys);
+        if ($id > 0) {
+            $item['id'] = $id;
+            $item['id_tindaklanjut'] = $item['id_tindaklanjut'] ?? $id;
+        }
+
+        $laporanId = (int)($item['laporan_id'] ?? ($item['laporan']['id'] ?? 0));
+        $petugasId = (int)($item['id_petugas'] ?? ($item['petugas']['id'] ?? 0));
+
+        $item['laporan_id'] = $laporanId > 0 ? $laporanId : null;
+        $item['petugas_id'] = $petugasId > 0 ? $petugasId : null;
+
+        $item['laporan_judul'] = $item['laporan']['judul_laporan']
+            ?? $item['laporan']['judul']
+            ?? null;
+
+        $item['pelapor_nama'] = $item['laporan']['pelapor']['nama']
+            ?? $item['pelapor']['nama']
+            ?? null;
+
+        $item['petugas_nama'] = $item['petugas']['nama']
+            ?? $item['operator']['nama']
+            ?? $item['user']['nama']
+            ?? null;
+
+        return $item;
+    }
+
+    private function mapList(array $rows): array
+    {
+        $mapped = [];
+        foreach ($rows as $row) {
+            if (is_array($row)) {
+                $mapped[] = $this->mapItem($row);
+            }
+        }
+        return $mapped;
+    }
+
     /**
      * Ambil semua tindak lanjut
      */
@@ -36,7 +78,11 @@ class TindakLanjutService
 
         $headers = $this->getHeaders();
 
-        return apiRequest($url, 'GET', null, $headers);
+        $response = apiRequest($url, 'GET', null, $headers);
+        if ($response['success']) {
+            $response['data'] = $this->mapList(apiDataList($response['data']));
+        }
+        return $response;
     }
 
     /**
@@ -47,7 +93,11 @@ class TindakLanjutService
         $url = buildApiUrlTindakLanjutById($id);
         $headers = $this->getHeaders();
 
-        return apiRequest($url, 'GET', null, $headers);
+        $response = apiRequest($url, 'GET', null, $headers);
+        if ($response['success']) {
+            $response['data'] = $this->mapItem(apiDataEntity($response['data']));
+        }
+        return $response;
     }
 
     /**
@@ -83,11 +133,19 @@ class TindakLanjutService
                 'data' => $multipartData
             ];
 
-            return apiRequest($this->apiEndpoint, 'POST', $requestData);
+            $response = apiRequest($this->apiEndpoint, 'POST', $requestData);
+            if ($response['success']) {
+                $response['data'] = $this->mapItem(apiDataEntity($response['data']));
+            }
+            return $response;
         } else {
             // No files, send as JSON
             $headers = $this->getHeaders();
-            return apiRequest($this->apiEndpoint, 'POST', $data, $headers);
+            $response = apiRequest($this->apiEndpoint, 'POST', $data, $headers);
+            if ($response['success']) {
+                $response['data'] = $this->mapItem(apiDataEntity($response['data']));
+            }
+            return $response;
         }
     }
 
@@ -126,11 +184,19 @@ class TindakLanjutService
                 'data' => $multipartData
             ];
 
-            return apiRequest($url, 'PUT', $requestData);
+            $response = apiRequest($url, 'PUT', $requestData);
+            if ($response['success']) {
+                $response['data'] = $this->mapItem(apiDataEntity($response['data']));
+            }
+            return $response;
         } else {
             // No files, send as JSON
             $headers = $this->getHeaders();
-            return apiRequest($url, 'PUT', $data, $headers);
+            $response = apiRequest($url, 'PUT', $data, $headers);
+            if ($response['success']) {
+                $response['data'] = $this->mapItem(apiDataEntity($response['data']));
+            }
+            return $response;
         }
     }
 
@@ -151,7 +217,11 @@ class TindakLanjutService
     public function getAllLaporan()
     {
         $headers = $this->getHeaders();
-        return apiRequest(API_LAPORANS, 'GET', null, $headers);
+        $response = apiRequest(API_LAPORANS, 'GET', null, $headers);
+        if ($response['success']) {
+            $response['data'] = apiDataList($response['data']);
+        }
+        return $response;
     }
 
     /**
@@ -160,6 +230,10 @@ class TindakLanjutService
     public function getAllPetugas()
     {
         $headers = $this->getHeaders();
-        return apiRequest(API_USERS . '?role=PetugasBPBD', 'GET', null, $headers);
+        $response = apiRequest(API_USERS . '?role=PetugasBPBD', 'GET', null, $headers);
+        if ($response['success']) {
+            $response['data'] = apiDataList($response['data']);
+        }
+        return $response;
     }
 }

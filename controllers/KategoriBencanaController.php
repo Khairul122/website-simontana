@@ -19,7 +19,7 @@ class KategoriBencanaController
     private function checkRole()
     {
         if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'Admin') {
-            header('Location: ../login.php');
+            header('Location: index.php?controller=Auth&action=login');
             exit();
         }
     }
@@ -33,8 +33,14 @@ class KategoriBencanaController
 
         $response = $this->service->getAll();
 
-        // Set session untuk debugging
-        $_SESSION['server_response'] = $response;
+        $kategoriRows = [];
+        $fetchError = null;
+
+        if ($response['success']) {
+            $kategoriRows = is_array($response['data'] ?? null) ? $response['data'] : [];
+        } else {
+            $fetchError = $response['message'] ?? 'Terjadi kesalahan pada server.';
+        }
 
         // Load view
         include __DIR__ . '/../views/kategori-bencana/index.php';
@@ -65,11 +71,7 @@ class KategoriBencanaController
 
         // Validasi ID
         if (!$id) {
-            $_SESSION['toast_message'] = [
-                'type' => 'error',
-                'title' => 'Error',
-                'message' => 'ID tidak ditemukan'
-            ];
+            setDialog('Error', 'ID tidak ditemukan', 'error');
             header('Location: index.php?controller=KategoriBencana&action=index');
             exit;
         }
@@ -77,36 +79,20 @@ class KategoriBencanaController
         $response = $this->service->getById($id);
 
         if (!$response['success']) {
-            $_SESSION['toast_message'] = [
-                'type' => 'error',
-                'title' => 'Error',
-                'message' => $response['message'] ?? 'Gagal mengambil data kategori bencana'
-            ];
+            setDialog('Error', $response['message'] ?? 'Gagal mengambil data kategori bencana', 'error');
             header('Location: index.php?controller=KategoriBencana&action=index');
             exit();
         }
 
-        // Cek struktur data yang dikembalikan API - bisa saja langsung berisi data atau dalam nested array
-        if (isset($response['data']['data'])) {
-            // Format biasanya untuk response list, tapi mungkin juga untuk single
-            $kategori = $response['data']['data'];
-        } elseif (isset($response['data']) && !empty($response['data'])) {
-            // Format untuk response single item
-            $kategori = $response['data'];
-        } else {
-            $_SESSION['toast_message'] = [
-                'type' => 'error',
-                'title' => 'Error',
-                'message' => 'Kategori bencana tidak ditemukan'
-            ];
+        if (empty($response['data']) || !is_array($response['data'])) {
+            setDialog('Error', 'Kategori bencana tidak ditemukan', 'error');
             header('Location: index.php?controller=KategoriBencana&action=index');
             exit();
         }
+
+        $kategori = $response['data'];
 
         $isEdit = true;
-
-        // Set session untuk debugging saat edit
-        $_SESSION['server_response_edit'] = $response;
 
         include __DIR__ . '/../views/kategori-bencana/form.php';
     }
@@ -130,11 +116,7 @@ class KategoriBencanaController
 
         // Validasi
         if (empty($nama_kategori)) {
-            $_SESSION['toast_message'] = [
-                'type' => 'error',
-                'title' => 'Error',
-                'message' => 'Nama kategori wajib diisi'
-            ];
+            setDialog('Error', 'Nama kategori wajib diisi', 'error');
             header('Location: index.php?controller=KategoriBencana&action=create');
             exit();
         }
@@ -185,11 +167,7 @@ class KategoriBencanaController
 
         // Validasi
         if (empty($nama_kategori)) {
-            $_SESSION['toast_message'] = [
-                'type' => 'error',
-                'title' => 'Error',
-                'message' => 'Nama kategori wajib diisi'
-            ];
+            setDialog('Error', 'Nama kategori wajib diisi', 'error');
             header('Location: index.php?controller=KategoriBencana&action=edit&id=' . $id);
             exit();
         }

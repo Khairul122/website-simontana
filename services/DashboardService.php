@@ -17,6 +17,10 @@ class DashboardService {
         
         return getAuthHeaders($token);
     }
+
+    private function extractList($data): array {
+        return apiDataList($data);
+    }
     
     // Fungsi untuk mendapatkan statistik dasbor admin
     public function getAdminDashboardStats() {
@@ -157,14 +161,9 @@ class DashboardService {
             return 0;
         }
 
-        // Jika respons dalam format pagination (dengan properti 'data' sebagai array)
-        if (isset($response['data']['data']) && is_array($response['data']['data'])) {
-            return count($response['data']['data']);
-        }
-
-        // Jika respons dalam format data langsung (bukan pagination)
-        if (is_array($response['data'])) {
-            return count($response['data']);
+        $list = $this->extractList($response['data']);
+        if (!empty($list)) {
+            return count($list);
         }
 
         // Jika respons berisi informasi jumlah secara eksplisit
@@ -196,7 +195,10 @@ class DashboardService {
         $url = API_LAPORANS . "?limit={$limit}";
         $response = apiRequest($url, 'GET', null, $headers);
 
-        // Format ulang respons untuk konsistensi
+        if ($response['success']) {
+            $response['data'] = $this->extractList($response['data']);
+        }
+
         return [
             'success' => $response['success'],
             'data' => $response['data'],
@@ -328,11 +330,7 @@ class DashboardService {
             if ($response['success'] && isset($response['data'])) {
 
                 // Ambil data laporan dari respons
-                if (isset($response['data']['data']) && is_array($response['data']['data'])) {
-                    $laporan_list = $response['data']['data'];
-                } elseif (is_array($response['data'])) {
-                    $laporan_list = $response['data'];
-                }
+                $laporan_list = $this->extractList($response['data']);
 
                 // Hitung total laporan
                 $total_laporan = count($laporan_list);

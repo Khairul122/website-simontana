@@ -745,7 +745,7 @@ $dokumen_menu = $stmt_dokumen->fetchAll(PDO::FETCH_ASSOC);
                         </a>
                     </div>
                 </div>
-                <a href="index.php?controller=auth&action=login">LOGIN</a>
+                <a href="index.php?controller=Auth&action=login">LOGIN</a>
 
                 <div class="nav-social">
                     <a href="https://www.facebook.com/PemkabMandailingNatal" title="Facebook" target="_blank" rel="noopener noreferrer">

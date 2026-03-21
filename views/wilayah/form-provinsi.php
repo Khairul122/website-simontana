@@ -1,57 +1,71 @@
 <?php include('template/header.php'); ?>
 
-<body class="with-welcome-text">
-  <div class="container-scroller">
+<?php
+$isEditMode = (bool) ($isEdit ?? false);
+$pageTitle = $isEditMode ? 'Edit Informasi Provinsi' : 'Input Provinsi Baru';
+$saveLabel = $isEditMode ? 'Simpan Perubahan' : 'Registrasi Provinsi';
+$idProvinsi = (int) ($provinsi['id'] ?? 0);
+?>
+
+<div class="flex h-screen overflow-hidden bg-slate-50">
+  <?php include 'template/sidebar.php'; ?>
+  
+  <div class="flex-1 flex flex-col overflow-hidden">
     <?php include 'template/navbar.php'; ?>
-    <div class="container-fluid page-body-wrapper">
-      <?php include 'template/setting_panel.php'; ?>
-      <?php include 'template/sidebar.php'; ?>
-      <div class="main-panel">
-        <div class="content-wrapper">
-          <div class="row">
-            <div class="col-sm-12">
-              <div class="page-header">
-                <h3 class="page-title"><?php echo $isEdit ? 'Edit' : 'Tambah'; ?> Provinsi</h3>
-                <nav aria-label="breadcrumb">
-                  <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="index.php">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="index.php?controller=Wilayah&action=indexProvinsi">Wilayah</a></li>
-                    <li class="breadcrumb-item active" aria-current="page"><?php echo $isEdit ? 'Edit' : 'Tambah'; ?> Provinsi</li>
-                  </ol>
-                </nav>
-              </div>
+    
+    <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative">
+      <div class="p-4 md:p-6 lg:p-8 w-full">
 
-              <div class="row">
-                <div class="col-lg-8 mx-auto">
-                  <div class="card">
-                    <div class="card-body">
-                      <h4 class="card-title"><?php echo $isEdit ? 'Edit' : 'Tambah'; ?> Data Provinsi</h4>
-                      <p class="card-description"><?php echo $isEdit ? 'Edit' : 'Tambah'; ?> data provinsi baru</p>
-
-                      <form action="index.php?controller=Wilayah&action=<?php echo $isEdit ? 'updateProvinsi&id=' . $provinsi['id'] : 'storeProvinsi'; ?>" method="POST" class="forms-sample">
-                        <div class="form-group row">
-                          <label for="nama" class="col-sm-3 col-form-label">Nama Provinsi</label>
-                          <div class="col-sm-9">
-                            <input type="text" class="form-control" id="nama" name="nama" placeholder="Masukkan nama provinsi"
-                              value="<?php echo htmlspecialchars($provinsi['nama'] ?? $provinsi['name'] ?? ''); ?>" required>
-                          </div>
-                        </div>
-
-                        <div class="mt-4">
-                          <button type="submit" class="btn btn-primary mr-2"><?php echo $isEdit ? 'Update' : 'Simpan'; ?></button>
-                          <a href="index.php?controller=Wilayah&action=indexProvinsi" class="btn btn-light">Batal</a>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-              </div>
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+          <div class="flex items-center gap-4">
+            <a href="index.php?controller=Wilayah&action=indexProvinsi" class="flex items-center justify-center h-10 w-10 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-brand-600 hover:bg-brand-50 hover:border-brand-200 transition-all shadow-sm">
+              <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div>
+              <h1 class="font-display text-2xl font-bold text-slate-900 leading-tight"><?php echo $pageTitle; ?></h1>
+              <p class="text-sm text-slate-500">Kelola record data provinsi sebagai fondasi struktur daerah.</p>
             </div>
           </div>
         </div>
+
+        <div class="rounded-2xl bg-white border border-slate-200 shadow-card overflow-hidden">
+          <form method="POST" action="index.php?controller=Wilayah&action=<?php echo $isEditMode ? ('updateProvinsi&id=' . $idProvinsi) : 'storeProvinsi'; ?>" class="p-6 md:p-8">
+            
+            <div class="space-y-6">
+              <div>
+                <label for="nama" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nama Provinsi Valid (Level 1) <span class="text-red-500">*</span></label>
+                <div class="relative">
+                  <i class="fa-solid fa-map absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                  <input
+                    type="text"
+                    class="w-full rounded-xl border border-slate-300 bg-slate-50 py-3 pl-11 pr-4 text-sm font-bold text-slate-800 outline-none transition-all focus:border-brand-500 focus:bg-white"
+                    id="nama"
+                    name="nama"
+                    value="<?php echo htmlspecialchars($provinsi['nama'] ?? $provinsi['name'] ?? ''); ?>"
+                    placeholder="Contoh: Jawa Timur, DKI Jakarta"
+                    required
+                  >
+                </div>
+                <p class="text-xs text-slate-400 mt-1.5 font-medium">Beri penamaan yang representatif tanpa disingkat jika memungkinkan (Cth: Kalimantan Barat vs Kalbar).</p>
+              </div>
+            </div>
+            
+            <div class="mt-8 pt-5 border-t border-slate-100 flex items-center justify-end gap-3">
+              <a href="index.php?controller=Wilayah&action=indexProvinsi" class="px-5 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors">
+                Kembali
+              </a>
+              <button type="submit" class="px-6 py-2.5 rounded-xl bg-brand-600 text-sm font-bold text-white hover:bg-brand-700 hover:shadow-float transition-all shadow-sm">
+                <i class="fa-solid fa-database mr-1.5"></i> <?php echo $saveLabel; ?>
+              </button>
+            </div>
+
+          </form>
+        </div>
+
       </div>
-    </div>
+    </main>
   </div>
-  <?php include 'template/script.php'; ?>
-</body>
-</html>
+</div>
+
+<?php include 'template/script.php'; ?>

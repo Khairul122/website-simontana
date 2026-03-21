@@ -7,15 +7,30 @@ class WilayahController
 {
     private $service;
 
+    private function redirectWithDialog(string $title, string $message, string $url, string $type = 'info'): void
+    {
+        setDialog($title, $message, $type);
+        header('Location: ' . $url);
+        exit;
+    }
+
     public function __construct()
     {
         // Cek otentikasi pengguna
         if (!isset($_SESSION['user'])) {
-            header('Location: ../login.php');
+            header('Location: index.php?controller=Auth&action=login');
             exit();
         }
         
         $this->service = new WilayahService();
+    }
+
+    /**
+     * Halaman ringkasan manajemen wilayah
+     */
+    public function index()
+    {
+        include __DIR__ . '/../views/wilayah/index.php';
     }
 
     /**
@@ -64,8 +79,7 @@ class WilayahController
 
         // Validasi
         if (empty($nama)) {
-            echo '<script>alert("Nama provinsi wajib diisi"); window.location.href="index.php?controller=Wilayah&action=createProvinsi";</script>';
-            exit();
+            $this->redirectWithDialog('Gagal', 'Nama provinsi wajib diisi', 'index.php?controller=Wilayah&action=createProvinsi', 'error');
         }
 
         // Data untuk dikirim ke API
@@ -77,9 +91,9 @@ class WilayahController
         $response = $this->service->store($data, 'provinsi');
 
         if ($response['success']) {
-            echo '<script>alert("Provinsi berhasil ditambahkan"); window.location.href="index.php?controller=Wilayah&action=indexProvinsi";</script>';
+            $this->redirectWithDialog('Berhasil', 'Provinsi berhasil ditambahkan', 'index.php?controller=Wilayah&action=indexProvinsi', 'success');
         } else {
-            echo '<script>alert("Gagal menambahkan provinsi: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexProvinsi";</script>';
+            $this->redirectWithDialog('Gagal', 'Gagal menambahkan provinsi: ' . ($response['message'] ?? 'Terjadi kesalahan'), 'index.php?controller=Wilayah&action=indexProvinsi', 'error');
         }
         exit();
     }
@@ -94,26 +108,20 @@ class WilayahController
 
         // Validasi ID
         if (!$id) {
-            echo '<script>alert("ID tidak ditemukan"); window.location.href="index.php?controller=Wilayah&action=indexProvinsi";</script>';
-            exit;
+            $this->redirectWithDialog('Gagal', 'ID tidak ditemukan', 'index.php?controller=Wilayah&action=indexProvinsi', 'error');
         }
 
         $response = $this->service->getById($id, 'provinsi');
 
         if (!$response['success']) {
-            echo '<script>alert("Gagal mengambil data provinsi: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexProvinsi";</script>';
-            exit();
+            $this->redirectWithDialog('Gagal', 'Gagal mengambil data provinsi: ' . ($response['message'] ?? 'Terjadi kesalahan'), 'index.php?controller=Wilayah&action=indexProvinsi', 'error');
         }
 
-        // Cek struktur data yang dikembalikan API
-        if (isset($response['data']['data'])) {
-            $provinsi = $response['data']['data'];
-        } elseif (isset($response['data']) && !empty($response['data'])) {
-            $provinsi = $response['data'];
-        } else {
-            echo '<script>alert("Provinsi tidak ditemukan"); window.location.href="index.php?controller=Wilayah&action=indexProvinsi";</script>';
-            exit();
+        if (empty($response['data']) || !is_array($response['data'])) {
+            $this->redirectWithDialog('Gagal', 'Provinsi tidak ditemukan', 'index.php?controller=Wilayah&action=indexProvinsi', 'error');
         }
+
+        $provinsi = $response['data'];
 
         $isEdit = true;
 
@@ -144,8 +152,7 @@ class WilayahController
 
         // Validasi
         if (empty($nama)) {
-            echo '<script>alert("Nama provinsi wajib diisi"); window.location.href="index.php?controller=Wilayah&action=editProvinsi&id=' . $id . '";</script>';
-            exit();
+            $this->redirectWithDialog('Gagal', 'Nama provinsi wajib diisi', 'index.php?controller=Wilayah&action=editProvinsi&id=' . $id, 'error');
         }
 
         // Data untuk dikirim ke API
@@ -157,9 +164,9 @@ class WilayahController
         $response = $this->service->update($id, $data, 'provinsi');
 
         if ($response['success']) {
-            echo '<script>alert("Provinsi berhasil diperbarui"); window.location.href="index.php?controller=Wilayah&action=indexProvinsi";</script>';
+            $this->redirectWithDialog('Berhasil', 'Provinsi berhasil diperbarui', 'index.php?controller=Wilayah&action=indexProvinsi', 'success');
         } else {
-            echo '<script>alert("Gagal memperbarui provinsi: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexProvinsi";</script>';
+            $this->redirectWithDialog('Gagal', 'Gagal memperbarui provinsi: ' . ($response['message'] ?? 'Terjadi kesalahan'), 'index.php?controller=Wilayah&action=indexProvinsi', 'error');
         }
         exit();
     }
@@ -187,9 +194,9 @@ class WilayahController
         $response = $this->service->delete($id, 'provinsi');
 
         if ($response['success']) {
-            echo '<script>alert("Provinsi berhasil dihapus"); window.location.href="index.php?controller=Wilayah&action=indexProvinsi";</script>';
+            $this->redirectWithDialog('Berhasil', 'Provinsi berhasil dihapus', 'index.php?controller=Wilayah&action=indexProvinsi', 'success');
         } else {
-            echo '<script>alert("Gagal menghapus provinsi: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexProvinsi";</script>';
+            $this->redirectWithDialog('Gagal', 'Gagal menghapus provinsi: ' . ($response['message'] ?? 'Terjadi kesalahan'), 'index.php?controller=Wilayah&action=indexProvinsi', 'error');
         }
         exit();
     }
@@ -266,13 +273,11 @@ class WilayahController
 
         // Validasi
         if (empty($nama)) {
-            echo '<script>alert("Nama kabupaten wajib diisi"); window.location.href="index.php?controller=Wilayah&action=createKabupaten";</script>';
-            exit();
+            $this->redirectWithDialog('Gagal', 'Nama kabupaten wajib diisi', 'index.php?controller=Wilayah&action=createKabupaten', 'error');
         }
 
         if (empty($id_provinsi)) {
-            echo '<script>alert("Provinsi wajib dipilih"); window.location.href="index.php?controller=Wilayah&action=createKabupaten";</script>';
-            exit();
+            $this->redirectWithDialog('Gagal', 'Provinsi wajib dipilih', 'index.php?controller=Wilayah&action=createKabupaten', 'error');
         }
 
         // Data untuk dikirim ke API
@@ -285,9 +290,9 @@ class WilayahController
         $response = $this->service->store($data, 'kabupaten');
 
         if ($response['success']) {
-            echo '<script>alert("Kabupaten berhasil ditambahkan"); window.location.href="index.php?controller=Wilayah&action=indexKabupaten";</script>';
+            $this->redirectWithDialog('Berhasil', 'Kabupaten berhasil ditambahkan', 'index.php?controller=Wilayah&action=indexKabupaten', 'success');
         } else {
-            echo '<script>alert("Gagal menambahkan kabupaten: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexKabupaten";</script>';
+            $this->redirectWithDialog('Gagal', 'Gagal menambahkan kabupaten: ' . ($response['message'] ?? 'Terjadi kesalahan'), 'index.php?controller=Wilayah&action=indexKabupaten', 'error');
         }
         exit();
     }
@@ -302,8 +307,7 @@ class WilayahController
 
         // Validasi ID
         if (!$id) {
-            echo '<script>alert("ID tidak ditemukan"); window.location.href="index.php?controller=Wilayah&action=indexKabupaten";</script>';
-            exit;
+            $this->redirectWithDialog('Gagal', 'ID tidak ditemukan', 'index.php?controller=Wilayah&action=indexKabupaten', 'error');
         }
 
         // Ambil semua provinsi untuk dropdown
@@ -317,19 +321,14 @@ class WilayahController
         $response = $this->service->getById($id, 'kabupaten');
 
         if (!$response['success']) {
-            echo '<script>alert("Gagal mengambil data kabupaten: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexKabupaten";</script>';
-            exit();
+            $this->redirectWithDialog('Gagal', 'Gagal mengambil data kabupaten: ' . ($response['message'] ?? 'Terjadi kesalahan'), 'index.php?controller=Wilayah&action=indexKabupaten', 'error');
         }
 
-        // Cek struktur data yang dikembalikan API
-        if (isset($response['data']['data'])) {
-            $kabupaten = $response['data']['data'];
-        } elseif (isset($response['data']) && !empty($response['data'])) {
-            $kabupaten = $response['data'];
-        } else {
-            echo '<script>alert("Kabupaten tidak ditemukan"); window.location.href="index.php?controller=Wilayah&action=indexKabupaten";</script>';
-            exit();
+        if (empty($response['data']) || !is_array($response['data'])) {
+            $this->redirectWithDialog('Gagal', 'Kabupaten tidak ditemukan', 'index.php?controller=Wilayah&action=indexKabupaten', 'error');
         }
+
+        $kabupaten = $response['data'];
 
         $isEdit = true;
 
@@ -361,13 +360,11 @@ class WilayahController
 
         // Validasi
         if (empty($nama)) {
-            echo '<script>alert("Nama kabupaten wajib diisi"); window.location.href="index.php?controller=Wilayah&action=editKabupaten&id=' . $id . '";</script>';
-            exit();
+            $this->redirectWithDialog('Gagal', 'Nama kabupaten wajib diisi', 'index.php?controller=Wilayah&action=editKabupaten&id=' . $id, 'error');
         }
 
         if (empty($id_provinsi)) {
-            echo '<script>alert("Provinsi wajib dipilih"); window.location.href="index.php?controller=Wilayah&action=editKabupaten&id=' . $id . '";</script>';
-            exit();
+            $this->redirectWithDialog('Gagal', 'Provinsi wajib dipilih', 'index.php?controller=Wilayah&action=editKabupaten&id=' . $id, 'error');
         }
 
         // Data untuk dikirim ke API
@@ -380,9 +377,9 @@ class WilayahController
         $response = $this->service->update($id, $data, 'kabupaten');
 
         if ($response['success']) {
-            echo '<script>alert("Kabupaten berhasil diperbarui"); window.location.href="index.php?controller=Wilayah&action=indexKabupaten";</script>';
+            $this->redirectWithDialog('Berhasil', 'Kabupaten berhasil diperbarui', 'index.php?controller=Wilayah&action=indexKabupaten', 'success');
         } else {
-            echo '<script>alert("Gagal memperbarui kabupaten: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexKabupaten";</script>';
+            $this->redirectWithDialog('Gagal', 'Gagal memperbarui kabupaten: ' . ($response['message'] ?? 'Terjadi kesalahan'), 'index.php?controller=Wilayah&action=indexKabupaten', 'error');
         }
         exit();
     }
@@ -410,9 +407,9 @@ class WilayahController
         $response = $this->service->delete($id, 'kabupaten');
 
         if ($response['success']) {
-            echo '<script>alert("Kabupaten berhasil dihapus"); window.location.href="index.php?controller=Wilayah&action=indexKabupaten";</script>';
+            $this->redirectWithDialog('Berhasil', 'Kabupaten berhasil dihapus', 'index.php?controller=Wilayah&action=indexKabupaten', 'success');
         } else {
-            echo '<script>alert("Gagal menghapus kabupaten: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexKabupaten";</script>';
+            $this->redirectWithDialog('Gagal', 'Gagal menghapus kabupaten: ' . ($response['message'] ?? 'Terjadi kesalahan'), 'index.php?controller=Wilayah&action=indexKabupaten', 'error');
         }
         exit();
     }
@@ -510,13 +507,11 @@ class WilayahController
 
         // Validasi
         if (empty($nama)) {
-            echo '<script>alert("Nama kecamatan wajib diisi"); window.location.href="index.php?controller=Wilayah&action=createKecamatan";</script>';
-            exit();
+            $this->redirectWithDialog('Gagal', 'Nama kecamatan wajib diisi', 'index.php?controller=Wilayah&action=createKecamatan', 'error');
         }
 
         if (empty($id_kabupaten)) {
-            echo '<script>alert("Kabupaten wajib dipilih"); window.location.href="index.php?controller=Wilayah&action=createKecamatan";</script>';
-            exit();
+            $this->redirectWithDialog('Gagal', 'Kabupaten wajib dipilih', 'index.php?controller=Wilayah&action=createKecamatan', 'error');
         }
 
         // Data untuk dikirim ke API
@@ -529,9 +524,9 @@ class WilayahController
         $response = $this->service->store($data, 'kecamatan');
 
         if ($response['success']) {
-            echo '<script>alert("Kecamatan berhasil ditambahkan"); window.location.href="index.php?controller=Wilayah&action=indexKecamatan";</script>';
+            $this->redirectWithDialog('Berhasil', 'Kecamatan berhasil ditambahkan', 'index.php?controller=Wilayah&action=indexKecamatan', 'success');
         } else {
-            echo '<script>alert("Gagal menambahkan kecamatan: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexKecamatan";</script>';
+            $this->redirectWithDialog('Gagal', 'Gagal menambahkan kecamatan: ' . ($response['message'] ?? 'Terjadi kesalahan'), 'index.php?controller=Wilayah&action=indexKecamatan', 'error');
         }
         exit();
     }
@@ -546,8 +541,7 @@ class WilayahController
 
         // Validasi ID
         if (!$id) {
-            echo '<script>alert("ID tidak ditemukan"); window.location.href="index.php?controller=Wilayah&action=indexKecamatan";</script>';
-            exit;
+            $this->redirectWithDialog('Gagal', 'ID tidak ditemukan', 'index.php?controller=Wilayah&action=indexKecamatan', 'error');
         }
 
         // Ambil semua provinsi untuk dropdown
@@ -591,19 +585,14 @@ class WilayahController
         $response = $this->service->getById($id, 'kecamatan');
 
         if (!$response['success']) {
-            echo '<script>alert("Gagal mengambil data kecamatan: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexKecamatan";</script>';
-            exit();
+            $this->redirectWithDialog('Gagal', 'Gagal mengambil data kecamatan: ' . ($response['message'] ?? 'Terjadi kesalahan'), 'index.php?controller=Wilayah&action=indexKecamatan', 'error');
         }
 
-        // Cek struktur data yang dikembalikan API
-        if (isset($response['data']['data'])) {
-            $kecamatan = $response['data']['data'];
-        } elseif (isset($response['data']) && !empty($response['data'])) {
-            $kecamatan = $response['data'];
-        } else {
-            echo '<script>alert("Kecamatan tidak ditemukan"); window.location.href="index.php?controller=Wilayah&action=indexKecamatan";</script>';
-            exit();
+        if (empty($response['data']) || !is_array($response['data'])) {
+            $this->redirectWithDialog('Gagal', 'Kecamatan tidak ditemukan', 'index.php?controller=Wilayah&action=indexKecamatan', 'error');
         }
+
+        $kecamatan = $response['data'];
 
         $isEdit = true;
 
@@ -635,13 +624,11 @@ class WilayahController
 
         // Validasi
         if (empty($nama)) {
-            echo '<script>alert("Nama kecamatan wajib diisi"); window.location.href="index.php?controller=Wilayah&action=editKecamatan&id=' . $id . '";</script>';
-            exit();
+            $this->redirectWithDialog('Gagal', 'Nama kecamatan wajib diisi', 'index.php?controller=Wilayah&action=editKecamatan&id=' . $id, 'error');
         }
 
         if (empty($id_kabupaten)) {
-            echo '<script>alert("Kabupaten wajib dipilih"); window.location.href="index.php?controller=Wilayah&action=editKecamatan&id=' . $id . '";</script>';
-            exit();
+            $this->redirectWithDialog('Gagal', 'Kabupaten wajib dipilih', 'index.php?controller=Wilayah&action=editKecamatan&id=' . $id, 'error');
         }
 
         // Data untuk dikirim ke API
@@ -654,9 +641,9 @@ class WilayahController
         $response = $this->service->update($id, $data, 'kecamatan');
 
         if ($response['success']) {
-            echo '<script>alert("Kecamatan berhasil diperbarui"); window.location.href="index.php?controller=Wilayah&action=indexKecamatan";</script>';
+            $this->redirectWithDialog('Berhasil', 'Kecamatan berhasil diperbarui', 'index.php?controller=Wilayah&action=indexKecamatan', 'success');
         } else {
-            echo '<script>alert("Gagal memperbarui kecamatan: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexKecamatan";</script>';
+            $this->redirectWithDialog('Gagal', 'Gagal memperbarui kecamatan: ' . ($response['message'] ?? 'Terjadi kesalahan'), 'index.php?controller=Wilayah&action=indexKecamatan', 'error');
         }
         exit();
     }
@@ -684,9 +671,9 @@ class WilayahController
         $response = $this->service->delete($id, 'kecamatan');
 
         if ($response['success']) {
-            echo '<script>alert("Kecamatan berhasil dihapus"); window.location.href="index.php?controller=Wilayah&action=indexKecamatan";</script>';
+            $this->redirectWithDialog('Berhasil', 'Kecamatan berhasil dihapus', 'index.php?controller=Wilayah&action=indexKecamatan', 'success');
         } else {
-            echo '<script>alert("Gagal menghapus kecamatan: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexKecamatan";</script>';
+            $this->redirectWithDialog('Gagal', 'Gagal menghapus kecamatan: ' . ($response['message'] ?? 'Terjadi kesalahan'), 'index.php?controller=Wilayah&action=indexKecamatan', 'error');
         }
         exit();
     }
@@ -801,13 +788,11 @@ class WilayahController
 
         // Validasi
         if (empty($nama)) {
-            echo '<script>alert("Nama desa wajib diisi"); window.location.href="index.php?controller=Wilayah&action=createDesa";</script>';
-            exit();
+            $this->redirectWithDialog('Gagal', 'Nama desa wajib diisi', 'index.php?controller=Wilayah&action=createDesa', 'error');
         }
 
         if (empty($id_kecamatan)) {
-            echo '<script>alert("Kecamatan wajib dipilih"); window.location.href="index.php?controller=Wilayah&action=createDesa";</script>';
-            exit();
+            $this->redirectWithDialog('Gagal', 'Kecamatan wajib dipilih', 'index.php?controller=Wilayah&action=createDesa', 'error');
         }
 
         // Data untuk dikirim ke API
@@ -820,9 +805,9 @@ class WilayahController
         $response = $this->service->store($data, 'desa');
 
         if ($response['success']) {
-            echo '<script>alert("Desa berhasil ditambahkan"); window.location.href="index.php?controller=Wilayah&action=indexDesa";</script>';
+            $this->redirectWithDialog('Berhasil', 'Desa berhasil ditambahkan', 'index.php?controller=Wilayah&action=indexDesa', 'success');
         } else {
-            echo '<script>alert("Gagal menambahkan desa: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexDesa";</script>';
+            $this->redirectWithDialog('Gagal', 'Gagal menambahkan desa: ' . ($response['message'] ?? 'Terjadi kesalahan'), 'index.php?controller=Wilayah&action=indexDesa', 'error');
         }
         exit();
     }
@@ -837,8 +822,7 @@ class WilayahController
 
         // Validasi ID
         if (!$id) {
-            echo '<script>alert("ID tidak ditemukan"); window.location.href="index.php?controller=Wilayah&action=indexDesa";</script>';
-            exit;
+            $this->redirectWithDialog('Gagal', 'ID tidak ditemukan', 'index.php?controller=Wilayah&action=indexDesa', 'error');
         }
 
         // Ambil semua provinsi untuk dropdown
@@ -870,19 +854,14 @@ class WilayahController
         $response = $this->service->getById($id, 'desa');
 
         if (!$response['success']) {
-            echo '<script>alert("Gagal mengambil data desa: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexDesa";</script>';
-            exit();
+            $this->redirectWithDialog('Gagal', 'Gagal mengambil data desa: ' . ($response['message'] ?? 'Terjadi kesalahan'), 'index.php?controller=Wilayah&action=indexDesa', 'error');
         }
 
-        // Cek struktur data yang dikembalikan API
-        if (isset($response['data']['data'])) {
-            $desa = $response['data']['data'];
-        } elseif (isset($response['data']) && !empty($response['data'])) {
-            $desa = $response['data'];
-        } else {
-            echo '<script>alert("Desa tidak ditemukan"); window.location.href="index.php?controller=Wilayah&action=indexDesa";</script>';
-            exit();
+        if (empty($response['data']) || !is_array($response['data'])) {
+            $this->redirectWithDialog('Gagal', 'Desa tidak ditemukan', 'index.php?controller=Wilayah&action=indexDesa', 'error');
         }
+
+        $desa = $response['data'];
 
         $isEdit = true;
 
@@ -914,13 +893,11 @@ class WilayahController
 
         // Validasi
         if (empty($nama)) {
-            echo '<script>alert("Nama desa wajib diisi"); window.location.href="index.php?controller=Wilayah&action=editDesa&id=' . $id . '";</script>';
-            exit();
+            $this->redirectWithDialog('Gagal', 'Nama desa wajib diisi', 'index.php?controller=Wilayah&action=editDesa&id=' . $id, 'error');
         }
 
         if (empty($id_kecamatan)) {
-            echo '<script>alert("Kecamatan wajib dipilih"); window.location.href="index.php?controller=Wilayah&action=editDesa&id=' . $id . '";</script>';
-            exit();
+            $this->redirectWithDialog('Gagal', 'Kecamatan wajib dipilih', 'index.php?controller=Wilayah&action=editDesa&id=' . $id, 'error');
         }
 
         // Data untuk dikirim ke API
@@ -933,9 +910,9 @@ class WilayahController
         $response = $this->service->update($id, $data, 'desa');
 
         if ($response['success']) {
-            echo '<script>alert("Desa berhasil diperbarui"); window.location.href="index.php?controller=Wilayah&action=indexDesa";</script>';
+            $this->redirectWithDialog('Berhasil', 'Desa berhasil diperbarui', 'index.php?controller=Wilayah&action=indexDesa', 'success');
         } else {
-            echo '<script>alert("Gagal memperbarui desa: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexDesa";</script>';
+            $this->redirectWithDialog('Gagal', 'Gagal memperbarui desa: ' . ($response['message'] ?? 'Terjadi kesalahan'), 'index.php?controller=Wilayah&action=indexDesa', 'error');
         }
         exit();
     }
@@ -963,9 +940,9 @@ class WilayahController
         $response = $this->service->delete($id, 'desa');
 
         if ($response['success']) {
-            echo '<script>alert("Desa berhasil dihapus"); window.location.href="index.php?controller=Wilayah&action=indexDesa";</script>';
+            $this->redirectWithDialog('Berhasil', 'Desa berhasil dihapus', 'index.php?controller=Wilayah&action=indexDesa', 'success');
         } else {
-            echo '<script>alert("Gagal menghapus desa: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=Wilayah&action=indexDesa";</script>';
+            $this->redirectWithDialog('Gagal', 'Gagal menghapus desa: ' . ($response['message'] ?? 'Terjadi kesalahan'), 'index.php?controller=Wilayah&action=indexDesa', 'error');
         }
         exit();
     }

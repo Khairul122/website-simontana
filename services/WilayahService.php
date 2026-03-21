@@ -23,7 +23,11 @@ class WilayahService
         $url = API_WILAYAH_PROVINSI;
         $headers = $this->getHeaders();
 
-        return apiRequest($url, 'GET', null, $headers);
+        $response = apiRequest($url, 'GET', null, $headers);
+        if ($response['success']) {
+            $response['data'] = apiDataList($response['data']);
+        }
+        return $response;
     }
 
     /**
@@ -34,7 +38,11 @@ class WilayahService
         $url = str_replace('{provinsi_id}', $provinsiId, API_WILAYAH_KABUPATEN);
         $headers = $this->getHeaders();
 
-        return apiRequest($url, 'GET', null, $headers);
+        $response = apiRequest($url, 'GET', null, $headers);
+        if ($response['success']) {
+            $response['data'] = apiDataList($response['data']);
+        }
+        return $response;
     }
 
     /**
@@ -45,7 +53,11 @@ class WilayahService
         $url = str_replace('{kabupaten_id}', $kabupatenId, API_WILAYAH_KECAMATAN);
         $headers = $this->getHeaders();
 
-        return apiRequest($url, 'GET', null, $headers);
+        $response = apiRequest($url, 'GET', null, $headers);
+        if ($response['success']) {
+            $response['data'] = apiDataList($response['data']);
+        }
+        return $response;
     }
 
     /**
@@ -56,7 +68,11 @@ class WilayahService
         $url = str_replace('{kecamatan_id}', $kecamatanId, API_WILAYAH_DESA);
         $headers = $this->getHeaders();
 
-        return apiRequest($url, 'GET', null, $headers);
+        $response = apiRequest($url, 'GET', null, $headers);
+        if ($response['success']) {
+            $response['data'] = apiDataList($response['data']);
+        }
+        return $response;
     }
 
     /**
@@ -68,7 +84,22 @@ class WilayahService
         $url .= '?jenis=' . $jenis;
         $headers = $this->getHeaders();
 
-        return apiRequest($url, 'GET', null, $headers);
+        $response = apiRequest($url, 'GET', null, $headers);
+        if ($response['success']) {
+            $response['data'] = apiDataEntity($response['data']);
+        }
+        return $response;
+    }
+
+    public function getWilayahDetailByDesa($desaId)
+    {
+        $url = str_replace('{desa_id}', $desaId, API_WILAYAH_DETAIL);
+        $headers = $this->getHeaders();
+        $response = apiRequest($url, 'GET', null, $headers);
+        if ($response['success']) {
+            $response['data'] = apiDataEntity($response['data']);
+        }
+        return $response;
     }
 
     /**

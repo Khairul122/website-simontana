@@ -1,230 +1,183 @@
-<?php 
+<?php
 include('template/header.php');
 
-// Ambil server response dari session
-$serverLog = $_SESSION['server_response'] ?? null;
+$kategoriRows = isset($kategoriRows) && is_array($kategoriRows) ? $kategoriRows : [];
+$fetchError = isset($fetchError) ? $fetchError : null;
 
-// Hapus session setelah diambil
-unset($_SESSION['server_response']);
+$withIcon = 0;
+foreach ($kategoriRows as $row) {
+  if (!empty($row['icon'])) $withIcon++;
+}
+$withoutIcon = max(0, count($kategoriRows) - $withIcon);
 ?>
 
-<body class="with-welcome-text">
-  <div class="container-scroller">
+<div class="flex h-screen overflow-hidden bg-slate-50">
+  <?php include 'template/sidebar.php'; ?>
+  
+  <div class="flex-1 flex flex-col overflow-hidden">
     <?php include 'template/navbar.php'; ?>
-    <div class="container-fluid page-body-wrapper">
-      <?php include 'template/setting_panel.php'; ?>
-      <?php include 'template/sidebar.php'; ?>
-      <div class="main-panel">
-        <div class="content-wrapper">
-          <div class="row">
-            <div class="col-sm-12">
-              <h2>Manajemen Kategori Bencana</h2>
-              <p class="text-muted">Kelola kategori bencana untuk sistem pelaporan</p>
+    
+    <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative">
+      <div class="p-4 md:p-6 lg:p-8 w-full">
+
+        <!-- Page Header -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+          <div>
+            <h1 class="font-display text-2xl md:text-3xl font-bold text-slate-900">Kategori Bencana</h1>
+            <p class="text-sm text-slate-500 mt-1">Klasifikasi tipe laporan dan mapping ikon untuk dashboard visual.</p>
+          </div>
+          <div class="shrink-0 flex gap-3">
+            <a href="index.php?controller=KategoriBencana&action=create" class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-600 text-white font-bold text-sm hover:bg-brand-700 hover:shadow-float transition-all shadow-sm">
+              <i class="fa-solid fa-plus"></i> Kategori Baru
+            </a>
+          </div>
+        </div>
+
+        <?php if (!empty($fetchError)): ?>
+          <div class="rounded-xl bg-red-50 border border-red-200 p-4 mb-6 flex items-start gap-4">
+            <div class="flex-shrink-0 text-red-500 mt-0.5"><i class="fa-solid fa-triangle-exclamation text-xl"></i></div>
+            <div class="flex-1">
+              <h3 class="text-sm font-bold text-red-800">Gagal Memuat Kategori</h3>
+              <p class="text-sm text-red-600 mt-1"><?php echo htmlspecialchars((string)$fetchError); ?></p>
             </div>
           </div>
+        <?php endif; ?>
 
-          <div class="row mt-4">
-            <div class="col-12">
-              <div class="card">
-                <div class="card-body">
-                  <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4 class="card-title">Daftar Kategori Bencana</h4>
-                    <a href="index.php?controller=KategoriBencana&action=create" class="btn btn-primary">
-                      <i class="mdi mdi-plus"></i> Tambah Kategori
-                    </a>
-                  </div>
-                  
-                  <?php if ($serverLog && !$serverLog['success']): ?>
-                    <div class="alert alert-danger" role="alert">
-                      <h4 class="alert-heading">Error!</h4>
-                      <p><?php echo htmlspecialchars($serverLog['message'] ?? 'Terjadi kesalahan saat mengambil data'); ?></p>
-                      <?php if (isset($serverLog['data']) && is_array($serverLog['data']) && !empty($serverLog['data'])): ?>
-                        <ul class="mb-0">
-                          <?php foreach ($serverLog['data'] as $error): ?>
-                            <li><?php echo htmlspecialchars(is_array($error) ? json_encode($error) : $error); ?></li>
-                          <?php endforeach; ?>
-                        </ul>
-                      <?php endif; ?>
-                    </div>
-                  <?php endif; ?>
-
-                  <div class="table-responsive">
-                    <table class="table table-striped">
-                      <thead>
-                        <tr>
-                          <th>No</th>
-                          <th>Nama Kategori</th>
-                          <th>Deskripsi</th>
-                          <th>Icon</th>
-                          <th>Aksi</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <?php if ($serverLog && $serverLog['success'] && !empty($serverLog['data']['data'])): ?>
-                          <?php $no = 1; ?>
-                          <?php foreach ($serverLog['data']['data'] as $kategori): ?>
-                            <tr>
-                              <td><?php echo $no++; ?></td>
-                              <td><?php echo htmlspecialchars($kategori['nama_kategori'] ?? $kategori['nama'] ?? '-'); ?></td>
-                              <td><?php echo htmlspecialchars($kategori['deskripsi'] ?? '-'); ?></td>
-                              <td>
-                                <?php if (!empty($kategori['icon'])): ?>
-                                  <span class="badge badge-info"><?php echo htmlspecialchars($kategori['icon']); ?></span>
-                                <?php else: ?>
-                                  <span class="badge badge-secondary">-</span>
-                                <?php endif; ?>
-                              </td>
-                              <td>
-                                <a href="index.php?controller=KategoriBencana&action=edit&id=<?php echo $kategori['id']; ?>"
-                                   class="btn btn-sm btn-warning btn-icon-text">
-                                  <i class="mdi mdi-pencil btn-icon-prepend"></i> Edit
-                                </a>
-                                <button type="button"
-                                        class="btn btn-sm btn-danger btn-icon-text btn-delete"
-                                        data-id="<?php echo $kategori['id']; ?>"
-                                        data-name="<?php echo addslashes(htmlspecialchars($kategori['nama_kategori'] ?? $kategori['nama'] ?? 'N/A')); ?>">
-                                  <i class="mdi mdi-delete btn-icon-prepend"></i> Hapus
-                                </button>
-                              </td>
-                            </tr>
-                          <?php endforeach; ?>
-                        <?php else: ?>
-                          <tr>
-                            <td colspan="5" class="text-center">
-                              <?php if ($serverLog && $serverLog['success']): ?>
-                                Tidak ada data kategori bencana
-                              <?php else: ?>
-                                Tidak ada data yang dapat ditampilkan
-                              <?php endif; ?>
-                            </td>
-                          </tr>
-                        <?php endif; ?>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm flex items-center gap-4 border-l-4 border-l-slate-400">
+            <div class="w-12 h-12 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-layer-group"></i></div>
+            <div>
+              <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Total Kategori</p>
+              <h3 class="font-display text-2xl font-bold text-slate-800 leading-none"><?php echo count($kategoriRows); ?></h3>
+            </div>
+          </div>
+          <div class="rounded-2xl border border-indigo-200 bg-indigo-50/50 p-5 shadow-sm flex items-center gap-4 border-l-4 border-l-indigo-500">
+            <div class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-icons"></i></div>
+            <div>
+              <p class="text-[11px] font-bold text-indigo-600 uppercase tracking-widest mb-0.5">Ber-Ikon Fa-Solid</p>
+              <h3 class="font-display text-2xl font-bold text-indigo-700 leading-none"><?php echo $withIcon; ?></h3>
+            </div>
+          </div>
+          <div class="rounded-2xl border border-rose-200 bg-rose-50/50 p-5 shadow-sm flex items-center gap-4 border-l-4 border-l-rose-500">
+            <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-shapes"></i></div>
+            <div>
+              <p class="text-[11px] font-bold text-rose-600 uppercase tracking-widest mb-0.5">Tanpa Ikon</p>
+              <h3 class="font-display text-2xl font-bold text-rose-700 leading-none"><?php echo $withoutIcon; ?></h3>
             </div>
           </div>
         </div>
+
+        <!-- Data Table -->
+        <div class="rounded-2xl border border-slate-200 bg-white shadow-card overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-widest">
+                  <th class="px-5 py-4 w-16 text-center">No</th>
+                  <th class="px-5 py-4">Nama Bencana</th>
+                  <th class="px-5 py-4 min-w-[250px]">Deskripsi Singkat</th>
+                  <th class="px-5 py-4 text-center">Preview Ikon</th>
+                  <th class="px-5 py-4 text-center w-32">Aksi</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 text-sm">
+                <?php if (!empty($kategoriRows)): ?>
+                  <?php $no = 1; foreach ($kategoriRows as $kategori): ?>
+                    <tr class="hover:bg-slate-50/70 transition-colors group">
+                      <td class="px-5 py-4 text-center font-bold text-slate-400"><?php echo $no++; ?></td>
+                      <td class="px-5 py-4 font-bold text-slate-800">
+                        <?php echo htmlspecialchars($kategori['nama_kategori'] ?? $kategori['nama'] ?? '-'); ?>
+                      </td>
+                      <td class="px-5 py-4 text-slate-500 font-medium line-clamp-2">
+                        <?php echo htmlspecialchars($kategori['deskripsi'] ?? '-'); ?>
+                      </td>
+                      <td class="px-5 py-4 text-center">
+                        <?php if (!empty($kategori['icon'])): ?>
+                          <div class="inline-flex flex-col items-center justify-center gap-1.5 p-2 rounded-lg bg-indigo-50 border border-indigo-100 text-indigo-600 min-w-[48px]">
+                            <i class="fa-solid fa-<?php echo htmlspecialchars(str_replace('fa-', '', $kategori['icon'])); ?> text-lg"></i>
+                          </div>
+                        <?php else: ?>
+                          <span class="inline-flex items-center px-2 py-1 rounded-md bg-slate-100 text-slate-400 text-[10px] font-bold uppercase tracking-wider">N/A</span>
+                        <?php endif; ?>
+                      </td>
+                      <td class="px-5 py-4 text-center">
+                        <div class="flex items-center justify-center gap-1.5">
+                          <a href="index.php?controller=KategoriBencana&action=edit&id=<?php echo (int)$kategori['id']; ?>" class="inline-flex items-center justify-center h-8 w-8 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700 transition" title="Edit">
+                            <i class="fa-solid fa-pen text-sm"></i>
+                          </a>
+                          <button
+                            type="button"
+                            class="inline-flex items-center justify-center h-8 w-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 transition btn-delete"
+                            data-id="<?php echo (int)$kategori['id']; ?>"
+                            data-name="<?php echo htmlspecialchars($kategori['nama_kategori'] ?? $kategori['nama'] ?? 'N/A'); ?>"
+                            title="Hapus"
+                          >
+                            <i class="fa-solid fa-trash-can text-sm"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  <?php endforeach; ?>
+                <?php else: ?>
+                  <tr>
+                    <td colspan="5" class="px-5 py-16 text-center">
+                      <div class="inline-flex h-16 w-16 rounded-full bg-slate-50 border border-slate-100 text-slate-300 items-center justify-center mb-4 text-3xl shadow-inner"><i class="fa-solid fa-layer-group"></i></div>
+                      <h3 class="font-display font-bold text-slate-700 text-lg mb-1">Kategori Kosong</h3>
+                      <p class="text-sm font-medium text-slate-500">Sistem belum memiliki referensi tipe bencana.</p>
+                    </td>
+                  </tr>
+                <?php endif; ?>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
-    </div>
+    </main>
   </div>
-  
-  <?php include 'template/script.php'; ?>
+</div>
 
-  <!-- Console Log untuk debugging -->
-  <script>
-    console.log('Server Response:', <?php echo json_encode($serverLog); ?>);
-  </script>
+<?php include 'template/script.php'; ?>
+<script>
+  document.addEventListener('click', function (event) {
+    const button = event.target.closest('.btn-delete');
+    if (!button) return;
 
-  <!-- SweetAlert2 Toast Notification -->
-  <script>
-    <?php if (isset($_SESSION['toast_message'])): ?>
-      const toastData = <?php echo json_encode($_SESSION['toast_message']); ?>;
-      
-      // Show toast notification
-      if (typeof Swal !== 'undefined') {
-        Swal.fire({
-          icon: toastData.type,
-          title: toastData.title,
-          text: toastData.message,
-          toast: true,
-          position: 'top-end',
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        });
-      }
-      
-      <?php unset($_SESSION['toast_message']); ?>
-    <?php endif; ?>
-  </script>
+    const id = button.getAttribute('data-id');
+    const name = button.getAttribute('data-name') || 'Kategori';
 
-  <!-- Confirm Delete Function with Event Delegation -->
-  <script>
-    $(document).ready(function() {
-      // Event delegation for delete buttons
-      $(document).on('click', '.btn-delete', function() {
-        const id = $(this).data('id');
-        const name = $(this).data('name');
-
-        console.log('Kategori Bencana Respon: Button Clicked', id);
-
-        if (typeof Swal !== 'undefined') {
-          Swal.fire({
-            title: 'Apakah Anda yakin?',
-            text: `Anda akan menghapus kategori "${name}"`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Ya, hapus!',
-            cancelButtonText: 'Batal'
-          }).then((result) => {
-            if (result.isConfirmed) {
-              // Create form and submit delete request
-              const form = document.createElement('form');
-              form.method = 'POST';
-              form.action = `index.php?controller=KategoriBencana&action=delete&id=${id}`;
-              document.body.appendChild(form);
-              form.submit();
-            }
-          });
-        } else {
-          // Fallback to native confirm
-          if (confirm(`Apakah Anda yakin ingin menghapus kategori "${name}"?`)) {
-            // Create form and submit delete request
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = `index.php?controller=KategoriBencana&action=delete&id=${id}`;
-            document.body.appendChild(form);
-            form.submit();
-          }
+    if (typeof Swal !== 'undefined') {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Hapus Referensi?',
+        text: `Master data "${name}" akan dihapus. Ini bisa mempengaruhi grafik dashboard bila masih ada laporan terkait.`,
+        showCancelButton: true,
+        confirmButtonText: 'Ya, Hapus Saja',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#ef4444',
+        customClass: {
+          popup: 'rounded-2xl',
+          confirmButton: 'rounded-xl px-5 py-2.5 font-bold shadow-sm',
+          cancelButton: 'rounded-xl px-5 py-2.5 font-bold border border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+        }
+      }).then(function (result) {
+        if (result.isConfirmed) {
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = 'index.php?controller=KategoriBencana&action=delete&id=' + encodeURIComponent(id);
+          document.body.appendChild(form);
+          form.submit();
         }
       });
-    });
-  </script>
-
-  <!-- Server Response Toast Notifications -->
-  <script>
-    // Show toast for server responses
-    function showServerResponseToast(icon, title, message) {
-      if (typeof Swal !== 'undefined') {
-        Swal.fire({
-          icon: icon,
-          title: title,
-          text: message,
-          toast: true,
-          position: 'top-end',
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        });
-      } else {
-        // Fallback to native alert if Swal is not available
-        alert(`${title}: ${message}`);
+    } else {
+      if (window.confirm('Hapus kategori "' + name + '"?')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'index.php?controller=KategoriBencana&action=delete&id=' + encodeURIComponent(id);
+        document.body.appendChild(form);
+        form.submit();
       }
     }
-
-    // Handle success responses
-    <?php if (isset($_GET['success'])): ?>
-      showServerResponseToast('success', 'Berhasil', '<?php echo htmlspecialchars(urldecode($_GET['success'])); ?>');
-    <?php endif; ?>
-
-    // Handle error responses
-    <?php if (isset($_GET['error'])): ?>
-      showServerResponseToast('error', 'Gagal', '<?php echo htmlspecialchars(urldecode($_GET['error'])); ?>');
-    <?php endif; ?>
-  </script>
-</body>
-
-</html>
+  });
+</script>

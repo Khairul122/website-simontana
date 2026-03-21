@@ -5,6 +5,16 @@ require_once dirname(__DIR__) . '/services/AuthService.php';
 class AuthController {
     private $authService;
 
+    private function jsonResponse(bool $success, $data = null, string $message = ''): void {
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => $success,
+            'message' => $message,
+            'data' => $data
+        ]);
+        exit;
+    }
+
     public function __construct() {
         $this->authService = new AuthService();
     }
@@ -43,11 +53,7 @@ class AuthController {
             $password = $_POST['password'] ?? '';
 
             if (empty($username) || empty($password)) {
-                $_SESSION['toast'] = [
-                    'type' => 'error',
-                    'title' => 'Gagal',
-                    'message' => 'Username dan password harus diisi'
-                ];
+                setToast('error', 'Gagal', 'Username dan password harus diisi');
                 header('Location: index.php?controller=Auth&action=login');
                 exit;
             }
@@ -56,14 +62,10 @@ class AuthController {
 
             if ($response['success']) {
                 // Login berhasil - ambil role user dan redirect ke dashboard
-                $userData = $response['data']['data'] ?? $response['data'];
+                $userData = apiDataEntity($response['data']);
                 $userRole = $userData['user']['role'] ?? $userData['role'] ?? 'Warga';
 
-                $_SESSION['toast'] = [
-                    'type' => 'success',
-                    'title' => 'Berhasil',
-                    'message' => 'Login berhasil'
-                ];
+                setToast('success', 'Berhasil', 'Login berhasil');
 
                 $this->redirectToDashboard($userRole);
                 exit;
@@ -72,21 +74,21 @@ class AuthController {
                 $errorMessage = $response['message'] ?? 'Username atau password salah';
 
                 // Jika ada detail error dari API, ambil pesan pertama
-                if (isset($response['data']) && is_array($response['data'])) {
-                    $errors = $response['data'];
-                    if (isset($errors['message'])) {
-                        $errorMessage = $errors['message'];
-                    } elseif (isset($errors['errors']) && is_array($errors['errors'])) {
-                        $firstError = reset($errors['errors']);
+                if (isset($response['errors']) && is_array($response['errors'])) {
+                    $errors = $response['errors'];
+                    $firstError = reset($errors);
+                    $errorMessage = is_array($firstError) ? ($firstError[0] ?? $errorMessage) : $firstError;
+                } elseif (isset($response['details']) && is_array($response['details'])) {
+                    $firstError = reset($response['details']);
+                    $errorMessage = is_array($firstError) ? ($firstError[0] ?? $errorMessage) : $firstError;
+                } elseif (isset($response['data']) && is_array($response['data'])) {
+                    if (isset($response['data']['errors']) && is_array($response['data']['errors'])) {
+                        $firstError = reset($response['data']['errors']);
                         $errorMessage = is_array($firstError) ? $firstError[0] : $firstError;
                     }
                 }
 
-                $_SESSION['toast'] = [
-                    'type' => 'error',
-                    'title' => 'Login Gagal',
-                    'message' => $errorMessage
-                ];
+                setToast('error', 'Login Gagal', $errorMessage);
                 header('Location: index.php?controller=Auth&action=login');
                 exit;
             }
@@ -99,6 +101,15 @@ class AuthController {
     public function register() {
         // Tampilkan halaman register
         $title = "Register - SIMONTA BENCANA";
+        $desaList = [];
+
+        $desaResponse = apiRequest(API_DESA, 'GET', null, getAuthHeaders($_SESSION['token'] ?? null));
+        if ($desaResponse['success']) {
+            $desaList = apiDataList($desaResponse['data']);
+        } else {
+            $error_message = $desaResponse['message'] ?? 'Daftar desa belum dapat dimuat saat ini.';
+        }
+
         include dirname(__DIR__) . '/views/auth/register.php';
     }
 
@@ -116,21 +127,13 @@ class AuthController {
 
             // Validasi input
             if (empty($nama) || empty($username) || empty($email) || empty($password)) {
-                $_SESSION['toast'] = [
-                    'type' => 'error',
-                    'title' => 'Gagal',
-                    'message' => 'Semua field wajib diisi'
-                ];
+                setToast('error', 'Gagal', 'Semua field wajib diisi');
                 header('Location: index.php?controller=Auth&action=register');
                 return;
             }
 
             if ($password !== $password_confirmation) {
-                $_SESSION['toast'] = [
-                    'type' => 'error',
-                    'title' => 'Gagal',
-                    'message' => 'Konfirmasi password tidak sesuai'
-                ];
+                setToast('error', 'Gagal', 'Konfirmasi password tidak sesuai');
                 header('Location: index.php?controller=Auth&action=register');
                 return;
             }
@@ -151,11 +154,7 @@ class AuthController {
 
             if ($response['success']) {
                 // Register berhasil, tampilkan pesan dan arahkan ke login
-                $_SESSION['toast'] = [
-                    'type' => 'success',
-                    'title' => 'Berhasil',
-                    'message' => 'Registrasi berhasil. Silakan login'
-                ];
+                setToast('success', 'Berhasil', 'Registrasi berhasil. Silakan login');
                 header('Location: index.php?controller=Auth&action=login');
                 return;
             } else {
@@ -163,22 +162,20 @@ class AuthController {
                 $message = $response['message'] ?? 'Registrasi gagal';
 
                 // Jika ada detail error dari API, ambil pesan yang paling relevan
-                if (isset($response['data']) && is_array($response['data'])) {
-                    $errors = $response['data'];
-                    if (isset($errors['message'])) {
-                        $message = $errors['message'];
-                    } elseif (isset($errors['errors']) && is_array($errors['errors'])) {
-                        // Ambil pesan error pertama dari array errors
-                        $firstError = reset($errors['errors']);
+                if (isset($response['errors']) && is_array($response['errors'])) {
+                    $firstError = reset($response['errors']);
+                    $message = is_array($firstError) ? ($firstError[0] ?? $message) : $firstError;
+                } elseif (isset($response['details']) && is_array($response['details'])) {
+                    $firstError = reset($response['details']);
+                    $message = is_array($firstError) ? ($firstError[0] ?? $message) : $firstError;
+                } elseif (isset($response['data']) && is_array($response['data'])) {
+                    if (isset($response['data']['errors']) && is_array($response['data']['errors'])) {
+                        $firstError = reset($response['data']['errors']);
                         $message = is_array($firstError) ? $firstError[0] : $firstError;
                     }
                 }
 
-                $_SESSION['toast'] = [
-                    'type' => 'error',
-                    'title' => 'Gagal',
-                    'message' => $message
-                ];
+                setToast('error', 'Gagal', $message);
                 header('Location: index.php?controller=Auth&action=register');
                 return;
             }
@@ -187,14 +184,64 @@ class AuthController {
         header('Location: index.php?controller=Auth&action=register');
     }
 
+    public function getAllProvinsi()
+    {
+        $response = apiRequest(API_WILAYAH_PROVINSI, 'GET', null, getAuthHeaders($_SESSION['token'] ?? null));
+        if ($response['success']) {
+            $this->jsonResponse(true, apiDataList($response['data']));
+        }
+        $this->jsonResponse(false, null, $response['message'] ?? 'Gagal mengambil data provinsi');
+    }
+
+    public function getKabupatenByProvinsi()
+    {
+        $provinsiId = (int)($_GET['id'] ?? 0);
+        if ($provinsiId <= 0) {
+            $this->jsonResponse(false, null, 'Provinsi tidak valid');
+        }
+
+        $url = str_replace('{provinsi_id}', (string)$provinsiId, API_WILAYAH_KABUPATEN);
+        $response = apiRequest($url, 'GET', null, getAuthHeaders($_SESSION['token'] ?? null));
+        if ($response['success']) {
+            $this->jsonResponse(true, apiDataList($response['data']));
+        }
+        $this->jsonResponse(false, null, $response['message'] ?? 'Gagal mengambil data kabupaten');
+    }
+
+    public function getKecamatanByKabupaten()
+    {
+        $kabupatenId = (int)($_GET['id'] ?? 0);
+        if ($kabupatenId <= 0) {
+            $this->jsonResponse(false, null, 'Kabupaten tidak valid');
+        }
+
+        $url = str_replace('{kabupaten_id}', (string)$kabupatenId, API_WILAYAH_KECAMATAN);
+        $response = apiRequest($url, 'GET', null, getAuthHeaders($_SESSION['token'] ?? null));
+        if ($response['success']) {
+            $this->jsonResponse(true, apiDataList($response['data']));
+        }
+        $this->jsonResponse(false, null, $response['message'] ?? 'Gagal mengambil data kecamatan');
+    }
+
+    public function getDesaByKecamatan()
+    {
+        $kecamatanId = (int)($_GET['id'] ?? 0);
+        if ($kecamatanId <= 0) {
+            $this->jsonResponse(false, null, 'Kecamatan tidak valid');
+        }
+
+        $url = str_replace('{kecamatan_id}', (string)$kecamatanId, API_WILAYAH_DESA);
+        $response = apiRequest($url, 'GET', null, getAuthHeaders($_SESSION['token'] ?? null));
+        if ($response['success']) {
+            $this->jsonResponse(true, apiDataList($response['data']));
+        }
+        $this->jsonResponse(false, null, $response['message'] ?? 'Gagal mengambil data desa');
+    }
+
     public function logout() {
         $this->authService->logout();
 
-        $_SESSION['toast'] = [
-            'type' => 'success',
-            'title' => 'Berhasil',
-            'message' => 'Berhasil logout'
-        ];
+        setToast('success', 'Berhasil', 'Berhasil logout');
 
         header('Location: index.php?controller=Auth&action=login');
     }
@@ -212,10 +259,10 @@ class AuthController {
                 header('Location: index.php?controller=Dashboard&action=operator');
                 break;
             case 'Warga':
-                header('Location: index.php?controller=Beranda&action=index');
+                header('Location: index.php?controller=Dashboard&action=warga');
                 break;
             default:
-                header('Location: index.php?controller=Beranda&action=index');
+                header('Location: index.php?controller=Dashboard&action=warga');
                 break;
         }
     }

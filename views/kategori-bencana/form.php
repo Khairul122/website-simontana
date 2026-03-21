@@ -1,186 +1,108 @@
-<?php 
-include('template/header.php');
+<?php include('template/header.php'); ?>
 
-// Ambil server response dari session jika sedang dalam mode edit
-$serverLog = $_SESSION['server_response_edit'] ?? null;
-
-// Hapus session setelah diambil
-unset($_SESSION['server_response_edit']);
+<?php
+$isEditMode = (bool) ($isEdit ?? false);
+$pageTitle = $isEditMode ? 'Edit Tipe Bencana' : 'Definisi Kategori Baru';
+$saveLabel = $isEditMode ? 'Update' : 'Simpan Kategori Baru';
+$idKategori = (int) ($kategori['id'] ?? 0);
 ?>
 
-<body class="with-welcome-text">
-  <div class="container-scroller">
+<div class="flex h-screen overflow-hidden bg-slate-50">
+  <?php include 'template/sidebar.php'; ?>
+  
+  <div class="flex-1 flex flex-col overflow-hidden">
     <?php include 'template/navbar.php'; ?>
-    <div class="container-fluid page-body-wrapper">
-      <?php include 'template/setting_panel.php'; ?>
-      <?php include 'template/sidebar.php'; ?>
-      <div class="main-panel">
-        <div class="content-wrapper">
-          <div class="row">
-            <div class="col-sm-12">
-              <h2>
-                <?php echo $isEdit ? 'Edit Kategori Bencana' : 'Tambah Kategori Bencana'; ?>
-              </h2>
-              <p class="text-muted">
-                <?php echo $isEdit ? 'Edit informasi kategori bencana' : 'Tambahkan kategori bencana baru ke sistem'; ?>
-              </p>
-            </div>
-          </div>
+    
+    <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative">
+      <div class="p-4 md:p-6 lg:p-8 w-full">
 
-          <div class="row mt-4">
-            <div class="col-12">
-              <div class="card">
-                <?php if ($isEdit && isset($serverLog) && $serverLog && !$serverLog['success']): ?>
-                  <div class="alert alert-danger m-3" role="alert">
-                    <h4 class="alert-heading">Error!</h4>
-                    <p><?php echo htmlspecialchars($serverLog['message'] ?? 'Terjadi kesalahan saat mengambil data kategori'); ?></p>
-                    <?php if (isset($serverLog['data']) && is_array($serverLog['data']) && !empty($serverLog['data'])): ?>
-                      <ul class="mb-0">
-                        <?php foreach ($serverLog['data'] as $error): ?>
-                          <li><?php echo htmlspecialchars(is_array($error) ? json_encode($error) : $error); ?></li>
-                        <?php endforeach; ?>
-                      </ul>
-                    <?php endif; ?>
-                  </div>
-                <?php endif; ?>
-
-                <?php if ($isEdit && (!$kategori || (isset($serverLog) && $serverLog && !$serverLog['success']))): ?>
-                  <div class="alert alert-warning m-3" role="alert">
-                    <h4 class="alert-heading">Peringatan!</h4>
-                    <p>Data kategori tidak ditemukan atau terjadi kesalahan.</p>
-                    <a href="index.php?controller=KategoriBencana&action=index" class="btn btn-primary">Kembali ke Daftar</a>
-                  </div>
-                <?php else: ?>
-                <div class="card-body">
-                  <h4 class="card-title">
-                    <?php echo $isEdit ? 'Edit Kategori Bencana' : 'Form Tambah Kategori Bencana'; ?>
-                  </h4>
-
-                  <form method="POST"
-                        action="index.php?controller=KategoriBencana&action=<?php echo $isEdit ? 'update&id=' . $kategori['id'] : 'store'; ?>">
-                    <div class="form-group">
-                      <label for="nama_kategori">Nama Kategori *</label>
-                      <input type="text"
-                             class="form-control"
-                             id="nama_kategori"
-                             name="nama_kategori"
-                             value="<?php echo htmlspecialchars($kategori['nama_kategori'] ?? $kategori['nama'] ?? ''); ?>"
-                             required>
-                      <small class="form-text text-muted">Nama kategori bencana (contoh: Banjir, Gempa Bumi)</small>
-                    </div>
-
-                    <div class="form-group">
-                      <label for="deskripsi">Deskripsi</label>
-                      <textarea class="form-control"
-                                id="deskripsi"
-                                name="deskripsi"
-                                rows="4"><?php echo htmlspecialchars($kategori['deskripsi'] ?? ''); ?></textarea>
-                      <small class="form-text text-muted">Deskripsi lengkap tentang jenis bencana ini</small>
-                    </div>
-
-                    <div class="form-group">
-                      <label for="icon">Icon (Kode/Nama)</label>
-                      <input type="text"
-                             class="form-control"
-                             id="icon"
-                             name="icon"
-                             placeholder="Contoh: water, fire, earthquake"
-                             value="<?php echo htmlspecialchars($kategori['icon'] ?? ''); ?>">
-                      <small class="form-text text-muted">Nama atau kode icon untuk kategori ini</small>
-                    </div>
-
-                    <div class="d-flex justify-content-between">
-                      <a href="index.php?controller=KategoriBencana&action=index" class="btn btn-secondary">
-                        <i class="mdi mdi-arrow-left"></i> Kembali
-                      </a>
-
-                      <button type="submit" class="btn btn-primary">
-                        <i class="mdi mdi-content-save"></i>
-                        <?php echo $isEdit ? 'Update' : 'Simpan'; ?>
-                      </button>
-                    </div>
-                  </form>
-                </div>
-                <?php endif; ?>
-              </div>
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+          <div class="flex items-center gap-4">
+            <a href="index.php?controller=KategoriBencana&action=index" class="flex items-center justify-center h-10 w-10 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-brand-600 hover:bg-brand-50 hover:border-brand-200 transition-all shadow-sm">
+              <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div>
+              <h1 class="font-display text-2xl font-bold text-slate-900 leading-tight"><?php echo $pageTitle; ?></h1>
+              <p class="text-sm text-slate-500">Konfigurasi nama, warna dan ikon pendukung untuk sistem referensi utama.</p>
             </div>
           </div>
         </div>
+
+        <?php if ($isEditMode && empty($kategori)): ?>
+          <div class="rounded-xl bg-amber-50 border border-amber-200 p-6 text-center">
+            <i class="fa-solid fa-circle-exclamation text-amber-500 text-3xl mb-3"></i>
+            <h3 class="font-bold text-amber-800 mb-1">Referensi Tidak Ditemukan</h3>
+            <p class="text-sm text-amber-700 mb-4">Master data kategori yang Anda tuju sepertinya sudah tidak valid.</p>
+            <a href="index.php?controller=KategoriBencana&action=index" class="inline-flex items-center px-5 py-2 rounded-xl bg-amber-600 text-sm font-bold text-white hover:bg-amber-700 transition">Kembali</a>
+          </div>
+        <?php else: ?>
+          
+          <div class="rounded-2xl bg-white border border-slate-200 shadow-card overflow-hidden">
+            <form method="POST" action="index.php?controller=KategoriBencana&action=<?php echo $isEditMode ? ('update&id=' . $idKategori) : 'store'; ?>" class="p-6 md:p-8">
+              
+              <div class="space-y-6">
+                
+                <div>
+                  <label for="nama_kategori" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nama Bencana <span class="text-red-500">*</span></label>
+                  <input
+                    type="text"
+                    class="w-full rounded-xl border border-slate-300 bg-slate-50 py-3 px-4 text-sm font-bold text-slate-800 outline-none transition-all focus:border-brand-500 focus:bg-white"
+                    id="nama_kategori"
+                    name="nama_kategori"
+                    value="<?php echo htmlspecialchars($kategori['nama_kategori'] ?? $kategori['nama'] ?? ''); ?>"
+                    placeholder="Misal: Gempa Bumi Tektonik, Longsor"
+                    required
+                  >
+                  <p class="text-xs text-slate-400 mt-1.5 font-medium"><i class="fa-solid fa-circle-info text-brand-500 mr-1"></i> Nama ini akan muncul di sidebar dan laporan statistik.</p>
+                </div>
+
+                <div>
+                  <label for="icon" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Identifier Ikon (FontAwesome 6.4)</label>
+                  <div class="relative">
+                    <i class="fa-solid fa-icons absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input
+                      type="text"
+                      class="w-full md:w-1/2 rounded-xl border border-slate-300 bg-slate-50 py-3 pl-11 pr-4 text-sm font-medium text-slate-700 outline-none transition-all focus:border-brand-500 focus:bg-white font-mono"
+                      id="icon"
+                      name="icon"
+                      value="<?php echo htmlspecialchars($kategori['icon'] ?? ''); ?>"
+                      placeholder="earthquake, fire, house-crack"
+                    >
+                  </div>
+                  <p class="text-xs text-slate-400 mt-1.5 font-medium">Gunakan prefix-free code (contoh: cukup <code>house-tsunami</code>, tidak perlu <code>fa-house-tsunami</code>).</p>
+                </div>
+
+                <div>
+                  <label for="deskripsi" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Keterangan / Deskripsi Khusus</label>
+                  <textarea 
+                    class="w-full rounded-xl border border-slate-300 bg-slate-50 py-3 px-4 text-sm font-medium text-slate-700 outline-none transition-all focus:border-brand-500 focus:bg-white leading-relaxed" 
+                    id="deskripsi" 
+                    name="deskripsi" 
+                    rows="4" 
+                    placeholder="Tuliskan indikator khusus untuk laporan bencana dengan jenis ini jika diperlukan..."
+                  ><?php echo htmlspecialchars($kategori['deskripsi'] ?? ''); ?></textarea>
+                </div>
+
+              </div>
+              
+              <div class="mt-8 pt-5 border-t border-slate-100 flex items-center justify-end gap-3">
+                <a href="index.php?controller=KategoriBencana&action=index" class="px-5 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors">
+                  Batalkan
+                </a>
+                <button type="submit" class="px-6 py-2.5 rounded-xl bg-brand-600 text-sm font-bold text-white hover:bg-brand-700 hover:shadow-float transition-all shadow-sm">
+                  <i class="fa-solid fa-cloud-arrow-up mr-1.5"></i> <?php echo $saveLabel; ?> Referensi
+                </button>
+              </div>
+
+            </form>
+          </div>
+
+        <?php endif; ?>
+
       </div>
-    </div>
+    </main>
   </div>
+</div>
 
-  <?php include 'template/script.php'; ?>
-
-  <!-- Console Log untuk debugging saat edit -->
-  <?php if ($isEdit && $serverLog): ?>
-  <script>
-    console.log('Server Response (Edit):', <?php echo json_encode($serverLog); ?>);
-  </script>
-  <?php endif; ?>
-
-  <!-- SweetAlert2 Toast Notification -->
-  <script>
-    <?php if (isset($_SESSION['toast_message'])): ?>
-      const toastData = <?php echo json_encode($_SESSION['toast_message']); ?>;
-
-      // Show toast notification
-      if (typeof Swal !== 'undefined') {
-        Swal.fire({
-          icon: toastData.type,
-          title: toastData.title,
-          text: toastData.message,
-          toast: true,
-          position: 'top-end',
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        });
-      }
-
-      <?php unset($_SESSION['toast_message']); ?>
-    <?php endif; ?>
-  </script>
-
-  <!-- Server Response Toast Notifications -->
-  <script>
-    // Show toast for server responses
-    function showServerResponseToast(icon, title, message) {
-      if (typeof Swal !== 'undefined') {
-        Swal.fire({
-          icon: icon,
-          title: title,
-          text: message,
-          toast: true,
-          position: 'top-end',
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
-        });
-      } else {
-        // Fallback to native alert if Swal is not available
-        alert(`${title}: ${message}`);
-      }
-    }
-
-    // Handle success responses
-    <?php if (isset($_GET['success'])): ?>
-      showServerResponseToast('success', 'Berhasil', '<?php echo htmlspecialchars(urldecode($_GET['success'])); ?>');
-    <?php endif; ?>
-
-    // Handle error responses
-    <?php if (isset($_GET['error'])): ?>
-      showServerResponseToast('error', 'Gagal', '<?php echo htmlspecialchars(urldecode($_GET['error'])); ?>');
-    <?php endif; ?>
-  </script>
-</body>
-
-</html>
+<?php include 'template/script.php'; ?>

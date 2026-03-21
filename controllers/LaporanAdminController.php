@@ -9,13 +9,21 @@ class LaporanAdminController
 
     public function __construct()
     {
-        // Cek otentikasi pengguna
-        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'Admin') {
-            header('Location: ../login.php');
+        if (!isset($_SESSION['user'])) {
+            header('Location: index.php?controller=Auth&action=login');
             exit();
         }
-        
+
         $this->service = new LaporanAdminService();
+    }
+
+    private function requireAdmin(): void
+    {
+        if (($_SESSION['user']['role'] ?? '') !== 'Admin') {
+            setDialog('Akses Ditolak', 'Fitur ini hanya untuk Admin.', 'error');
+            header('Location: index.php?controller=Dashboard&action=warga');
+            exit;
+        }
     }
 
     /**
@@ -39,18 +47,12 @@ class LaporanAdminController
         $response = $this->service->getAll($filters);
 
         if (!$response['success']) {
-            echo '<script>alert("Gagal mengambil data laporan bencana: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '");</script>';
+            setDialog('Gagal', 'Gagal mengambil data laporan bencana: ' . ($response['message'] ?? 'Terjadi kesalahan'), 'error');
             $laporanList = [];
             $pagination = null;
         } else {
-            $data = $response['data'];
-            $laporanList = $data['data'] ?? $data ?? [];
-            $pagination = isset($data['current_page']) ? [
-                'current_page' => $data['current_page'],
-                'last_page' => $data['last_page'],
-                'per_page' => $data['per_page'],
-                'total' => $data['total']
-            ] : null;
+            $laporanList = is_array($response['data']) ? $response['data'] : [];
+            $pagination = $response['meta']['pagination'] ?? null;
         }
 
         include __DIR__ . '/../views/laporan-admin/index.php';
@@ -66,11 +68,7 @@ class LaporanAdminController
 
         // Validasi ID
         if (!$id) {
-            $_SESSION['toast_message'] = [
-                'type' => 'error',
-                'title' => 'Error',
-                'message' => 'ID laporan tidak ditemukan'
-            ];
+            setDialog('Error', 'ID laporan tidak ditemukan', 'error');
             header('Location: index.php?controller=LaporanAdmin&action=index');
             exit;
         }
@@ -78,19 +76,18 @@ class LaporanAdminController
         $response = $this->service->getById($id);
 
         if (!$response['success']) {
-            echo '<script>alert("Gagal mengambil detail laporan bencana: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=LaporanAdmin&action=index";</script>';
+            setDialog('Gagal', 'Gagal mengambil detail laporan bencana: ' . ($response['message'] ?? 'Terjadi kesalahan'), 'error');
+            header('Location: index.php?controller=LaporanAdmin&action=index');
             exit();
         }
 
-        // Cek struktur data yang dikembalikan API
-        if (isset($response['data']['data'])) {
-            $laporan = $response['data']['data'];
-        } elseif (isset($response['data']) && !empty($response['data'])) {
-            $laporan = $response['data'];
-        } else {
-            echo '<script>alert("Laporan bencana tidak ditemukan"); window.location.href="index.php?controller=LaporanAdmin&action=index";</script>';
+        if (empty($response['data']) || !is_array($response['data'])) {
+            setDialog('Gagal', 'Laporan bencana tidak ditemukan', 'error');
+            header('Location: index.php?controller=LaporanAdmin&action=index');
             exit();
         }
+
+        $laporan = $response['data'];
 
         include __DIR__ . '/../views/laporan-admin/detail.php';
     }
@@ -100,16 +97,14 @@ class LaporanAdminController
      */
     public function edit()
     {
+        $this->requireAdmin();
+
         // Ambil ID dari query string
         $id = $_GET['id'] ?? null;
 
         // Validasi ID
         if (!$id) {
-            $_SESSION['toast_message'] = [
-                'type' => 'error',
-                'title' => 'Error',
-                'message' => 'ID laporan tidak ditemukan'
-            ];
+            setDialog('Error', 'ID laporan tidak ditemukan', 'error');
             header('Location: index.php?controller=LaporanAdmin&action=index');
             exit;
         }
@@ -117,18 +112,70 @@ class LaporanAdminController
         $response = $this->service->getById($id);
 
         if (!$response['success']) {
-            echo '<script>alert("Gagal mengambil data laporan bencana: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=LaporanAdmin&action=index";</script>';
+            setDialog('Gagal', 'Gagal mengambil data laporan bencana: ' . ($response['message'] ?? 'Terjadi kesalahan'), 'error');
+            header('Location: index.php?controller=LaporanAdmin&action=index');
             exit();
         }
 
-        // Cek struktur data yang dikembalikan API
-        if (isset($response['data']['data'])) {
-            $laporan = $response['data']['data'];
-        } elseif (isset($response['data']) && !empty($response['data'])) {
-            $laporan = $response['data'];
-        } else {
-            echo '<script>alert("Laporan bencana tidak ditemukan"); window.location.href="index.php?controller=LaporanAdmin&action=index";</script>';
+        if (empty($response['data']) || !is_array($response['data'])) {
+            setDialog('Gagal', 'Laporan bencana tidak ditemukan', 'error');
+            header('Location: index.php?controller=LaporanAdmin&action=index');
             exit();
+        }
+
+        $laporan = $response['data'];
+
+        $provinsiList = [];
+        $kabupatenList = [];
+        $kecamatanList = [];
+        $desaList = [];
+
+        $selectedProvinsiId = (int)($_GET['provinsi_id'] ?? ($laporan['desa']['kecamatan']['kabupaten']['provinsi']['id'] ?? ($laporan['desa']['id_provinsi'] ?? 0)));
+        $selectedKabupatenId = (int)($_GET['kabupaten_id'] ?? ($laporan['desa']['kecamatan']['kabupaten']['id'] ?? ($laporan['desa']['id_kabupaten'] ?? 0)));
+        $selectedKecamatanId = (int)($_GET['kecamatan_id'] ?? ($laporan['desa']['kecamatan']['id'] ?? ($laporan['id_kecamatan'] ?? 0)));
+        $selectedDesaId = (int)($_GET['desa_id'] ?? ($laporan['id_desa'] ?? ($laporan['desa']['id'] ?? 0)));
+
+        $provinsiResponse = apiRequest(API_WILAYAH_PROVINSI, 'GET', null, getAuthHeaders($_SESSION['token'] ?? null));
+        if ($provinsiResponse['success']) {
+            $provinsiList = apiDataList($provinsiResponse['data']);
+        } else {
+            $error_message = $provinsiResponse['message'] ?? 'Gagal memuat data provinsi.';
+        }
+
+        if ($selectedProvinsiId > 0) {
+            $kabupatenResponse = apiRequest(
+                str_replace('{provinsi_id}', (string)$selectedProvinsiId, API_WILAYAH_KABUPATEN),
+                'GET',
+                null,
+                getAuthHeaders($_SESSION['token'] ?? null)
+            );
+            if ($kabupatenResponse['success']) {
+                $kabupatenList = apiDataList($kabupatenResponse['data']);
+            }
+        }
+
+        if ($selectedKabupatenId > 0) {
+            $kecamatanResponse = apiRequest(
+                str_replace('{kabupaten_id}', (string)$selectedKabupatenId, API_WILAYAH_KECAMATAN),
+                'GET',
+                null,
+                getAuthHeaders($_SESSION['token'] ?? null)
+            );
+            if ($kecamatanResponse['success']) {
+                $kecamatanList = apiDataList($kecamatanResponse['data']);
+            }
+        }
+
+        if ($selectedKecamatanId > 0) {
+            $desaResponse = apiRequest(
+                str_replace('{kecamatan_id}', (string)$selectedKecamatanId, API_WILAYAH_DESA),
+                'GET',
+                null,
+                getAuthHeaders($_SESSION['token'] ?? null)
+            );
+            if ($desaResponse['success']) {
+                $desaList = apiDataList($desaResponse['data']);
+            }
         }
 
         include __DIR__ . '/../views/laporan-admin/update.php';
@@ -139,6 +186,8 @@ class LaporanAdminController
      */
     public function update()
     {
+        $this->requireAdmin();
+
         // Ambil ID dari query string
         $id = $_GET['id'] ?? null;
 
@@ -154,23 +203,25 @@ class LaporanAdminController
         }
 
         // Ambil data dari form
-        $judul = trim($_POST['judul'] ?? '');
+        $judul = trim($_POST['judul_laporan'] ?? $_POST['judul'] ?? '');
         $deskripsi = trim($_POST['deskripsi'] ?? '');
-        $tingkat_kedaruratan = trim($_POST['tingkat_kedaruratan'] ?? '');
-        $alamat = trim($_POST['alamat'] ?? '');
+        $tingkat_kedaruratan = trim($_POST['tingkat_keparahan'] ?? $_POST['tingkat_kedaruratan'] ?? '');
+        $alamat = trim($_POST['alamat_lengkap'] ?? $_POST['alamat'] ?? '');
 
         // Validasi
         if (empty($judul) || empty($deskripsi) || empty($tingkat_kedaruratan)) {
-            echo '<script>alert("Judul, deskripsi, dan tingkat kedaruratan wajib diisi"); window.location.href="index.php?controller=LaporanAdmin&action=edit&id=' . $id . '";</script>';
+            setDialog('Gagal', 'Judul, deskripsi, dan tingkat kedaruratan wajib diisi', 'error');
+            header('Location: index.php?controller=LaporanAdmin&action=edit&id=' . $id);
             exit();
         }
 
         // Data untuk dikirim ke API
         $data = [
-            'judul' => $judul,
+            'judul_laporan' => $judul,
             'deskripsi' => $deskripsi,
-            'tingkat_kedaruratan' => $tingkat_kedaruratan,
-            'alamat' => $alamat
+            'tingkat_keparahan' => $tingkat_kedaruratan,
+            'alamat_lengkap' => $alamat,
+            'id_desa' => trim($_POST['id_desa'] ?? '')
         ];
 
         // Cek apakah ada file yang diupload
@@ -187,9 +238,11 @@ class LaporanAdminController
         $response = $this->service->update($id, $data, $files);
 
         if ($response['success']) {
-            echo '<script>alert("Laporan bencana berhasil diperbarui"); window.location.href="index.php?controller=LaporanAdmin&action=detail&id=' . $id . '";</script>';
+            setDialog('Berhasil', 'Laporan bencana berhasil diperbarui', 'success');
+            header('Location: index.php?controller=LaporanAdmin&action=detail&id=' . $id);
         } else {
-            echo '<script>alert("Gagal memperbarui laporan bencana: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=LaporanAdmin&action=edit&id=' . $id . '";</script>';
+            setDialog('Gagal', 'Gagal memperbarui laporan bencana: ' . ($response['message'] ?? 'Terjadi kesalahan'), 'error');
+            header('Location: index.php?controller=LaporanAdmin&action=edit&id=' . $id);
         }
         exit();
     }
@@ -199,6 +252,8 @@ class LaporanAdminController
      */
     public function delete()
     {
+        $this->requireAdmin();
+
         // Ambil ID dari query string
         $id = $_GET['id'] ?? null;
 
@@ -217,10 +272,92 @@ class LaporanAdminController
         $response = $this->service->delete($id);
 
         if ($response['success']) {
-            echo '<script>alert("Laporan bencana berhasil dihapus"); window.location.href="index.php?controller=LaporanAdmin&action=index";</script>';
+            setDialog('Berhasil', 'Laporan bencana berhasil dihapus', 'success');
         } else {
-            echo '<script>alert("Gagal menghapus laporan bencana: ' . addslashes($response['message'] ?? 'Terjadi kesalahan') . '"); window.location.href="index.php?controller=LaporanAdmin&action=index";</script>';
+            setDialog('Gagal', 'Gagal menghapus laporan bencana: ' . ($response['message'] ?? 'Terjadi kesalahan'), 'error');
         }
+        header('Location: index.php?controller=LaporanAdmin&action=index');
         exit();
+    }
+
+    public function create()
+    {
+        $userRole = $_SESSION['user']['role'] ?? '';
+
+        if (!in_array($userRole, ['Admin', 'Warga'], true)) {
+            setDialog('Akses Ditolak', 'Anda tidak memiliki akses membuat laporan.', 'error');
+            header('Location: index.php?controller=Dashboard&action=warga');
+            exit;
+        }
+
+        $desaList = [];
+        $desaResponse = apiRequest(API_DESA, 'GET', null, getAuthHeaders($_SESSION['token'] ?? null));
+        if ($desaResponse['success']) {
+            $desaList = is_array($desaResponse['data'] ?? null)
+                ? apiDataList($desaResponse['data'])
+                : [];
+        } else {
+            $error_message = $desaResponse['message'] ?? 'Gagal memuat daftar desa.';
+        }
+
+        include __DIR__ . '/../views/laporan-admin/create.php';
+    }
+
+    public function store()
+    {
+        $userRole = $_SESSION['user']['role'] ?? '';
+
+        if (!in_array($userRole, ['Admin', 'Warga'], true)) {
+            setDialog('Akses Ditolak', 'Anda tidak memiliki akses membuat laporan.', 'error');
+            header('Location: index.php?controller=Dashboard&action=warga');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: index.php?controller=LaporanAdmin&action=create');
+            exit;
+        }
+
+        $judul = trim($_POST['judul_laporan'] ?? '');
+        $deskripsi = trim($_POST['deskripsi'] ?? '');
+        $tingkat = trim($_POST['tingkat_keparahan'] ?? '');
+        $idDesa = trim($_POST['id_desa'] ?? '');
+        $alamat = trim($_POST['alamat_lengkap'] ?? '');
+
+        if ($judul === '' || $deskripsi === '' || $tingkat === '' || $idDesa === '') {
+            setDialog('Gagal', 'Judul, deskripsi, tingkat keparahan, dan kode desa wajib diisi.', 'error');
+            header('Location: index.php?controller=LaporanAdmin&action=create');
+            exit;
+        }
+
+        $data = [
+            'judul_laporan' => $judul,
+            'deskripsi' => $deskripsi,
+            'tingkat_keparahan' => $tingkat,
+            'id_desa' => (int)$idDesa,
+            'alamat_lengkap' => $alamat,
+            'latitude' => trim($_POST['latitude'] ?? ''),
+            'longitude' => trim($_POST['longitude'] ?? ''),
+            'jumlah_korban' => (int)($_POST['jumlah_korban'] ?? 0),
+            'jumlah_rumah_rusak' => (int)($_POST['jumlah_rumah_rusak'] ?? 0)
+        ];
+
+        $files = [];
+        foreach (['foto_bukti_1', 'foto_bukti_2', 'foto_bukti_3', 'video_bukti'] as $field) {
+            if (isset($_FILES[$field]) && $_FILES[$field]['error'] !== UPLOAD_ERR_NO_FILE) {
+                $files[$field] = $_FILES[$field];
+            }
+        }
+
+        $response = createLaporan($data, $files);
+
+        if ($response['success']) {
+            setDialog('Berhasil', 'Laporan bencana berhasil dibuat.', 'success');
+            header('Location: index.php?controller=LaporanAdmin&action=index');
+        } else {
+            setDialog('Gagal', $response['message'] ?? 'Gagal membuat laporan bencana.', 'error');
+            header('Location: index.php?controller=LaporanAdmin&action=create');
+        }
+        exit;
     }
 }

@@ -16,10 +16,10 @@ class TindakLanjutController {
             exit;
         }
 
-        // Pastikan role adalah Admin atau PetugasBPBD
+        // Pastikan role adalah Admin, PetugasBPBD, atau OperatorDesa
         $userRole = $currentUser['data']['role'] ?? '';
-        if ($userRole !== 'Admin' && $userRole !== 'PetugasBPBD') {
-            // Jika bukan Admin atau PetugasBPBD, redirect ke halaman sesuai role
+        if (!in_array($userRole, ['Admin', 'PetugasBPBD', 'OperatorDesa'], true)) {
+            // Jika role tidak diizinkan, redirect ke halaman sesuai role
             $this->redirectToRoleDashboard($userRole);
             exit;
         }
@@ -46,7 +46,7 @@ class TindakLanjutController {
         $response = $this->tindakLanjutService->getAll($filters);
 
         if ($response['success']) {
-            $tindakLanjutList = $response['data'];
+            $tindakLanjutList = is_array($response['data']) ? $response['data'] : [];
         } else {
             $tindakLanjutList = [];
             $error_message = $response['message'] ?? 'Gagal mengambil data tindak lanjut';
@@ -88,9 +88,8 @@ class TindakLanjutController {
         $laporanResponse = $this->tindakLanjutService->getAllLaporan();
         $petugasResponse = $this->tindakLanjutService->getAllPetugas();
 
-        // Extract data handling pagination structure
-        $laporanList = $laporanResponse['data']['data'] ?? $laporanResponse['data'] ?? [];
-        $petugasList = $petugasResponse['data']['data'] ?? $petugasResponse['data'] ?? [];
+        $laporanList = is_array($laporanResponse['data']) ? $laporanResponse['data'] : [];
+        $petugasList = is_array($petugasResponse['data']) ? $petugasResponse['data'] : [];
 
         $title = "Tambah Tindak Lanjut - SIMONTA BENCANA";
         include 'views/tindak-lanjut/form.php';
@@ -112,11 +111,7 @@ class TindakLanjutController {
         
         // Validasi input
         if (empty($laporanId) || empty($tanggalTanggapan) || empty($status)) {
-            $_SESSION['toast'] = [
-                'type' => 'error',
-                'title' => 'Gagal',
-                'message' => 'Laporan, tanggal tanggapan, dan status harus diisi'
-            ];
+            setDialog('Gagal', 'Laporan, tanggal tanggapan, dan status harus diisi', 'error');
             header('Location: index.php?controller=TindakLanjut&action=create');
             exit;
         }
@@ -139,18 +134,10 @@ class TindakLanjutController {
         $response = $this->tindakLanjutService->create($data, $files);
 
         if ($response['success']) {
-            $_SESSION['toast'] = [
-                'type' => 'success',
-                'title' => 'Berhasil',
-                'message' => 'Tindak lanjut berhasil ditambahkan'
-            ];
+            setDialog('Berhasil', 'Tindak lanjut berhasil ditambahkan', 'success');
             header('Location: index.php?controller=TindakLanjut&action=index');
         } else {
-            $_SESSION['toast'] = [
-                'type' => 'error',
-                'title' => 'Gagal',
-                'message' => $response['message'] ?? 'Gagal menambahkan tindak lanjut'
-            ];
+            setDialog('Gagal', $response['message'] ?? 'Gagal menambahkan tindak lanjut', 'error');
             header('Location: index.php?controller=TindakLanjut&action=create');
         }
         exit;
@@ -181,9 +168,8 @@ class TindakLanjutController {
         $laporanResponse = $this->tindakLanjutService->getAllLaporan();
         $petugasResponse = $this->tindakLanjutService->getAllPetugas();
 
-        // Extract data handling pagination structure
-        $laporanList = $laporanResponse['data']['data'] ?? $laporanResponse['data'] ?? [];
-        $petugasList = $petugasResponse['data']['data'] ?? $petugasResponse['data'] ?? [];
+        $laporanList = is_array($laporanResponse['data']) ? $laporanResponse['data'] : [];
+        $petugasList = is_array($petugasResponse['data']) ? $petugasResponse['data'] : [];
 
         $title = "Edit Tindak Lanjut - SIMONTA BENCANA";
         include 'views/tindak-lanjut/form.php';
@@ -213,11 +199,7 @@ class TindakLanjutController {
         
         // Validasi input
         if (empty($tanggalTanggapan) || empty($status)) {
-            $_SESSION['toast'] = [
-                'type' => 'error',
-                'title' => 'Gagal',
-                'message' => 'Tanggal tanggapan dan status harus diisi'
-            ];
+            setDialog('Gagal', 'Tanggal tanggapan dan status harus diisi', 'error');
             header('Location: index.php?controller=TindakLanjut&action=edit&id=' . $id);
             exit;
         }
@@ -238,18 +220,10 @@ class TindakLanjutController {
         $response = $this->tindakLanjutService->update($id, $data, $files);
 
         if ($response['success']) {
-            $_SESSION['toast'] = [
-                'type' => 'success',
-                'title' => 'Berhasil',
-                'message' => 'Tindak lanjut berhasil diperbarui'
-            ];
+            setDialog('Berhasil', 'Tindak lanjut berhasil diperbarui', 'success');
             header('Location: index.php?controller=TindakLanjut&action=detail&id=' . $id);
         } else {
-            $_SESSION['toast'] = [
-                'type' => 'error',
-                'title' => 'Gagal',
-                'message' => $response['message'] ?? 'Gagal memperbarui tindak lanjut'
-            ];
+            setDialog('Gagal', $response['message'] ?? 'Gagal memperbarui tindak lanjut', 'error');
             header('Location: index.php?controller=TindakLanjut&action=edit&id=' . $id);
         }
         exit;
@@ -275,17 +249,9 @@ class TindakLanjutController {
         $response = $this->tindakLanjutService->delete($id);
 
         if ($response['success']) {
-            $_SESSION['toast'] = [
-                'type' => 'success',
-                'title' => 'Berhasil',
-                'message' => 'Tindak lanjut berhasil dihapus'
-            ];
+            setDialog('Berhasil', 'Tindak lanjut berhasil dihapus', 'success');
         } else {
-            $_SESSION['toast'] = [
-                'type' => 'error',
-                'title' => 'Gagal',
-                'message' => $response['message'] ?? 'Gagal menghapus tindak lanjut'
-            ];
+            setDialog('Gagal', $response['message'] ?? 'Gagal menghapus tindak lanjut', 'error');
         }
 
         header('Location: index.php?controller=TindakLanjut&action=index');
@@ -305,7 +271,7 @@ class TindakLanjutController {
                 header('Location: index.php?controller=Dashboard&action=operator');
                 break;
             case 'Warga':
-                header('Location: index.php?controller=Beranda&action=index');
+                header('Location: index.php?controller=Dashboard&action=warga');
                 break;
             default:
                 header('Location: index.php?controller=Auth&action=login');

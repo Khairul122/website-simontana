@@ -9,7 +9,11 @@ class ProfileService {
     }
 
     public function getProfile() {
-        return apiRequest($this->apiUrl, 'GET', null, getAuthHeaders($_SESSION['token'] ?? null));
+        $response = apiRequest($this->apiUrl, 'GET', null, getAuthHeaders($_SESSION['token'] ?? null));
+        if ($response['success']) {
+            $response['data'] = apiDataEntity($response['data']);
+        }
+        return $response;
     }
 
     public function updateProfile($data) {

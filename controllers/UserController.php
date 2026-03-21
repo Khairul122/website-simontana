@@ -18,7 +18,7 @@ class UserController
     private function checkRole()
     {
         if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'Admin') {
-            header('Location: index.php?controller=dashboard&action=admin');
+            header('Location: index.php?controller=Dashboard&action=admin');
             exit();
         }
     }
@@ -28,15 +28,9 @@ class UserController
      */
     private function handleUnauthorized()
     {
-        // Clear all session data
-        session_destroy();
+        clearSession();
 
-        // Set flash message for user
-        $_SESSION['toast_message'] = [
-            'type' => 'error',
-            'title' => 'Sesi Habis',
-            'message' => 'Sesi Anda telah berakhir, silakan login kembali.'
-        ];
+        setToast('error', 'Sesi Habis', 'Sesi Anda telah berakhir, silakan login kembali.');
 
         // Redirect to login page
         header('Location: index.php?controller=Auth&action=login');
@@ -68,8 +62,17 @@ class UserController
             $this->handleUnauthorized();
         }
 
-        // Set session for debugging
-        $_SESSION['server_response'] = $response;
+        $users = [];
+        $fetchError = null;
+
+        if ($response['success']) {
+            $users = is_array($response['data'] ?? null) ? $response['data'] : [];
+        } else {
+            $fetchError = [
+                'message' => $response['message'] ?? 'Terjadi kesalahan saat mengambil data pengguna.',
+                'details' => $response['details'] ?? $response['errors'] ?? []
+            ];
+        }
 
         // Load view
         include dirname(__DIR__) . '/views/user/index.php';
@@ -118,11 +121,7 @@ class UserController
         }
 
         if (!$response['success'] || empty($response['data'])) {
-            $_SESSION['toast_message'] = [
-                'type' => 'error',
-                'title' => 'Error',
-                'message' => 'Pengguna tidak ditemukan'
-            ];
+            setDialog('Error', 'Pengguna tidak ditemukan', 'error');
             header('Location: index.php?controller=User&action=index');
             exit();
         }
@@ -147,9 +146,6 @@ class UserController
             // Load provinsi list untuk ditampilkan di form
             $provinsiList = $this->getAllProvinsi();
         }
-
-        // Set session for debugging during edit
-        $_SESSION['server_response_edit'] = $response;
 
         include dirname(__DIR__) . '/views/user/form.php';
     }
@@ -263,11 +259,7 @@ class UserController
 
         // Validasi input wajib
         if (empty($nama) || empty($username) || empty($role) || empty($password)) {
-            $_SESSION['toast_message'] = [
-                'type' => 'error',
-                'title' => 'Error',
-                'message' => 'Semua field wajib diisi (kecuali alamat, no_telepon dan id_desa)'
-            ];
+            setDialog('Error', 'Semua field wajib diisi (kecuali alamat, no_telepon dan id_desa)', 'error');
             header('Location: index.php?controller=User&action=create');
             exit();
         }
@@ -334,11 +326,7 @@ class UserController
 
         // Validasi input wajib
         if (empty($nama) || empty($username) || empty($role)) {
-            $_SESSION['toast_message'] = [
-                'type' => 'error',
-                'title' => 'Error',
-                'message' => 'Nama, username, dan role wajib diisi'
-            ];
+            setDialog('Error', 'Nama, username, dan role wajib diisi', 'error');
             header('Location: index.php?controller=User&action=edit&id=' . $id);
             exit();
         }

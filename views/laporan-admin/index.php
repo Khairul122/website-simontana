@@ -1,515 +1,393 @@
 <?php include('template/header.php'); ?>
 
-<style>
-  .table th {
-    font-weight: 600;
-    color: #495057;
-    border-top: none;
-    background-color: #f8f9fa;
-  }
+<?php
+$reportRows = is_array($laporanList ?? null) ? $laporanList : [];
+$reportTotal = count($reportRows);
+$reportPending = 0;
+$reportProgress = 0;
+$reportDone = 0;
 
-  .table-hover tbody tr:hover {
-    background-color: rgba(0, 123, 255, 0.05);
+foreach ($reportRows as $reportItem) {
+  $statusRaw = strtolower(trim((string)($reportItem['status'] ?? '')));
+  if ($statusRaw === 'menunggu verifikasi') {
+    $reportPending++;
+  } elseif ($statusRaw === 'diproses' || $statusRaw === 'ditangani') {
+    $reportProgress++;
+  } elseif ($statusRaw === 'selesai') {
+    $reportDone++;
   }
+}
+?>
 
-  .card {
-    border: none;
-    box-shadow: 0 0.1rem 0.7rem rgba(0, 0, 0, 0.1);
-    border-radius: 0.5rem;
-  }
-
-  .page-title {
-    font-weight: 600;
-    color: #2c2c2c;
-  }
-
-  .card-title {
-    font-weight: 600;
-    color: #2c2c2c;
-  }
-
-  .btn-group .btn {
-    margin: 0 1px;
-  }
-
-  .table-responsive {
-    border-radius: 0.5rem;
-  }
-
-  .badge {
-    font-size: 0.8em;
-    font-weight: 500;
-    padding: 0.5em 0.75em;
-  }
-
-  .bg-orange {
-    background-color: #fd7e14;
-    color: white;
-  }
-
-  .pagination .page-link {
-    border-radius: 0.375rem;
-    margin: 0 0.2rem;
-  }
-
-  .form-select, .form-control {
-    border-radius: 0.375rem;
-  }
-
-  .input-group .form-control {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-  }
-
-  .input-group .input-group-append .input-group-text {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    border-top-right-radius: 0.375rem;
-    border-bottom-right-radius: 0.375rem;
-  }
-
-  .table th {
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .table th:hover {
-    background-color: #e9ecef;
-  }
-
-  .table th.sortable::after {
-    content: ' ↕';
-    font-size: 0.8em;
-    opacity: 0.5;
-  }
-
-  .table th.sort-asc::after {
-    content: ' ↑';
-    opacity: 1;
-  }
-
-  .table th.sort-desc::after {
-    content: ' ↓';
-    opacity: 1;
-  }
-</style>
-
-<body class="with-welcome-text">
-  <div class="container-scroller">
+<div class="flex h-screen overflow-hidden bg-slate-50">
+  <?php include 'template/sidebar.php'; ?>
+  
+  <div class="flex-1 flex flex-col overflow-hidden">
     <?php include 'template/navbar.php'; ?>
-    <div class="container-fluid page-body-wrapper">
-      <?php include 'template/setting_panel.php'; ?>
-      <?php include 'template/sidebar.php'; ?>
-      <div class="main-panel">
-        <div class="content-wrapper">
-          <div class="row">
-            <div class="col-12">
-              <div class="page-header">
-                <h3 class="page-title">Data Laporan Bencana</h3>
-                <nav aria-label="breadcrumb">
-                  <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="index.php">Dashboard</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Laporan Bencana</li>
-                  </ol>
-                </nav>
-              </div>
+    
+    <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative">
+      <div class="p-4 md:p-6 lg:p-8 w-full">
 
-              <div class="row">
-                <div class="col-12 grid-margin">
-                  <div class="card">
-                    <div class="card-body">
-                      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
-                        <div>
-                          <h4 class="card-title mb-1">Daftar Laporan Bencana</h4>
-                          <p class="card-description mb-0">Laporan bencana yang terdaftar dalam sistem</p>
-                        </div>
-                        <div class="d-flex gap-2">
-                          <div class="input-group" style="width: 300px;">
-                            <input type="text" class="form-control" id="search" name="search" placeholder="Cari judul atau deskripsi..." value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>">
-                            <div class="input-group-append">
-                              <span class="input-group-text bg-transparent"><i class="mdi mdi-magnify"></i></span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="row mb-4">
-                        <div class="col-md-12">
-                          <form method="GET" class="d-flex flex-wrap gap-3">
-                            <input type="hidden" name="controller" value="LaporanAdmin">
-                            <input type="hidden" name="action" value="index">
-
-                            <div class="form-group mb-2">
-                              <label for="status" class="form-label">Status:</label>
-                              <select name="status" id="status" class="form-select">
-                                <option value="">Semua Status</option>
-                                <option value="Menunggu Verifikasi" <?php echo (isset($_GET['status']) && $_GET['status'] == 'Menunggu Verifikasi') ? 'selected' : ''; ?>>Menunggu Verifikasi</option>
-                                <option value="Diproses" <?php echo (isset($_GET['status']) && $_GET['status'] == 'Diproses') ? 'selected' : ''; ?>>Diproses</option>
-                                <option value="Selesai" <?php echo (isset($_GET['status']) && $_GET['status'] == 'Selesai') ? 'selected' : ''; ?>>Selesai</option>
-                                <option value="Ditolak" <?php echo (isset($_GET['status']) && $_GET['status'] == 'Ditolak') ? 'selected' : ''; ?>>Ditolak</option>
-                              </select>
-                            </div>
-
-                            <div class="form-group mb-2">
-                              <label for="tingkat_keparahan" class="form-label">Tingkat Keparahan:</label>
-                              <select name="tingkat_keparahan" id="tingkat_keparahan" class="form-select">
-                                <option value="">Semua Tingkat</option>
-                                <option value="Rendah" <?php echo (isset($_GET['tingkat_keparahan']) && $_GET['tingkat_keparahan'] == 'Rendah') ? 'selected' : ''; ?>>Rendah</option>
-                                <option value="Sedang" <?php echo (isset($_GET['tingkat_keparahan']) && $_GET['tingkat_keparahan'] == 'Sedang') ? 'selected' : ''; ?>>Sedang</option>
-                                <option value="Tinggi" <?php echo (isset($_GET['tingkat_keparahan']) && $_GET['tingkat_keparahan'] == 'Tinggi') ? 'selected' : ''; ?>>Tinggi</option>
-                                <option value="Sangat Tinggi" <?php echo (isset($_GET['tingkat_keparahan']) && $_GET['tingkat_keparahan'] == 'Sangat Tinggi') ? 'selected' : ''; ?>>Sangat Tinggi</option>
-                              </select>
-                            </div>
-
-                            <button type="submit" class="btn btn-primary mb-2 align-self-end">
-                              <i class="mdi mdi-filter-variant"></i> Filter
-                            </button>
-                            <a href="index.php?controller=LaporanAdmin&action=index" class="btn btn-outline-secondary mb-2 align-self-end">
-                              <i class="mdi mdi-refresh"></i> Reset
-                            </a>
-                          </form>
-                        </div>
-                      </div>
-
-                      <?php if (isset($_SESSION['toast_message'])): ?>
-                        <div class="alert alert-<?php echo $_SESSION['toast_message']['type']; ?> alert-dismissible fade show" role="alert">
-                          <strong><?php echo $_SESSION['toast_message']['title']; ?></strong> <?php echo $_SESSION['toast_message']['message']; ?>
-                          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                        <?php unset($_SESSION['toast_message']); ?>
-                      <?php endif; ?>
-
-                      <div class="table-responsive">
-                        <table class="table table-hover" id="laporanTable">
-                          <thead class="table-light">
-                            <tr>
-                              <th class="text-center">
-                                <input type="checkbox" id="selectAll" class="form-check-input">
-                              </th>
-                              <th class="sortable">No</th>
-                              <th class="sortable">Judul Laporan</th>
-                              <th class="sortable">Pelapor</th>
-                              <th class="sortable">Lokasi</th>
-                              <th class="sortable">Tingkat Keparahan</th>
-                              <th class="sortable">Status</th>
-                              <th class="sortable">Tanggal</th>
-                              <th class="text-center">Aksi</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <?php if (!empty($laporanList)): ?>
-                              <?php $no = (($_GET['page'] ?? 1) - 1) * ($pagination['per_page'] ?? 15) + 1; ?>
-                              <?php foreach ($laporanList as $laporan): ?>
-                                <tr>
-                                  <td class="text-center">
-                                    <input type="checkbox" class="form-check-input row-checkbox" value="<?php echo $laporan['id']; ?>">
-                                  </td>
-                                  <td><?php echo $no++; ?></td>
-                                  <td>
-                                    <div class="fw-medium"><?php echo htmlspecialchars($laporan['judul_laporan'] ?? $laporan['judul'] ?? $laporan['name'] ?? ''); ?></div>
-                                    <small class="text-muted d-block"><?php echo htmlspecialchars(substr($laporan['deskripsi'] ?? $laporan['description'] ?? '', 0, 60)) . (strlen($laporan['deskripsi'] ?? $laporan['description'] ?? '') > 60 ? '...' : ''); ?></small>
-                                  </td>
-                                  <td><?php echo htmlspecialchars($laporan['pelapor']['nama'] ?? $laporan['pelapor']['username'] ?? $laporan['user']['nama'] ?? $laporan['user']['username'] ?? ''); ?></td>
-                                  <td>
-                                    <?php
-                                      $desa = $laporan['desa']['nama'] ?? '';
-                                      $kecamatan = $laporan['desa']['kecamatan']['nama'] ?? '';
-                                      $kabupaten = $laporan['desa']['kecamatan']['kabupaten']['nama'] ?? '';
-                                      $provinsi = $laporan['desa']['kecamatan']['kabupaten']['provinsi']['nama'] ?? '';
-
-                                      $lokasi = [];
-                                      if ($desa) $lokasi[] = $desa;
-                                      if ($kecamatan) $lokasi[] = $kecamatan;
-                                      if ($kabupaten) $lokasi[] = $kabupaten;
-                                      if ($provinsi) $lokasi[] = $provinsi;
-
-                                      echo htmlspecialchars(implode(', ', $lokasi));
-                                    ?>
-                                  </td>
-                                  <td>
-                                    <?php
-                                      $tingkat = $laporan['tingkat_keparahan'] ?? $laporan['tingkat_kedaruratan'] ?? '';
-                                      $tingkatClass = '';
-                                      switch ($tingkat) {
-                                        case 'Rendah':
-                                          $tingkatClass = 'badge bg-success';
-                                          break;
-                                        case 'Sedang':
-                                          $tingkatClass = 'badge bg-warning text-dark';
-                                          break;
-                                        case 'Tinggi':
-                                          $tingkatClass = 'badge bg-orange';
-                                          break;
-                                        case 'Sangat Tinggi':
-                                          $tingkatClass = 'badge bg-danger';
-                                          break;
-                                        default:
-                                          $tingkatClass = 'badge bg-secondary';
-                                      }
-                                    ?>
-                                    <span class="<?php echo $tingkatClass; ?>"><?php echo htmlspecialchars($tingkat); ?></span>
-                                  </td>
-                                  <td>
-                                    <?php
-                                      $status = $laporan['status'] ?? '';
-                                      $badgeClass = '';
-                                      switch ($status) {
-                                        case 'Menunggu Verifikasi':
-                                          $badgeClass = 'badge bg-warning text-dark';
-                                          break;
-                                        case 'Diproses':
-                                          $badgeClass = 'badge bg-info';
-                                          break;
-                                        case 'Selesai':
-                                          $badgeClass = 'badge bg-success';
-                                          break;
-                                        case 'Ditolak':
-                                          $badgeClass = 'badge bg-danger';
-                                          break;
-                                        default:
-                                          $badgeClass = 'badge bg-secondary';
-                                      }
-                                    ?>
-                                    <span class="<?php echo $badgeClass; ?>"><?php echo htmlspecialchars($status); ?></span>
-                                  </td>
-                                  <td><?php echo date('d M Y', strtotime($laporan['waktu_laporan'] ?? $laporan['created_at'] ?? '')); ?></td>
-                                  <td class="text-center">
-                                    <div class="btn-group" role="group">
-                                      <a href="index.php?controller=LaporanAdmin&action=detail&id=<?php echo $laporan['id']; ?>" class="btn btn-outline-info btn-sm" title="Detail">
-                                        <i class="mdi mdi-eye"></i>
-                                      </a>
-                                      <a href="index.php?controller=LaporanAdmin&action=edit&id=<?php echo $laporan['id']; ?>" class="btn btn-outline-warning btn-sm" title="Edit">
-                                        <i class="mdi mdi-pencil"></i>
-                                      </a>
-                                      <form method="POST" action="index.php?controller=LaporanAdmin&action=delete&id=<?php echo $laporan['id']; ?>" style="display:inline;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus laporan ini?');">
-                                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Hapus">
-                                          <i class="mdi mdi-trash-can"></i>
-                                        </button>
-                                      </form>
-                                    </div>
-                                  </td>
-                                </tr>
-                              <?php endforeach; ?>
-                            <?php else: ?>
-                              <tr>
-                                <td colspan="9" class="text-center py-5">
-                                  <div class="d-flex flex-column align-items-center justify-content-center">
-                                    <i class="mdi mdi-alert-octagram mdi-48px text-muted mb-3"></i>
-                                    <h5 class="text-muted">Tidak ada data laporan bencana</h5>
-                                    <p class="text-muted">Belum ada laporan bencana yang tersedia</p>
-                                  </div>
-                                </td>
-                              </tr>
-                            <?php endif; ?>
-                          </tbody>
-                        </table>
-                      </div>
-
-                      <?php if ($pagination && $pagination['last_page'] > 1): ?>
-                        <nav aria-label="Laporan pagination" class="mt-4">
-                          <ul class="pagination justify-content-center flex-wrap">
-                            <?php if ($pagination['current_page'] > 1): ?>
-                              <li class="page-item">
-                                <a class="page-link" href="index.php?controller=LaporanAdmin&action=index&page=<?php echo $pagination['current_page'] - 1; ?>&<?php echo http_build_query(array_filter($_GET, function($key) { return $key !== 'page'; }, ARRAY_FILTER_USE_KEY)); ?>">&laquo; Sebelumnya</a>
-                              </li>
-                            <?php endif; ?>
-
-                            <?php if ($pagination['current_page'] > 3): ?>
-                              <li class="page-item">
-                                <a class="page-link" href="index.php?controller=LaporanAdmin&action=index&page=1&<?php echo http_build_query(array_filter($_GET, function($key) { return $key !== 'page'; }, ARRAY_FILTER_USE_KEY)); ?>">1</a>
-                              </li>
-                              <?php if ($pagination['current_page'] > 4): ?>
-                                <li class="page-item disabled">
-                                  <span class="page-link">...</span>
-                                </li>
-                              <?php endif; ?>
-                            <?php endif; ?>
-
-                            <?php for ($i = max(1, $pagination['current_page'] - 2); $i <= min($pagination['last_page'], $pagination['current_page'] + 2); $i++): ?>
-                              <li class="page-item <?php echo ($i == $pagination['current_page']) ? 'active' : ''; ?>">
-                                <a class="page-link" href="index.php?controller=LaporanAdmin&action=index&page=<?php echo $i; ?>&<?php echo http_build_query(array_filter($_GET, function($key) { return $key !== 'page'; }, ARRAY_FILTER_USE_KEY)); ?>"><?php echo $i; ?></a>
-                              </li>
-                            <?php endfor; ?>
-
-                            <?php if ($pagination['current_page'] < $pagination['last_page'] - 2): ?>
-                              <?php if ($pagination['last_page'] - $pagination['current_page'] > 3): ?>
-                                <li class="page-item disabled">
-                                  <span class="page-link">...</span>
-                                </li>
-                              <?php endif; ?>
-                              <li class="page-item">
-                                <a class="page-link" href="index.php?controller=LaporanAdmin&action=index&page=<?php echo $pagination['last_page']; ?>&<?php echo http_build_query(array_filter($_GET, function($key) { return $key !== 'page'; }, ARRAY_FILTER_USE_KEY)); ?>"><?php echo $pagination['last_page']; ?></a>
-                              </li>
-                            <?php endif; ?>
-
-                            <?php if ($pagination['current_page'] < $pagination['last_page']): ?>
-                              <li class="page-item">
-                                <a class="page-link" href="index.php?controller=LaporanAdmin&action=index&page=<?php echo $pagination['current_page'] + 1; ?>&<?php echo http_build_query(array_filter($_GET, function($key) { return $key !== 'page'; }, ARRAY_FILTER_USE_KEY)); ?>">Berikutnya &raquo;</a>
-                              </li>
-                            <?php endif; ?>
-                          </ul>
-                        </nav>
-                      <?php endif; ?>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <!-- Page Header -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+          <div>
+            <h1 class="font-display text-2xl md:text-3xl font-bold text-slate-900">Data Laporan Bencana</h1>
+            <p class="text-sm text-slate-500 mt-1">Kelola laporan masyarakat, status validasi, dan rincian kejadian darurat.</p>
+          </div>
+          <div class="shrink-0 flex gap-3">
+            <a href="index.php?controller=LaporanAdmin&action=create" class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-600 text-white font-bold text-sm hover:bg-brand-700 hover:shadow-float transition-all shadow-sm">
+              <i class="fa-solid fa-plus"></i> Buat Laporan
+            </a>
           </div>
         </div>
+
+        <!-- Metric Chips -->
+        <div class="flex flex-wrap items-center gap-3 mb-6">
+          <div class="flex items-center gap-3 px-4 py-2 bg-white border border-slate-200 rounded-full shadow-sm">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Semua Data</p>
+            <span class="inline-flex h-6 min-w-[24px] items-center justify-center rounded-full bg-slate-100 px-2 text-xs font-bold text-slate-700"><?php echo $reportTotal; ?></span>
+          </div>
+          <div class="flex items-center gap-3 px-4 py-2 bg-red-50 border border-red-200 rounded-full shadow-sm">
+            <span class="flex h-2 w-2 rounded-full bg-red-500"></span>
+            <p class="text-xs font-bold text-red-700 uppercase tracking-widest">Menunggu Validasi</p>
+            <span class="inline-flex h-6 min-w-[24px] items-center justify-center rounded-full bg-red-100 px-2 text-xs font-bold text-red-800"><?php echo $reportPending; ?></span>
+          </div>
+          <div class="flex items-center gap-3 px-4 py-2 bg-amber-50 border border-amber-200 rounded-full shadow-sm">
+            <span class="flex h-2 w-2 rounded-full bg-amber-500"></span>
+            <p class="text-xs font-bold text-amber-700 uppercase tracking-widest">Diproses Tim</p>
+            <span class="inline-flex h-6 min-w-[24px] items-center justify-center rounded-full bg-amber-100 px-2 text-xs font-bold text-amber-800"><?php echo $reportProgress; ?></span>
+          </div>
+          <div class="flex items-center gap-3 px-4 py-2 bg-emerald-50 border border-emerald-200 rounded-full shadow-sm">
+            <span class="flex h-2 w-2 rounded-full bg-emerald-500"></span>
+            <p class="text-xs font-bold text-emerald-700 uppercase tracking-widest">Penanganan Selesai</p>
+            <span class="inline-flex h-6 min-w-[24px] items-center justify-center rounded-full bg-emerald-100 px-2 text-xs font-bold text-emerald-800"><?php echo $reportDone; ?></span>
+          </div>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-card mb-6">
+          <form method="GET" class="flex flex-col md:flex-row flex-wrap gap-4 items-end">
+            <input type="hidden" name="controller" value="LaporanAdmin">
+            <input type="hidden" name="action" value="index">
+            
+            <div class="w-full md:w-auto flex-1 min-w-[200px]">
+              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Pencarian</label>
+              <div class="relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input type="text" id="search" name="search" value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>" placeholder="Cari judul, pelapor, atau wilayah..." class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-11 pr-4 text-sm font-medium text-slate-800 outline-none transition-all placeholder:text-slate-400 focus:border-brand-500 focus:bg-white focus:ring-4 focus:ring-brand-500/10">
+              </div>
+            </div>
+
+            <div class="w-full md:w-48 shrink-0">
+              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Status</label>
+              <select name="status" id="status" class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-4 text-sm font-semibold text-slate-700 outline-none transition-all focus:border-brand-500 focus:bg-white focus:ring-4 focus:ring-brand-500/10 appearance-none">
+                <option value="">Semua Status</option>
+                <option value="Menunggu Verifikasi" <?php echo (isset($_GET['status']) && $_GET['status'] == 'Menunggu Verifikasi') ? 'selected' : ''; ?>>Menunggu Verifikasi</option>
+                <option value="Diproses" <?php echo (isset($_GET['status']) && $_GET['status'] == 'Diproses') ? 'selected' : ''; ?>>Diproses</option>
+                <option value="Selesai" <?php echo (isset($_GET['status']) && $_GET['status'] == 'Selesai') ? 'selected' : ''; ?>>Selesai</option>
+                <option value="Ditolak" <?php echo (isset($_GET['status']) && $_GET['status'] == 'Ditolak') ? 'selected' : ''; ?>>Ditolak</option>
+              </select>
+            </div>
+
+            <div class="w-full md:w-56 shrink-0">
+              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tingkat Darurat</label>
+              <select name="tingkat_keparahan" id="tingkat_keparahan" class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-4 text-sm font-semibold text-slate-700 outline-none transition-all focus:border-brand-500 focus:bg-white focus:ring-4 focus:ring-brand-500/10 appearance-none">
+                <option value="">Semua Tingkat</option>
+                <option value="Rendah" <?php echo (isset($_GET['tingkat_keparahan']) && $_GET['tingkat_keparahan'] == 'Rendah') ? 'selected' : ''; ?>>Rendah</option>
+                <option value="Sedang" <?php echo (isset($_GET['tingkat_keparahan']) && $_GET['tingkat_keparahan'] == 'Sedang') ? 'selected' : ''; ?>>Sedang</option>
+                <option value="Tinggi" <?php echo (isset($_GET['tingkat_keparahan']) && $_GET['tingkat_keparahan'] == 'Tinggi') ? 'selected' : ''; ?>>Tinggi</option>
+                <option value="Sangat Tinggi" <?php echo (isset($_GET['tingkat_keparahan']) && $_GET['tingkat_keparahan'] == 'Sangat Tinggi') ? 'selected' : ''; ?>>Sangat Tinggi</option>
+              </select>
+            </div>
+
+            <div class="flex w-full md:w-auto gap-2">
+              <button type="submit" class="flex-1 md:flex-none flex items-center justify-center gap-2 rounded-xl bg-slate-800 px-5 py-2.5 text-sm font-bold text-white hover:bg-slate-900 transition-colors shadow-sm">
+                <i class="fa-solid fa-filter text-xs"></i> Terapkan
+              </button>
+              <?php if (isset($_GET['status']) || isset($_GET['tingkat_keparahan']) || !empty($_GET['search'])): ?>
+              <a href="index.php?controller=LaporanAdmin&action=index" class="flex items-center justify-center rounded-xl bg-slate-100 border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-200 transition-colors" title="Reset Filter">
+                <i class="fa-solid fa-rotate-left"></i>
+              </a>
+              <?php endif; ?>
+            </div>
+            
+            <div class="w-full md:w-auto md:ml-auto">
+              <button type="button" onclick="bulkDelete()" class="w-full flex items-center justify-center gap-2 rounded-xl border border-red-200 bg-white px-4 py-2.5 text-sm font-bold text-red-600 hover:bg-red-50 hover:border-red-300 transition-colors shadow-sm">
+                <i class="fa-solid fa-trash-can text-xs"></i> Hapus Massal
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Data Table -->
+        <div class="rounded-2xl border border-slate-200 bg-white shadow-card overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse" id="laporanTable">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                  <th class="px-5 py-4 w-12 text-center">
+                    <input type="checkbox" id="selectAll" class="w-4 h-4 text-brand-600 rounded border-slate-300 focus:ring-brand-500">
+                  </th>
+                  <th class="px-5 py-4 cursor-pointer hover:text-slate-800 sortable">ID Kejadian</th>
+                  <th class="px-5 py-4 cursor-pointer hover:text-slate-800 sortable">Info Laporan</th>
+                  <th class="px-5 py-4 cursor-pointer hover:text-slate-800 sortable">Lokasi</th>
+                  <th class="px-5 py-4 cursor-pointer hover:text-slate-800 sortable">Tingkat</th>
+                  <th class="px-5 py-4 cursor-pointer hover:text-slate-800 sortable">Status</th>
+                  <th class="px-5 py-4 cursor-pointer hover:text-slate-800 sortable text-right">Tanggal Masuk</th>
+                  <th class="px-5 py-4 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 text-sm">
+                <?php if (!empty($laporanList)): ?>
+                  <?php $no = (($_GET['page'] ?? 1) - 1) * ($pagination['per_page'] ?? 15) + 1; ?>
+                  <?php foreach ($laporanList as $laporan): ?>
+                    <tr class="hover:bg-slate-50/70 transition-colors group">
+                      <td class="px-5 py-4 text-center">
+                        <input type="checkbox" class="row-checkbox w-4 h-4 text-brand-600 rounded border-slate-300 focus:ring-brand-500" value="<?php echo $laporan['id']; ?>">
+                      </td>
+                      <td class="px-5 py-4 font-bold text-slate-400">#<?php echo $laporan['id']; ?></td>
+                      <td class="px-5 py-4">
+                        <p class="font-bold text-slate-800 mb-0.5 group-hover:text-brand-600 transition-colors"><?php echo htmlspecialchars($laporan['judul_laporan'] ?? $laporan['judul'] ?? $laporan['name'] ?? ''); ?></p>
+                        <p class="text-[11px] font-bold text-slate-500 tracking-wide uppercase"><i class="fa-solid fa-user text-slate-400 mr-1"></i> <?php echo htmlspecialchars($laporan['pelapor']['nama'] ?? $laporan['pelapor']['username'] ?? $laporan['user']['nama'] ?? $laporan['user']['username'] ?? ''); ?></p>
+                      </td>
+                      <td class="px-5 py-4">
+                        <?php
+                          $desa = $laporan['desa']['nama'] ?? '';
+                          $kecamatan = $laporan['desa']['kecamatan']['nama'] ?? '';
+                          $kabupaten = $laporan['desa']['kecamatan']['kabupaten']['nama'] ?? '';
+                          $lokasi = [];
+                          if ($desa) $lokasi[] = $desa;
+                          if ($kecamatan) $lokasi[] = $kecamatan;
+                          if ($kabupaten) $lokasi[] = $kabupaten;
+                          $lokasiStr = implode(', ', $lokasi);
+                        ?>
+                        <div class="flex items-start gap-1.5 min-w-[140px]">
+                          <i class="fa-solid fa-location-dot mt-0.5 text-brand-500"></i>
+                          <p class="font-medium text-slate-600 leading-tight"><?php echo htmlspecialchars($lokasiStr ?: '-'); ?></p>
+                        </div>
+                      </td>
+                      <td class="px-5 py-4">
+                        <?php
+                          $tingkat = $laporan['tingkat_keparahan'] ?? $laporan['tingkat_kedaruratan'] ?? '';
+                          $tingkatClass = 'bg-slate-100 text-slate-700 border-slate-200';
+                          $tingkatIcon = 'fa-circle-info';
+                          if ($tingkat === 'Rendah') { $tingkatClass = 'bg-emerald-50 text-emerald-700 border-emerald-200'; $tingkatIcon = 'fa-check'; }
+                          if ($tingkat === 'Sedang') { $tingkatClass = 'bg-amber-50 text-amber-700 border-amber-200'; $tingkatIcon = 'fa-triangle-exclamation'; }
+                          if ($tingkat === 'Tinggi') { $tingkatClass = 'bg-orange-50 text-orange-700 border-orange-200'; $tingkatIcon = 'fa-fire'; }
+                          if ($tingkat === 'Sangat Tinggi') { $tingkatClass = 'bg-red-50 text-red-700 border-red-200'; $tingkatIcon = 'fa-radiation'; }
+                        ?>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-bold tracking-widest uppercase <?php echo $tingkatClass; ?> whitespace-nowrap">
+                          <i class="fa-solid <?php echo $tingkatIcon; ?>"></i> <?php echo htmlspecialchars($tingkat); ?>
+                        </span>
+                      </td>
+                      <td class="px-5 py-4">
+                        <?php
+                          $status = $laporan['status'] ?? '';
+                          $badgeTheme = 'bg-slate-100 text-slate-700 border-slate-200';
+                          $statusIcon = 'fa-spinner';
+                          if ($status === 'Menunggu Verifikasi') { $badgeTheme = 'bg-red-50 text-red-700 border-red-200'; $statusIcon = 'fa-clock'; }
+                          if ($status === 'Diproses' || $status === 'Ditangani') { $badgeTheme = 'bg-amber-50 text-amber-700 border-amber-200'; $statusIcon = 'fa-helmet-safety'; }
+                          if ($status === 'Selesai') { $badgeTheme = 'bg-emerald-50 text-emerald-700 border-emerald-200'; $statusIcon = 'fa-check-double'; }
+                          if ($status === 'Ditolak') { $badgeTheme = 'bg-slate-100 text-slate-500 border-slate-200'; $statusIcon = 'fa-xmark'; }
+                        ?>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-bold tracking-widest uppercase <?php echo $badgeTheme; ?> whitespace-nowrap">
+                          <i class="fa-solid <?php echo $statusIcon; ?>"></i> <?php echo htmlspecialchars($status); ?>
+                        </span>
+                      </td>
+                      <td class="px-5 py-4 text-right font-medium text-slate-500 whitespace-nowrap">
+                        <?php echo date('d M Y', strtotime($laporan['waktu_laporan'] ?? $laporan['created_at'] ?? 'now')); ?>
+                      </td>
+                      <td class="px-5 py-4 text-center">
+                        <div class="flex items-center justify-center gap-1.5">
+                          <a href="index.php?controller=LaporanAdmin&action=detail&id=<?php echo $laporan['id']; ?>" class="inline-flex items-center justify-center h-8 w-8 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 hover:text-indigo-700 transition" title="Lihat Detail">
+                            <i class="fa-solid fa-eye text-sm"></i>
+                          </a>
+                          <a href="index.php?controller=LaporanAdmin&action=edit&id=<?php echo $laporan['id']; ?>" class="inline-flex items-center justify-center h-8 w-8 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700 transition" title="Edit Laporan">
+                            <i class="fa-solid fa-pen text-sm"></i>
+                          </a>
+                          <form method="POST" action="index.php?controller=LaporanAdmin&action=delete&id=<?php echo $laporan['id']; ?>" class="inline-block delete-laporan-form">
+                            <button type="submit" class="inline-flex items-center justify-center h-8 w-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 transition" title="Hapus Laporan">
+                              <i class="fa-solid fa-trash-can text-sm"></i>
+                            </button>
+                          </form>
+                        </div>
+                      </td>
+                    </tr>
+                  <?php endforeach; ?>
+                <?php else: ?>
+                  <tr>
+                    <td colspan="8" class="px-5 py-16 text-center">
+                      <div class="inline-flex h-16 w-16 rounded-full bg-slate-50 border border-slate-100 text-slate-300 items-center justify-center mb-4 text-3xl shadow-inner"><i class="fa-solid fa-box-open"></i></div>
+                      <h3 class="font-display font-bold text-slate-700 text-lg mb-1">Data Kosong</h3>
+                      <p class="text-sm font-medium text-slate-500">Tidak ada laporan yang dapat ditampilkan saat ini.</p>
+                    </td>
+                  </tr>
+                <?php endif; ?>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <?php if (!empty($pagination) && isset($pagination['last_page']) && $pagination['last_page'] > 1): ?>
+          <div class="p-4 border-t border-slate-100 flex items-center justify-center bg-slate-50/50">
+            <nav class="flex items-center gap-1">
+              <?php if ($pagination['current_page'] > 1): ?>
+                <a href="index.php?controller=LaporanAdmin&action=index&page=<?php echo $pagination['current_page'] - 1; ?>&<?php echo http_build_query(array_filter($_GET, function($key) { return $key !== 'page'; }, ARRAY_FILTER_USE_KEY)); ?>" class="flex items-center justify-center h-9 px-3 rounded-lg border border-slate-200 bg-white text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-brand-600 transition">
+                  <i class="fa-solid fa-chevron-left mr-1.5 text-[10px]"></i> Prev
+                </a>
+              <?php endif; ?>
+
+              <div class="hidden sm:flex items-center gap-1 mx-2">
+                <?php for ($i = max(1, $pagination['current_page'] - 2); $i <= min($pagination['last_page'], $pagination['current_page'] + 2); $i++): ?>
+                  <?php if ($i == $pagination['current_page']): ?>
+                    <span class="flex items-center justify-center h-9 w-9 rounded-lg bg-brand-600 border border-brand-600 text-sm font-bold text-white shadow-sm"><?php echo $i; ?></span>
+                  <?php else: ?>
+                    <a href="index.php?controller=LaporanAdmin&action=index&page=<?php echo $i; ?>&<?php echo http_build_query(array_filter($_GET, function($key) { return $key !== 'page'; }, ARRAY_FILTER_USE_KEY)); ?>" class="flex items-center justify-center h-9 w-9 rounded-lg border border-slate-200 bg-white text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-brand-600 transition"><?php echo $i; ?></a>
+                  <?php endif; ?>
+                <?php endfor; ?>
+              </div>
+
+              <?php if ($pagination['current_page'] < $pagination['last_page']): ?>
+                <a href="index.php?controller=LaporanAdmin&action=index&page=<?php echo $pagination['current_page'] + 1; ?>&<?php echo http_build_query(array_filter($_GET, function($key) { return $key !== 'page'; }, ARRAY_FILTER_USE_KEY)); ?>" class="flex items-center justify-center h-9 px-3 rounded-lg border border-slate-200 bg-white text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-brand-600 transition">
+                  Next <i class="fa-solid fa-chevron-right ml-1.5 text-[10px]"></i>
+                </a>
+              <?php endif; ?>
+            </nav>
+          </div>
+          <?php endif; ?>
+
+        </div>
       </div>
-    </div>
+    </main>
   </div>
-  <?php include 'template/script.php'; ?>
+</div>
 
-  <script>
-    // Select all checkbox functionality
-    document.getElementById('selectAll').addEventListener('change', function() {
-      const checkboxes = document.querySelectorAll('.row-checkbox');
-      checkboxes.forEach(checkbox => {
-        checkbox.checked = this.checked;
-      });
+<?php include 'template/script.php'; ?>
+
+<script>
+  // Select all checkbox functionality
+  document.getElementById('selectAll').addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.row-checkbox');
+    checkboxes.forEach(checkbox => {
+      checkbox.checked = this.checked;
+    });
+  });
+
+  // Search logic (live filtering client-side for visible rows)
+  document.getElementById('search').addEventListener('keyup', function() {
+    const searchTerm = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#laporanTable tbody tr');
+    rows.forEach(row => {
+      const text = row.textContent.toLowerCase();
+      row.style.display = text.includes(searchTerm) ? '' : 'none';
+    });
+  });
+
+  // Table Sorting logic
+  document.querySelectorAll('#laporanTable th.sortable').forEach((header, index) => {
+    header.addEventListener('click', function() {
+      // Index is +1 because of checkbox column check
+      sortTable(index + 1);
+    });
+  });
+
+  function sortTable(columnIndex) {
+    const table = document.getElementById('laporanTable');
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    if(rows.length <= 1 && rows[0].cells.length === 1) return; // empty state
+
+    const currentHeader = document.querySelectorAll('#laporanTable th')[columnIndex];
+    const isAscending = !currentHeader.classList.contains('asc');
+    
+    document.querySelectorAll('#laporanTable th').forEach(th => th.classList.remove('asc', 'desc'));
+    currentHeader.classList.add(isAscending ? 'asc' : 'desc');
+
+    rows.sort((a, b) => {
+      const aVal = a.cells[columnIndex].textContent.trim();
+      const bVal = b.cells[columnIndex].textContent.trim();
+      const aNum = parseFloat(aVal.replace(/,/g, '').replace(/#/g, ''));
+      const bNum = parseFloat(bVal.replace(/,/g, '').replace(/#/g, ''));
+
+      if (!isNaN(aNum) && !isNaN(bNum)) {
+        return isAscending ? aNum - bNum : bNum - aNum;
+      }
+      return isAscending ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
     });
 
-    // Search functionality with live filtering
-    document.getElementById('search').addEventListener('keyup', function() {
-      const searchTerm = this.value.toLowerCase();
-      const rows = document.querySelectorAll('#laporanTable tbody tr');
+    tbody.innerHTML = '';
+    rows.forEach(row => tbody.appendChild(row));
+  }
 
-      rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        if (text.includes(searchTerm)) {
-          row.style.display = '';
-        } else {
-          row.style.display = 'none';
-        }
+  // Bulk Delete
+  function bulkDelete() {
+    const selectedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
+    if (selectedCheckboxes.length === 0) {
+      Swal.fire({
+        icon: 'info',
+        title: 'Pilih Data',
+        text: 'Silakan pilih setidaknya satu laporan terlebih dahulu.',
+        confirmButtonColor: '#b91c1c',
+        customClass: { popup: 'rounded-2xl shadow-xl' }
       });
-    });
-
-    // Status filter functionality
-    document.getElementById('status').addEventListener('change', function() {
-      const statusFilter = this.value;
-      const rows = document.querySelectorAll('#laporanTable tbody tr');
-
-      rows.forEach(row => {
-        if (statusFilter === '') {
-          row.style.display = '';
-        } else {
-          const statusText = row.cells[6].textContent.trim();
-          if (statusText === statusFilter) {
-            row.style.display = '';
-          } else {
-            row.style.display = 'none';
-          }
-        }
-      });
-    });
-
-    // Tingkat Keparahan filter functionality
-    document.getElementById('tingkat_keparahan').addEventListener('change', function() {
-      const tingkatFilter = this.value;
-      const rows = document.querySelectorAll('#laporanTable tbody tr');
-
-      rows.forEach(row => {
-        if (tingkatFilter === '') {
-          row.style.display = '';
-        } else {
-          const tingkatText = row.cells[5].textContent.trim();
-          if (tingkatText === tingkatFilter) {
-            row.style.display = '';
-          } else {
-            row.style.display = 'none';
-          }
-        }
-      });
-    });
-
-    // Sort functionality for table headers
-    document.querySelectorAll('#laporanTable th.sortable').forEach((header, index) => {
-      header.style.cursor = 'pointer';
-      header.addEventListener('click', function() {
-        // Find the actual index of this header in the row
-        const columnIndex = Array.from(this.parentElement.children).indexOf(this);
-        sortTable(columnIndex);
-      });
-    });
-
-    function sortTable(columnIndex) {
-      const table = document.getElementById('laporanTable');
-      const tbody = table.querySelector('tbody');
-      const rows = Array.from(tbody.querySelectorAll('tr'));
-
-      // Remove sort indicators from all headers
-      document.querySelectorAll('#laporanTable th').forEach(th => {
-        th.classList.remove('sort-asc', 'sort-desc');
-      });
-
-      // Determine sort direction based on current state of this header
-      const currentHeader = document.querySelectorAll('#laporanTable th')[columnIndex];
-      const isAscending = !currentHeader.classList.contains('sort-asc');
-
-      // Add sort indicator to current header
-      currentHeader.classList.toggle('sort-asc', isAscending);
-      currentHeader.classList.toggle('sort-desc', !isAscending);
-
-      rows.sort((a, b) => {
-        const aVal = a.cells[columnIndex].textContent.trim();
-        const bVal = b.cells[columnIndex].textContent.trim();
-
-        // Check if values are numeric for proper sorting
-        const aNum = parseFloat(aVal.replace(/,/g, ''));
-        const bNum = parseFloat(bVal.replace(/,/g, ''));
-
-        if (!isNaN(aNum) && !isNaN(bNum)) {
-          return isAscending ? aNum - bNum : bNum - aNum;
-        }
-
-        // For date sorting
-        const aDate = new Date(aVal);
-        const bDate = new Date(bVal);
-        if (!isNaN(aDate) && !isNaN(bDate)) {
-          return isAscending ? aDate - bDate : bDate - aDate;
-        }
-
-        // For text sorting
-        return isAscending ?
-          aVal.localeCompare(bVal) :
-          bVal.localeCompare(aVal);
-      });
-
-      // Clear the table and append sorted rows
-      tbody.innerHTML = '';
-      rows.forEach(row => tbody.appendChild(row));
+      return;
     }
 
-    // Bulk delete functionality
-    function bulkDelete() {
-      const selectedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
-      if (selectedCheckboxes.length === 0) {
-        alert('Pilih setidaknya satu laporan untuk dihapus');
-        return;
+    Swal.fire({
+      icon: 'warning',
+      title: 'Hapus Massal',
+      text: `Total ${selectedCheckboxes.length} laporan akan dihapus secara permanen. Lanjutkan?`,
+      showCancelButton: true,
+      confirmButtonText: 'Ya, Hapus Semua!',
+      cancelButtonText: 'Batal',
+      confirmButtonColor: '#ef4444',
+      customClass: {
+        popup: 'rounded-2xl',
+        confirmButton: 'rounded-xl px-5 py-2.5 font-bold shadow-sm',
+        cancelButton: 'rounded-xl px-5 py-2.5 font-bold border border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
       }
-
-      const ids = Array.from(selectedCheckboxes).map(checkbox => checkbox.value);
-      if (confirm(`Apakah Anda yakin ingin menghapus ${selectedCheckboxes.length} laporan?`)) {
-        // In a real implementation, you would send an AJAX request to handle bulk deletion
-        // For now, we'll just show an alert - in a real system, you would submit a form or make an API call
+    }).then((result) => {
+      if (result.isConfirmed) {
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = 'index.php?controller=LaporanAdmin&action=bulkDelete';
-
-        ids.forEach(id => {
+        
+        Array.from(selectedCheckboxes).forEach(checkbox => {
           const input = document.createElement('input');
           input.type = 'hidden';
           input.name = 'ids[]';
-          input.value = id;
+          input.value = checkbox.value;
           form.appendChild(input);
         });
-
         document.body.appendChild(form);
         form.submit();
       }
-    }
-  </script>
-</body>
-</html>
+    });
+  }
+
+  // Single Delete
+  document.addEventListener('submit', function(event) {
+    const form = event.target.closest('.delete-laporan-form');
+    if (!form) return;
+    
+    event.preventDefault();
+    Swal.fire({
+      icon: 'warning',
+      title: 'Hapus Laporan',
+      text: 'Laporan bencana ini akan dihapus permanen. Tindakan tidak bisa dibatalkan.',
+      showCancelButton: true,
+      confirmButtonText: 'Ya, Hapus!',
+      cancelButtonText: 'Batal',
+      confirmButtonColor: '#ef4444',
+      customClass: {
+        popup: 'rounded-2xl',
+        confirmButton: 'rounded-xl px-5 py-2.5 font-bold shadow-sm',
+        cancelButton: 'rounded-xl px-5 py-2.5 font-bold border border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        form.submit();
+      }
+    });
+  });
+</script>

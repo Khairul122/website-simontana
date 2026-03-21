@@ -46,7 +46,7 @@ class LaporanPetugasController {
         $response = $this->laporanService->getAll($filters);
 
         if ($response['success']) {
-            $laporanList = $response['data'];
+            $laporanList = is_array($response['data']) ? $response['data'] : [];
         } else {
             $laporanList = [];
             $error_message = $response['message'] ?? 'Gagal mengambil data laporan';
@@ -128,11 +128,7 @@ class LaporanPetugasController {
 
         // Validasi input
         if (empty($status)) {
-            $_SESSION['toast'] = [
-                'type' => 'error',
-                'title' => 'Gagal',
-                'message' => 'Status harus dipilih'
-            ];
+            setDialog('Gagal', 'Status harus dipilih', 'error');
             header('Location: index.php?controller=LaporanPetugas&action=edit&id=' . $id);
             exit;
         }
@@ -147,17 +143,9 @@ class LaporanPetugasController {
         $response = $this->laporanService->updateStatus($id, $data);
 
         if ($response['success']) {
-            $_SESSION['toast'] = [
-                'type' => 'success',
-                'title' => 'Berhasil',
-                'message' => 'Status laporan berhasil diperbarui'
-            ];
+            setDialog('Berhasil', 'Status laporan berhasil diperbarui', 'success');
         } else {
-            $_SESSION['toast'] = [
-                'type' => 'error',
-                'title' => 'Gagal',
-                'message' => $response['message'] ?? 'Gagal memperbarui status laporan'
-            ];
+            setDialog('Gagal', $response['message'] ?? 'Gagal memperbarui status laporan', 'error');
         }
 
         header('Location: index.php?controller=LaporanPetugas&action=detail&id=' . $id);
@@ -184,17 +172,9 @@ class LaporanPetugasController {
         $response = $this->laporanService->updateToProses($id);
 
         if ($response['success']) {
-            $_SESSION['toast'] = [
-                'type' => 'success',
-                'title' => 'Berhasil',
-                'message' => 'Status laporan berhasil diubah menjadi Diproses'
-            ];
+            setDialog('Berhasil', 'Status laporan berhasil diubah menjadi Diproses', 'success');
         } else {
-            $_SESSION['toast'] = [
-                'type' => 'error',
-                'title' => 'Gagal',
-                'message' => $response['message'] ?? 'Gagal mengubah status laporan'
-            ];
+            setDialog('Gagal', $response['message'] ?? 'Gagal mengubah status laporan', 'error');
         }
 
         header('Location: index.php?controller=LaporanPetugas&action=detail&id=' . $id);
@@ -229,17 +209,9 @@ class LaporanPetugasController {
         $response = $this->laporanService->updateToSelesai($id, $data);
 
         if ($response['success']) {
-            $_SESSION['toast'] = [
-                'type' => 'success',
-                'title' => 'Berhasil',
-                'message' => 'Status laporan berhasil diubah menjadi Selesai'
-            ];
+            setDialog('Berhasil', 'Status laporan berhasil diubah menjadi Selesai', 'success');
         } else {
-            $_SESSION['toast'] = [
-                'type' => 'error',
-                'title' => 'Gagal',
-                'message' => $response['message'] ?? 'Gagal mengubah status laporan'
-            ];
+            setDialog('Gagal', $response['message'] ?? 'Gagal mengubah status laporan', 'error');
         }
 
         header('Location: index.php?controller=LaporanPetugas&action=detail&id=' . $id);
@@ -274,17 +246,9 @@ class LaporanPetugasController {
         $response = $this->laporanService->updateToDitolak($id, $data);
 
         if ($response['success']) {
-            $_SESSION['toast'] = [
-                'type' => 'success',
-                'title' => 'Berhasil',
-                'message' => 'Status laporan berhasil diubah menjadi Ditolak'
-            ];
+            setDialog('Berhasil', 'Status laporan berhasil diubah menjadi Ditolak', 'success');
         } else {
-            $_SESSION['toast'] = [
-                'type' => 'error',
-                'title' => 'Gagal',
-                'message' => $response['message'] ?? 'Gagal mengubah status laporan'
-            ];
+            setDialog('Gagal', $response['message'] ?? 'Gagal mengubah status laporan', 'error');
         }
 
         header('Location: index.php?controller=LaporanPetugas&action=detail&id=' . $id);
@@ -304,7 +268,7 @@ class LaporanPetugasController {
                 header('Location: index.php?controller=Dashboard&action=operator');
                 break;
             case 'Warga':
-                header('Location: index.php?controller=Beranda&action=index');
+                header('Location: index.php?controller=Dashboard&action=warga');
                 break;
             default:
                 header('Location: index.php?controller=Auth&action=login');

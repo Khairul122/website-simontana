@@ -18,7 +18,7 @@ class LaporanOperatorController
     {
         // Check if user is logged in and has the correct role
         if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'OperatorDesa') {
-            header('Location: index.php?controller=auth&action=login');
+            header('Location: index.php?controller=Auth&action=login');
             exit();
         }
 
@@ -27,7 +27,8 @@ class LaporanOperatorController
 
             // Validasi: Jika id_desa tidak ada, tampilkan alert error atau redirect
             if (!$id_desa) {
-                echo '<script>alert("Operator Desa harus memiliki wilayah kerja yang terdefinisi!"); window.location.href="index.php?controller=auth&action=login";</script>';
+                setDialog('Gagal', 'Operator Desa harus memiliki wilayah kerja yang terdefinisi!', 'error');
+                header('Location: index.php?controller=Auth&action=login');
                 exit;
             }
 
@@ -59,7 +60,7 @@ class LaporanOperatorController
     {
         // Check if user is logged in and has the correct role
         if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'OperatorDesa') {
-            header('Location: index.php?controller=auth&action=login');
+            header('Location: index.php?controller=Auth&action=login');
             exit;
         }
 
@@ -68,7 +69,7 @@ class LaporanOperatorController
 
             // Validasi: Jika id_desa tidak ada, redirect ke login
             if (!$id_desa) {
-                header('Location: index.php?controller=auth&action=login');
+                header('Location: index.php?controller=Auth&action=login');
                 exit;
             }
 
@@ -109,7 +110,7 @@ class LaporanOperatorController
     {
         // Check if user is logged in and has the correct role
         if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'OperatorDesa') {
-            header('Location: index.php?controller=auth&action=login');
+            header('Location: index.php?controller=Auth&action=login');
             exit;
         }
 
@@ -118,7 +119,7 @@ class LaporanOperatorController
 
             // Validasi: Jika id_desa tidak ada, redirect ke login
             if (!$id_desa) {
-                header('Location: index.php?controller=auth&action=login');
+                header('Location: index.php?controller=Auth&action=login');
                 exit;
             }
 
@@ -159,7 +160,7 @@ class LaporanOperatorController
     {
         // Check if user is logged in and has the correct role
         if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'OperatorDesa') {
-            header('Location: index.php?controller=auth&action=login');
+            header('Location: index.php?controller=Auth&action=login');
             exit;
         }
 
@@ -168,7 +169,7 @@ class LaporanOperatorController
 
             // Validasi: Jika id_desa tidak ada, redirect ke login
             if (!$id_desa) {
-                header('Location: index.php?controller=auth&action=login');
+                header('Location: index.php?controller=Auth&action=login');
                 exit;
             }
 
@@ -183,7 +184,8 @@ class LaporanOperatorController
 
             // Validate required fields
             if (empty($status)) {
-                echo '<script>alert("Status wajib diisi!"); window.location.href="index.php?controller=LaporanOperator&action=edit-status&id=' . $id . '";</script>';
+                setDialog('Gagal', 'Status wajib diisi!', 'error');
+                header('Location: index.php?controller=LaporanOperator&action=edit-status&id=' . $id);
                 exit;
             }
 
@@ -196,13 +198,16 @@ class LaporanOperatorController
             $response = $this->service->updateStatus($id, $data);
 
             if ($response['success']) {
-                echo '<script>alert("Status laporan berhasil diperbarui!"); window.location.href="index.php?controller=LaporanOperator&action=index";</script>';
+                setDialog('Berhasil', 'Status laporan berhasil diperbarui!', 'success');
+                header('Location: index.php?controller=LaporanOperator&action=index');
             } else {
                 $error_message = $response['message'] ?? 'Gagal memperbarui status laporan';
-                echo '<script>alert("' . addslashes($error_message) . '"); window.location.href="index.php?controller=LaporanOperator&action=edit-status&id=' . $id . '";</script>';
+                setDialog('Gagal', $error_message, 'error');
+                header('Location: index.php?controller=LaporanOperator&action=edit-status&id=' . $id);
             }
         } catch (Exception $e) {
-            echo '<script>alert("Terjadi kesalahan: ' . addslashes($e->getMessage()) . '"); window.location.href="index.php?controller=LaporanOperator&action=index";</script>';
+            setDialog('Gagal', 'Terjadi kesalahan: ' . $e->getMessage(), 'error');
+            header('Location: index.php?controller=LaporanOperator&action=index');
         }
     }
 

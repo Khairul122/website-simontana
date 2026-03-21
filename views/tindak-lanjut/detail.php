@@ -1,317 +1,281 @@
 <?php include('template/header.php'); ?>
 
-<body class="with-welcome-text">
-  <div class="container-scroller">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<?php
+function tindakStatusTheme($statusRaw) {
+  $status = strtolower(trim((string)$statusRaw));
+  if ($status === 'menuju lokasi') return ['Menuju Lokasi', 'bg-rose-50 text-rose-700 border-rose-200', 'fa-truck-fast'];
+  if ($status === 'sedang ditangani') return ['Sedang Ditangani', 'bg-amber-50 text-amber-700 border-amber-200', 'fa-person-digging'];
+  if ($status === 'selesai') return ['Selesai', 'bg-emerald-50 text-emerald-700 border-emerald-200', 'fa-check-double'];
+  if ($status === 'ditolak') return ['Dibatalkan', 'bg-slate-100 text-slate-500 border-slate-200', 'fa-xmark'];
+  return [$statusRaw ?: '-', 'bg-slate-100 text-slate-700 border-slate-200', 'fa-circle-info'];
+}
+?>
+
+<div class="flex h-screen overflow-hidden bg-slate-50">
+  <?php include 'template/sidebar.php'; ?>
+  
+  <div class="flex-1 flex flex-col overflow-hidden">
     <?php include 'template/navbar.php'; ?>
-    <div class="container-fluid page-body-wrapper">
-      <?php include 'template/setting_panel.php'; ?>
-      <?php include 'template/sidebar.php'; ?>
-      <div class="main-panel">
-        <div class="content-wrapper">
-          <div class="row mb-4">
-             <div class="col-sm-12">
-                <h3 class="font-weight-bold">Detail Tindak Lanjut</h3>
-                <div class="d-flex justify-content-between">
-                  <a href="index.php?controller=TindakLanjut&action=index" class="btn btn-secondary">Kembali ke Daftar</a>
-                </div>
-             </div>
+    
+    <main class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 relative">
+      <div class="p-4 md:p-6 lg:p-8 w-full">
+
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+          <div class="flex items-center gap-4">
+            <a href="index.php?controller=TindakLanjut&action=index" class="flex items-center justify-center h-10 w-10 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-brand-600 hover:bg-brand-50 hover:border-brand-200 transition-all shadow-sm">
+              <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div>
+              <h1 class="font-display text-2xl font-bold text-slate-900 leading-tight">Detail Operasi <span class="text-slate-400">#<?php echo (int)($tindakLanjut['id_tindaklanjut'] ?? 0); ?></span></h1>
+              <p class="text-sm text-slate-500">Tinjau rekam jejak, foto, dan lokasi dari proses tanggap darurat.</p>
+            </div>
           </div>
+          <div class="shrink-0 flex gap-2">
+            <?php if (!empty($tindakLanjut['id_tindaklanjut'])): ?>
+              <a href="index.php?controller=TindakLanjut&action=edit&id=<?php echo (int)$tindakLanjut['id_tindaklanjut']; ?>" class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 font-bold text-sm hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm">
+                <i class="fa-solid fa-pen"></i> Update Info
+              </a>
+            <?php endif; ?>
+          </div>
+        </div>
 
-          <div class="row">
-            <div class="col-sm-12">
-              <?php if (isset($error_message)): ?>
-              <div class="alert alert-danger" role="alert">
-                <h4 class="alert-heading">Kesalahan!</h4>
-                <p><?php echo htmlspecialchars($error_message); ?></p>
-              </div>
-              <?php endif; ?>
+        <?php if (isset($error_message)): ?>
+          <div class="rounded-xl bg-red-50 border border-red-200 p-4 mb-6 flex items-start gap-4">
+            <div class="flex-shrink-0 text-red-500 mt-0.5"><i class="fa-solid fa-triangle-exclamation text-xl"></i></div>
+            <div class="flex-1">
+              <h3 class="text-sm font-bold text-red-800">Gagal Memuat Data</h3>
+              <p class="text-sm text-red-600 mt-1"><?php echo htmlspecialchars($error_message); ?></p>
+            </div>
+          </div>
+        <?php endif; ?>
 
-              <?php if (isset($tindakLanjut) && $tindakLanjut): ?>
-              <div class="card">
-                <div class="card-body">
-                  <div class="row">
-                    <div class="col-md-8">
-                      <h4 class="card-title">Tindak Lanjut ID: <?php echo $tindakLanjut['id_tindaklanjut'] ?? '-'; ?></h4>
-                      
-                      <div class="row">
-                        <div class="col-md-6">
-                          <table class="table table-borderless">
-                            <tr>
-                              <td width="30%"><strong>ID Tindak Lanjut</strong></td>
-                              <td><?php echo $tindakLanjut['id_tindaklanjut'] ?? '-'; ?></td>
-                            </tr>
-                            <tr>
-                              <td><strong>Tanggal Tanggapan</strong></td>
-                              <td><?php echo date('d M Y H:i', strtotime($tindakLanjut['tanggal_tanggapan'] ?? 'now')); ?></td>
-                            </tr>
-                            <tr>
-                              <td><strong>Status</strong></td>
-                              <td>
-                                <?php
-                                  $status = $tindakLanjut['status'] ?? '-';
-                                  $badgeClass = '';
+        <?php if (isset($tindakLanjut) && $tindakLanjut): ?>
+          <?php [$statusLabel, $badgeClass, $iconClass] = tindakStatusTheme($tindakLanjut['status'] ?? ''); ?>
+          
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <div class="lg:col-span-2 space-y-6">
+              
+              <!-- Main Info Card -->
+              <div class="rounded-2xl bg-white border border-slate-200 shadow-card overflow-hidden">
+                <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                  <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-truck-medical text-slate-400"></i> Rekam Jejak Lapangan
+                  </h3>
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold tracking-widest uppercase <?php echo $badgeClass; ?>">
+                    <i class="fa-solid <?php echo $iconClass; ?>"></i> <?php echo htmlspecialchars($statusLabel); ?>
+                  </span>
+                </div>
+                <div class="p-6">
+                  <!-- Info Strip -->
+                  <div class="rounded-xl bg-slate-50 border border-slate-200 p-4 mb-6 flex flex-wrap gap-x-8 gap-y-3">
+                    <div>
+                      <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">Asal Laporan</span>
+                      <strong class="text-brand-600"><?php echo htmlspecialchars($tindakLanjut['laporan_judul'] ?? $tindakLanjut['laporan']['judul_laporan'] ?? '-'); ?></strong>
+                    </div>
+                    <div>
+                      <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">Petugas PIC / Regu</span>
+                      <strong class="text-indigo-600"><i class="fa-solid fa-users text-indigo-300 mr-1"></i> <?php echo htmlspecialchars($tindakLanjut['petugas_nama'] ?? $tindakLanjut['petugas']['nama'] ?? '-'); ?></strong>
+                    </div>
+                  </div>
 
-                                  // Sesuaikan status dengan format yang mungkin dikembalikan API
-                                  switch(strtolower($status)) {
-                                    case 'menuju lokasi':
-                                      $badgeClass = 'badge-info';
-                                      $displayText = 'Menuju Lokasi';
-                                      break;
-                                    case 'sedang ditangani':
-                                      $badgeClass = 'badge-warning';
-                                      $displayText = 'Sedang Ditangani';
-                                      break;
-                                    case 'selesai':
-                                      $badgeClass = 'badge-success';
-                                      $displayText = 'Selesai';
-                                      break;
-                                    case 'ditolak':
-                                      $badgeClass = 'badge-danger';
-                                      $displayText = 'Ditolak';
-                                      break;
-                                    default:
-                                      $badgeClass = 'badge-secondary';
-                                      $displayText = $status;
-                                  }
-                                ?>
-                                <label class="badge <?php echo $badgeClass; ?>"><?php echo $displayText; ?></label>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td><strong>Keterangan</strong></td>
-                              <td><?php echo htmlspecialchars($tindakLanjut['keterangan'] ?? '-'); ?></td>
-                            </tr>
-                          </table>
-                        </div>
-                        
-                        <div class="col-md-6">
-                          <table class="table table-borderless">
-                            <tr>
-                              <td width="30%"><strong>Nama Petugas</strong></td>
-                              <td><?php echo htmlspecialchars($tindakLanjut['petugas']['nama'] ?? '-'); ?></td>
-                            </tr>
-                            <tr>
-                              <td><strong>Nama Petugas</strong></td>
-                              <td><?php echo htmlspecialchars($tindakLanjut['petugas']['nama'] ?? '-'); ?></td>
-                            </tr>
-                            <tr>
-                              <td><strong>Judul Laporan</strong></td>
-                              <td><?php echo htmlspecialchars($tindakLanjut['laporan']['judul_laporan'] ?? '-'); ?></td>
-                            </tr>
-                          </table>
-                        </div>
-                      </div>
-                      
-                      <!-- Laporan Information -->
-                      <div class="mt-4">
-                        <h5>Informasi Laporan Terkait</h5>
-                        <table class="table table-borderless">
-                          <tr>
-                            <td width="30%"><strong>Deskripsi Laporan</strong></td>
-                            <td><?php echo htmlspecialchars($tindakLanjut['laporan']['deskripsi'] ?? '-'); ?></td>
-                          </tr>
-                          <tr>
-                            <td><strong>Nama Pelapor</strong></td>
-                            <td><?php
-                              $namaPelapor = $tindakLanjut['laporan']['pelapor']['nama']
-                                             ?? $tindakLanjut['laporan']['nama_pelapor']
-                                             ?? 'Warga';
-                              echo htmlspecialchars($namaPelapor);
-                            ?></td>
-                          </tr>
-                          <tr>
-                            <td><strong>Alamat Lengkap</strong></td>
-                            <td><?php echo htmlspecialchars($tindakLanjut['laporan']['alamat_lengkap'] ?? '-'); ?></td>
-                          </tr>
-                        </table>
-
-                        <!-- Dokumentasi Bukti -->
-                        <div class="mt-4">
-                          <h6>Dokumentasi Bukti</h6>
-                          <div class="row">
-                            <?php if (!empty($tindakLanjut['laporan']['foto_bukti_1'])): ?>
-                            <div class="col-md-4 mb-2">
-                              <a href="<?php echo $tindakLanjut['laporan']['foto_bukti_1_url'] ?? $tindakLanjut['laporan']['foto_bukti_1']; ?>" target="_blank">
-                                <img src="<?php echo $tindakLanjut['laporan']['foto_bukti_1_url'] ?? $tindakLanjut['laporan']['foto_bukti_1']; ?>" alt="Foto Bukti 1" class="img-thumbnail" style="width: 100%; height: 150px; object-fit: cover;">
-                              </a>
-                              <small class="text-muted">Foto Bukti 1</small>
-                            </div>
-                            <?php endif; ?>
-
-                            <?php if (!empty($tindakLanjut['laporan']['foto_bukti_2'])): ?>
-                            <div class="col-md-4 mb-2">
-                              <a href="<?php echo $tindakLanjut['laporan']['foto_bukti_2_url'] ?? $tindakLanjut['laporan']['foto_bukti_2']; ?>" target="_blank">
-                                <img src="<?php echo $tindakLanjut['laporan']['foto_bukti_2_url'] ?? $tindakLanjut['laporan']['foto_bukti_2']; ?>" alt="Foto Bukti 2" class="img-thumbnail" style="width: 100%; height: 150px; object-fit: cover;">
-                              </a>
-                              <small class="text-muted">Foto Bukti 2</small>
-                            </div>
-                            <?php endif; ?>
-
-                            <?php if (!empty($tindakLanjut['laporan']['foto_bukti_3'])): ?>
-                            <div class="col-md-4 mb-2">
-                              <a href="<?php echo $tindakLanjut['laporan']['foto_bukti_3_url'] ?? $tindakLanjut['laporan']['foto_bukti_3']; ?>" target="_blank">
-                                <img src="<?php echo $tindakLanjut['laporan']['foto_bukti_3_url'] ?? $tindakLanjut['laporan']['foto_bukti_3']; ?>" alt="Foto Bukti 3" class="img-thumbnail" style="width: 100%; height: 150px; object-fit: cover;">
-                              </a>
-                              <small class="text-muted">Foto Bukti 3</small>
-                            </div>
-                            <?php endif; ?>
-
-                            <?php if (!empty($tindakLanjut['laporan']['video_bukti'])): ?>
-                            <div class="col-md-4 mb-2">
-                              <video width="100%" height="150" controls>
-                                <source src="<?php echo $tindakLanjut['laporan']['video_bukti_url'] ?? $tindakLanjut['laporan']['video_bukti']; ?>" type="video/mp4">
-                                Browser tidak mendukung pemutar video.
-                              </video>
-                              <small class="text-muted">Video Bukti</small>
-                            </div>
-                            <?php endif; ?>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <!-- Foto Kegiatan -->
-                      <?php if (isset($tindakLanjut['foto_kegiatan']) && !empty($tindakLanjut['foto_kegiatan'])): ?>
-                      <div class="mt-4">
-                        <h5>Foto Kegiatan</h5>
-                        <img src="<?php echo $tindakLanjut['foto_kegiatan']; ?>" alt="Foto Kegiatan Tindak Lanjut" class="img-fluid" style="max-height: 300px; object-fit: cover;">
-                      </div>
-                      <?php endif; ?>
-
-                      <!-- Peta Lokasi -->
-                      <div class="mt-4">
-                        <h5>Lokasi Kejadian</h5>
-                        <div id="map" style="height: 400px; width: 100%; border: 1px solid #ddd; border-radius: 4px;"></div>
-
-                        <div class="mt-3">
-                          <p><strong>Koordinat:</strong></p>
-                          <p>Latitude: <?php echo $tindakLanjut['laporan']['latitude'] ?? '-'; ?></p>
-                          <p>Longitude: <?php echo $tindakLanjut['laporan']['longitude'] ?? '-'; ?></p>
-                        </div>
-                      </div>
-
-                      <!-- Action Buttons -->
-                      <div class="mt-4">
-                        <a href="index.php?controller=TindakLanjut&action=edit&id=<?php echo $tindakLanjut['id_tindaklanjut']; ?>" class="btn btn-warning">Edit</a>
-                        <a href="index.php?controller=LaporanPetugas&action=detail&id=<?php echo $tindakLanjut['laporan_id']; ?>" class="btn btn-info">Lihat Laporan</a>
-                        <a href="index.php?controller=TindakLanjut&action=index" class="btn btn-secondary">Kembali ke Daftar</a>
-                      </div>
+                  <!-- Details -->
+                  <div class="space-y-4">
+                    <div>
+                      <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Waktu Update Status</p>
+                      <p class="font-semibold text-slate-600"><i class="fa-regular fa-clock mr-1.5 text-slate-400"></i> <?php echo date('d M Y, H:i', strtotime($tindakLanjut['tanggal_tanggapan'] ?? 'now')); ?></p>
                     </div>
                     
-                    <div class="col-md-4">
-                      <div class="card">
-                        <div class="card-body">
-                          <h5 class="card-title">Ringkasan</h5>
-                          <ul class="list-group list-group-flush">
-                            <li class="list-group-item">
-                              <strong>Status:</strong>
-                              <span class="float-right">
-                                <?php
-                                  $status_sidebar = $tindakLanjut['status'] ?? '-';
-                                  $badgeClass_sidebar = '';
-
-                                  // Sesuaikan status dengan format yang mungkin dikembalikan API
-                                  switch(strtolower($status_sidebar)) {
-                                    case 'menuju lokasi':
-                                      $badgeClass_sidebar = 'badge-info';
-                                      $displayText_sidebar = 'Menuju Lokasi';
-                                      break;
-                                    case 'sedang ditangani':
-                                      $badgeClass_sidebar = 'badge-warning';
-                                      $displayText_sidebar = 'Sedang Ditangani';
-                                      break;
-                                    case 'selesai':
-                                      $badgeClass_sidebar = 'badge-success';
-                                      $displayText_sidebar = 'Selesai';
-                                      break;
-                                    case 'ditolak':
-                                      $badgeClass_sidebar = 'badge-danger';
-                                      $displayText_sidebar = 'Ditolak';
-                                      break;
-                                    default:
-                                      $badgeClass_sidebar = 'badge-secondary';
-                                      $displayText_sidebar = $status_sidebar;
-                                  }
-                                ?>
-                                <label class="badge <?php echo $badgeClass_sidebar; ?>"><?php echo $displayText_sidebar; ?></label>
-                              </span>
-                            </li>
-                            <li class="list-group-item">
-                              <strong>Tanggal:</strong> 
-                              <span class="float-right"><?php echo date('d M Y', strtotime($tindakLanjut['tanggal_tanggapan'] ?? 'now')); ?></span>
-                            </li>
-                            <li class="list-group-item">
-                              <strong>Petugas:</strong> 
-                              <span class="float-right"><?php echo htmlspecialchars($tindakLanjut['petugas']['nama'] ?? '-'); ?></span>
-                            </li>
-                            <li class="list-group-item">
-                              <strong>Laporan:</strong> 
-                              <span class="float-right"><?php echo htmlspecialchars($tindakLanjut['laporan']['judul_laporan'] ?? '-'); ?></span>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
+                    <div class="pt-2">
+                      <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Catatan Operasi / Keterangan Tim</p>
+                      <div class="rounded-xl bg-slate-50 border border-slate-200 p-4 text-slate-700 leading-relaxed whitespace-pre-wrap font-medium"><?php echo htmlspecialchars($tindakLanjut['keterangan'] ?? 'Tanpa catatan tertulis.'); ?></div>
                     </div>
                   </div>
                 </div>
               </div>
-              <?php else: ?>
-              <div class="alert alert-warning" role="alert">
-                <h4 class="alert-heading">Data Tidak Ditemukan!</h4>
-                <p>Tindak lanjut dengan ID yang dimaksud tidak ditemukan atau telah dihapus.</p>
-                <a href="index.php?controller=TindakLanjut&action=index" class="btn btn-primary">Kembali ke Daftar</a>
+
+              <!-- Media Bukti dari Laporan -->
+              <div class="rounded-2xl bg-white border border-slate-200 shadow-card overflow-hidden">
+                <div class="p-6 border-b border-slate-100">
+                  <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-camera-retro text-slate-400"></i> Dokumentasi Referensi Laporan Awal
+                  </h3>
+                </div>
+                <div class="p-6">
+                  
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    <?php for($i=1; $i<=3; $i++): ?>
+                      <?php 
+                        $fotoKey = 'foto_bukti_' . $i;
+                        $fotoUrlKey = 'foto_bukti_' . $i . '_url';
+                        $fotoSrc = $tindakLanjut['laporan'][$fotoUrlKey] ?? $tindakLanjut['laporan'][$fotoKey] ?? null;
+                      ?>
+                      <?php if (!empty($fotoSrc)): ?>
+                        <div class="group relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer shadow-sm border border-slate-200" onclick="openFullscreen('<?php echo htmlspecialchars($fotoSrc); ?>')">
+                          <img src="<?php echo htmlspecialchars($fotoSrc); ?>" alt="Bukti <?php echo $i; ?>" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                          <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <i class="fa-solid fa-expand text-white text-2xl"></i>
+                          </div>
+                        </div>
+                      <?php else: ?>
+                        <div class="aspect-[4/3] rounded-xl bg-slate-50 border border-slate-200 border-dashed flex flex-col items-center justify-center text-slate-400">
+                          <i class="fa-regular fa-image mb-2 text-2xl"></i>
+                          <span class="text-xs font-medium">Foto <?php echo $i; ?> tidak ada</span>
+                        </div>
+                      <?php endif; ?>
+                    <?php endfor; ?>
+                  </div>
+
+                  <?php $videoSrc = $tindakLanjut['laporan']['video_bukti_url'] ?? $tindakLanjut['laporan']['video_bukti'] ?? null; ?>
+                  <?php if (!empty($videoSrc)): ?>
+                    <div class="rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-black aspect-video max-w-xl">
+                      <video width="100%" height="auto" controls class="w-full h-full object-contain">
+                        <source src="<?php echo htmlspecialchars($videoSrc); ?>" type="video/mp4">
+                        Browser tidak mendukung elemen video.
+                      </video>
+                    </div>
+                  <?php endif; ?>
+
+                </div>
               </div>
-              <?php endif; ?>
+
             </div>
+
+            <!-- Right Column -->
+            <div class="lg:col-span-1 space-y-6">
+              
+              <!-- Location Map -->
+              <div class="rounded-2xl bg-white border border-slate-200 shadow-card overflow-hidden">
+                <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+                  <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-map-location-dot text-slate-400"></i> Peta Insiden
+                  </h3>
+                </div>
+                
+                <div class="w-full h-[320px] relative z-0">
+                  <div id="map" class="w-full h-full bg-slate-100"></div>
+                </div>
+
+                <div class="p-5 bg-slate-50/50">
+                  <div class="mb-3">
+                    <p class="text-xs font-semibold text-slate-600 leading-relaxed"><i class="fa-solid fa-location-dot text-brand-500 mr-1.5"></i> <?php echo htmlspecialchars($tindakLanjut['laporan']['alamat_lengkap'] ?? '-'); ?></p>
+                  </div>
+                  <div class="grid grid-cols-2 gap-2 pt-3 border-t border-slate-200 text-sm">
+                    <div>
+                      <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Latitude</p>
+                      <p class="font-mono text-slate-700 text-xs"><?php echo htmlspecialchars((string)($tindakLanjut['laporan']['latitude'] ?? '-')); ?></p>
+                    </div>
+                    <div>
+                      <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Longitude</p>
+                      <p class="font-mono text-slate-700 text-xs"><?php echo htmlspecialchars((string)($tindakLanjut['laporan']['longitude'] ?? '-')); ?></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick Actions -->
+              <div class="rounded-2xl bg-white border border-slate-200 shadow-card p-5">
+                <h3 class="font-bold text-slate-800 mb-4 pb-3 border-b border-slate-100 flex items-center gap-2">
+                  <i class="fa-solid fa-link text-slate-400 text-sm"></i> Tautan Navigasi
+                </h3>
+                
+                <div class="flex flex-col gap-2">
+                  <a href="index.php?controller=LaporanAdmin&action=detail&id=<?php echo (int)($tindakLanjut['laporan_id'] ?? 0); ?>" class="flex items-center gap-3 w-full p-3 rounded-xl border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 transition-colors group">
+                    <div class="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-indigo-500 group-hover:scale-110 transition-transform"><i class="fa-solid fa-file-invoice"></i></div>
+                    <div class="text-left">
+                      <p class="text-sm font-bold text-indigo-900">Lihat Laporan Awal</p>
+                      <p class="text-[10px] font-bold text-indigo-600 uppercase tracking-widest">Detail Pelapor & Kronologi</p>
+                    </div>
+                  </a>
+                  
+                  <a href="index.php?controller=TindakLanjut&action=index" class="w-full flex items-center justify-center p-3 rounded-xl bg-slate-100 text-sm font-bold text-slate-600 hover:bg-slate-200 transition-colors mt-2">
+                    Kembali ke Daftar
+                  </a>
+                </div>
+              </div>
+
+            </div>
+
           </div>
-        </div>
-        </div>
-    </div>
+        <?php else: ?>
+          <div class="rounded-2xl border border-amber-200 bg-amber-50 p-8 text-center flex flex-col items-center">
+            <div class="inline-flex h-16 w-16 rounded-full bg-white text-amber-500 items-center justify-center mb-4 text-3xl shadow-sm"><i class="fa-solid fa-file-circle-question"></i></div>
+            <h3 class="font-bold text-amber-800 text-lg mb-2">Data Tidak Ditemukan</h3>
+            <p class="text-amber-700 max-w-sm mb-6">Data operasi ini mungkin telah dibatalkan atau dihapus dari sistem.</p>
+            <a href="index.php?controller=TindakLanjut&action=index" class="inline-flex items-center gap-2 rounded-xl bg-amber-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-amber-700 transition">
+              Kembali ke Daftar
+            </a>
+          </div>
+        <?php endif; ?>
+
+      </div>
+    </main>
   </div>
-  <?php include 'template/script.php'; ?>
+</div>
 
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<!-- Modal Fullscreen Media -->
+<div id="mediaModal" class="fixed inset-0 z-[100] hidden bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
+  <button onclick="closeFullscreen()" class="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition backdrop-blur-md">
+    <i class="fa-solid fa-xmark text-xl"></i>
+  </button>
+  <div class="max-w-6xl w-full max-h-[90vh] flex items-center justify-center">
+    <img id="modalImage" src="" class="hidden max-h-[90vh] max-w-full rounded-lg shadow-2xl object-contain">
+  </div>
+</div>
 
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<?php include 'template/script.php'; ?>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Get coordinates from PHP
-      const latitude = <?php echo json_encode($tindakLanjut['laporan']['latitude'] ?? -6.200000); ?>;
-      const longitude = <?php echo json_encode($tindakLanjut['laporan']['longitude'] ?? 106.816666); ?>;
+<script>
+  // Image Viewer Modal
+  function openFullscreen(src) {
+    document.getElementById('modalImage').src = src;
+    document.getElementById('modalImage').classList.remove('hidden');
+    document.getElementById('mediaModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
 
-      // Initialize the map
-      const map = L.map('map').setView([latitude, longitude], 15);
+  function closeFullscreen() {
+    document.getElementById('mediaModal').classList.add('hidden');
+    document.getElementById('modalImage').classList.add('hidden');
+    document.body.style.overflow = 'auto';
+  }
 
-      // Add OpenStreetMap tiles
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(map);
+  document.addEventListener('keydown', function(event){
+    if(event.key === "Escape"){
+      closeFullscreen();
+    }
+  });
 
-      // Add marker to the map
-      const marker = L.marker([latitude, longitude]).addTo(map);
+  // Maps Init
+  document.addEventListener('DOMContentLoaded', function () {
+    const mapElement = document.getElementById('map');
+    if (!mapElement || typeof L === 'undefined') return;
 
-      // Add popup to the marker
-      marker.bindPopup('<b>Lokasi Kejadian Bencana</b><br><?php echo addslashes(htmlspecialchars($tindakLanjut['laporan']['judul_laporan'] ?? 'Lokasi Bencana')); ?>').openPopup();
-    });
-  </script>
+    var latRaw = "<?php echo (string)($tindakLanjut['laporan']['latitude'] ?? ''); ?>";
+    var lngRaw = "<?php echo (string)($tindakLanjut['laporan']['longitude'] ?? ''); ?>";
+    
+    // Default Jakarta center if none
+    const latitude = Number(latRaw) || -6.2;
+    const longitude = Number(lngRaw) || 106.816666;
 
-  <?php if (isset($_SESSION['toast'])): ?>
-    <script>
-        // Clean strings to prevent JS errors
-        var title = "<?php echo addslashes($_SESSION['toast']['title'] ?? ''); ?>";
-        var message = "<?php echo addslashes($_SESSION['toast']['message'] ?? ''); ?>";
+    const map = L.map('map').setView([latitude, longitude], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap',
+      maxZoom: 19
+    }).addTo(map);
 
-        // Display native alert
-        if (title && title !== 'null') {
-            alert(title + "\n\n" + message);
-        } else {
-            alert(message);
-        }
-        <?php unset($_SESSION['toast']); ?>
-    </script>
-  <?php endif; ?>
-
-</body>
-</html>
+    if(latRaw && lngRaw) {
+      L.marker([latitude, longitude]).addTo(map).bindPopup(
+        '<div class="font-sans font-bold text-sm mb-1 text-slate-800">Sasaran Operasi</div><div class="font-mono text-xs text-slate-500">' + latitude + ', ' + longitude + '</div>'
+      ).openPopup();
+      
+      setTimeout(function() { map.invalidateSize(); }, 200);
+    } else {
+      document.getElementById('map').innerHTML = '<div class="w-full h-full flex flex-col items-center justify-center text-slate-400 bg-slate-100"><i class="fa-solid fa-map-location-dot text-4xl mb-3 opacity-50"></i><p class="font-medium text-sm">Koordinat tidak tersedia</p></div>';
+    }
+  });
+</script>

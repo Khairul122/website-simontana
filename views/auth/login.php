@@ -4,270 +4,266 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title><?= $title ?></title>
-
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-  <!-- Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-  <!-- Favicon -->
   <link rel="shortcut icon" href="assets/images/favicon.png" />
-
   <script>
     tailwind.config = {
       theme: {
         extend: {
           fontFamily: {
-            'sans': ['Inter', 'sans-serif'],
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            display: ['Space Grotesk', 'sans-serif']
           },
           colors: {
-            'primary': {
-              50: '#EEF2FF',
-              100: '#E0E7FF',
-              200: '#C7D2FE',
-              300: '#A5B4FC',
-              400: '#818CF8',
-              500: '#6366F1',
-              600: '#4F46E5',
-              700: '#4338CA',
-              800: '#3730A3',
-              900: '#312E81',
+            brand: {
+              50: '#f2f7ff',
+              100: '#e0edff',
+              200: '#bfd8ff',
+              300: '#95bfff',
+              400: '#619dff',
+              500: '#3b82f6',
+              600: '#235fdb',
+              700: '#1d4db2',
+              800: '#1d438f',
+              900: '#1d3b76'
             }
+          },
+          boxShadow: {
+            auth: '0 30px 70px rgba(15, 35, 72, 0.18)',
+            pane: '0 14px 38px rgba(15, 35, 72, 0.12)'
+          },
+          keyframes: {
+            floaty: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-10px)' }
+            },
+            pulseSoft: {
+              '0%, 100%': { transform: 'scale(1)', opacity: '0.85' },
+              '50%': { transform: 'scale(1.06)', opacity: '1' }
+            },
+            cardReveal: {
+              '0%': { opacity: '0', transform: 'translateY(16px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' }
+            },
+            toastIn: {
+              '0%': { opacity: '0', transform: 'translateY(-10px) translateX(10px)' },
+              '100%': { opacity: '1', transform: 'translateY(0) translateX(0)' }
+            }
+          },
+          animation: {
+            floaty: 'floaty 7s ease-in-out infinite',
+            pulseSoft: 'pulseSoft 8s ease-in-out infinite',
+            cardReveal: 'cardReveal .6s ease-out both',
+            toastIn: 'toastIn .35s ease-out both'
           }
         }
       }
     }
   </script>
 </head>
-<body class="h-full font-sans bg-gray-50">
-  <div class="h-screen w-full flex overflow-hidden">
-    <!-- Image Section -->
-    <div class="hidden lg:flex lg:w-1/2 xl:w-2/3 bg-cover bg-center relative" style="background-image: url('https://source.unsplash.com/random/1920x1080/?nature,disaster');">
-      <!-- Gradient Overlay -->
-      <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-70"></div>
-      
-      <!-- Branding Content -->
-      <div class="relative z-10 flex flex-col justify-center items-center text-center text-white p-12 w-full">
-        <h1 class="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-primary-200 bg-clip-text text-transparent">
-          SIMONTA BENCANA
-        </h1>
-        <p class="text-xl md:text-2xl font-semibold mb-6">Sistem Informasi Monitoring dan Pelaporan Bencana</p>
-        <p class="text-lg text-primary-200 max-w-2xl">
-          Solusi komprehensif untuk pengelolaan data bencana, pelaporan real-time, dan koordinasi penanganan darurat.
-        </p>
-        
-        <!-- Features -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10 w-full max-w-2xl">
-          <div class="flex items-start gap-3">
-            <div class="bg-primary-500 bg-opacity-30 p-2 rounded-lg">
-              <i class="fas fa-bolt"></i>
-            </div>
-            <div class="text-left">
-              <div class="font-medium">Laporan Real-time</div>
-              <div class="text-primary-200 text-sm">Pembaruan instan</div>
-            </div>
-          </div>
-          <div class="flex items-start gap-3">
-            <div class="bg-primary-500 bg-opacity-30 p-2 rounded-lg">
-              <i class="fas fa-sync-alt"></i>
-            </div>
-            <div class="text-left">
-              <div class="font-medium">Update Otomatis</div>
-              <div class="text-primary-200 text-sm">Data terkini</div>
-            </div>
-          </div>
-          <div class="flex items-start gap-3">
-            <div class="bg-primary-500 bg-opacity-30 p-2 rounded-lg">
-              <i class="fas fa-shield-alt"></i>
-            </div>
-            <div class="text-left">
-              <div class="font-medium">Data Terpercaya</div>
-              <div class="text-primary-200 text-sm">Keamanan terjamin</div>
-            </div>
-          </div>
-          <div class="flex items-start gap-3">
-            <div class="bg-primary-500 bg-opacity-30 p-2 rounded-lg">
-              <i class="fas fa-users"></i>
-            </div>
-            <div class="text-left">
-              <div class="font-medium">Kolaborasi Tim</div>
-              <div class="text-primary-200 text-sm">Koordinasi efektif</div>
-            </div>
-          </div>
-        </div>
-      </div>
+<body class="h-full overflow-x-hidden bg-slate-100 font-sans text-slate-800">
+  <div class="relative min-h-screen">
+    <div class="pointer-events-none absolute inset-0 overflow-hidden">
+      <div class="absolute -top-20 -left-24 h-72 w-72 rounded-full bg-brand-300/55 blur-3xl animate-pulseSoft"></div>
+      <div class="absolute top-[18%] right-[-90px] h-80 w-80 rounded-full bg-cyan-300/40 blur-3xl animate-pulseSoft" style="animation-delay: .8s"></div>
+      <div class="absolute bottom-[-140px] left-[38%] h-96 w-96 rounded-full bg-brand-200/45 blur-3xl animate-pulseSoft" style="animation-delay: 1.6s"></div>
     </div>
 
-    <!-- Form Section -->
-    <div class="w-full lg:w-1/2 xl:w-1/3 flex items-center justify-center bg-white px-8 py-12 sm:px-12">
-      <div class="w-full max-w-md">
-        <div class="text-center mb-10">
-          <h1 class="text-3xl font-bold text-gray-800 mb-2">Selamat Datang</h1>
-          <p class="text-gray-500">Masuk ke akun Anda untuk melanjutkan</p>
+    <div class="relative z-10 mx-auto flex min-h-screen w-full flex-col items-stretch lg:grid lg:grid-cols-2">
+      <section class="relative hidden overflow-hidden lg:block">
+        <div class="absolute inset-0">
+          <div class="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(59,130,246,.26),transparent_38%),radial-gradient(circle_at_80%_12%,rgba(34,211,238,.24),transparent_30%),linear-gradient(135deg,#0b1f42_0%,#122f63_50%,#1b3f7a_100%)]"></div>
+          <div class="absolute inset-0 opacity-[.14]" style="background-image: url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1800&q=80'); background-size: cover; background-position: center;"></div>
+          <div class="absolute inset-0 bg-[linear-gradient(125deg,rgba(11,31,66,.9),rgba(22,52,101,.75))]"></div>
         </div>
 
-        <form method="POST" action="index.php?controller=Auth&action=processLogin" class="space-y-6">
-          <div class="space-y-4">
+        <div class="relative flex h-full flex-col justify-between px-14 py-14 text-white xl:px-16 xl:py-16">
+          <div class="animate-cardReveal">
+            <div class="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-2 text-sm font-semibold backdrop-blur-sm">
+              <i class="fa-solid fa-shield-heart text-cyan-200"></i>
+              <span>SIMONTA BENCANA</span>
+            </div>
+
+            <h1 class="mt-8 max-w-xl font-display text-5xl font-bold leading-tight xl:text-6xl">
+              Koordinasi cepat untuk respon bencana yang tepat.
+            </h1>
+            <p class="mt-5 max-w-xl text-base leading-relaxed text-slate-200 xl:text-lg">
+              Satu platform terpadu untuk pelaporan warga, validasi operator desa, dan tindak lanjut petugas BPBD secara real-time.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 text-white/95">
+            <article class="rounded-2xl border border-white/25 bg-white/10 p-4 backdrop-blur-sm animate-floaty">
+              <p class="text-xs uppercase tracking-widest text-cyan-100">Respons</p>
+              <p class="mt-1 font-display text-2xl font-semibold">24/7</p>
+              <p class="mt-2 text-sm text-slate-200">Monitoring dan pembaruan status terus berjalan.</p>
+            </article>
+            <article class="rounded-2xl border border-white/25 bg-white/10 p-4 backdrop-blur-sm animate-floaty" style="animation-delay: .6s">
+              <p class="text-xs uppercase tracking-widest text-cyan-100">Aktor</p>
+              <p class="mt-1 font-display text-2xl font-semibold">4 Peran</p>
+              <p class="mt-2 text-sm text-slate-200">Warga, Operator, Petugas BPBD, dan Admin.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="relative flex min-h-screen items-center justify-center px-5 py-7 sm:px-8 lg:px-12">
+        <div class="w-full max-w-lg animate-cardReveal rounded-[30px] border border-white/70 bg-white/90 p-6 shadow-auth backdrop-blur-xl sm:p-9">
+          <div class="mb-8">
+            <div class="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1.5 text-xs font-semibold text-brand-700">
+              <span class="h-2 w-2 rounded-full bg-brand-600"></span>
+              Akses Dashboard
+            </div>
+            <h2 class="mt-4 font-display text-3xl font-bold text-slate-900 sm:text-4xl">Masuk ke SIMONTA</h2>
+            <p class="mt-2 text-sm text-slate-500">Gunakan akun Anda untuk mengelola laporan dan monitoring.</p>
+          </div>
+
+          <form method="POST" action="index.php?controller=Auth&action=processLogin" class="space-y-5" id="loginForm">
             <div>
-              <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username atau Email</label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <i class="fas fa-user text-gray-400"></i>
-                </div>
-                <input type="text" class="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition" id="username" name="username" placeholder="Masukkan username atau email" required>
+              <label for="username" class="mb-1.5 block text-sm font-semibold text-slate-700">Username atau Email</label>
+              <div class="group relative">
+                <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 transition group-focus-within:text-brand-700">
+                  <i class="fa-solid fa-user"></i>
+                </span>
+                <input id="username" name="username" type="text" required class="w-full rounded-xl border border-slate-300 bg-white py-3 pl-10 pr-3 text-sm outline-none transition focus:border-brand-700 focus:ring-4 focus:ring-brand-100" placeholder="contoh: petugas.bpbd">
               </div>
             </div>
 
             <div>
-              <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Kata Sandi</label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <i class="fas fa-lock text-gray-400"></i>
-                </div>
-                <input type="password" class="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition" id="password" name="password" placeholder="Masukkan kata sandi" required>
-                <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center" id="togglePassword">
-                  <i class="fas fa-eye text-gray-400"></i>
+              <div class="mb-1.5 flex items-center justify-between">
+                <label for="password" class="block text-sm font-semibold text-slate-700">Kata Sandi</label>
+                <span class="text-xs text-slate-400">Pastikan perangkat aman</span>
+              </div>
+              <div class="group relative">
+                <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 transition group-focus-within:text-brand-700">
+                  <i class="fa-solid fa-lock"></i>
+                </span>
+                <input id="password" name="password" type="password" required class="w-full rounded-xl border border-slate-300 bg-white py-3 pl-10 pr-12 text-sm outline-none transition focus:border-brand-700 focus:ring-4 focus:ring-brand-100" placeholder="Masukkan kata sandi">
+                <button id="togglePassword" type="button" class="absolute inset-y-0 right-0 px-3 text-slate-400 transition hover:text-brand-700" aria-label="Tampilkan kata sandi">
+                  <i class="fa-solid fa-eye"></i>
                 </button>
               </div>
             </div>
-          </div>
 
-          <button type="submit" class="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white py-3 px-4 rounded-lg font-medium hover:from-primary-700 hover:to-primary-800 transition-all duration-200 transform hover:-translate-y-0.5 shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
-            <i class="fas fa-sign-in-alt"></i>
-            MASUK
-          </button>
+            <button id="submitBtn" type="submit" class="group relative inline-flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-brand-700 px-4 py-3 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-brand-800 focus:outline-none focus:ring-4 focus:ring-brand-200">
+              <span class="absolute inset-0 -translate-x-full bg-white/20 transition duration-500 group-hover:translate-x-0"></span>
+              <i class="fa-solid fa-right-to-bracket relative"></i>
+              <span class="relative">Masuk Sekarang</span>
+            </button>
 
-          <div class="text-center">
-            <a href="index.php?controller=Auth&action=register" class="text-primary-600 hover:text-primary-800 font-medium text-sm transition">
-              Belum punya akun? Buat akun baru
-            </a>
-          </div>
-        </form>
-      </div>
+            <p class="text-center text-sm text-slate-500">
+              Belum punya akun?
+              <a href="index.php?controller=Auth&action=register" class="font-semibold text-brand-700 transition hover:text-brand-900">Daftar di sini</a>
+            </p>
+          </form>
+        </div>
+      </section>
     </div>
   </div>
 
-  <!-- Toast Container -->
-  <div class="fixed top-4 right-4 z-50 space-y-2" id="toastContainer"></div>
+  <div class="fixed right-4 top-4 z-50 flex w-[calc(100%-2rem)] max-w-sm flex-col gap-2 sm:w-full" id="toastContainer"></div>
 
   <script>
-    // Password visibility toggle functionality
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       const togglePassword = document.getElementById('togglePassword');
       const passwordInput = document.getElementById('password');
-      const eyeIcon = togglePassword.querySelector('i');
+      const eyeIcon = togglePassword ? togglePassword.querySelector('i') : null;
+      const submitBtn = document.getElementById('submitBtn');
+      const loginForm = document.getElementById('loginForm');
 
-      togglePassword.addEventListener('click', function() {
-        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordInput.setAttribute('type', type);
-
-        // Toggle eye icon
-        if (type === 'password') {
-          eyeIcon.classList.remove('fa-eye-slash');
-          eyeIcon.classList.add('fa-eye');
-        } else {
-          eyeIcon.classList.remove('fa-eye');
-          eyeIcon.classList.add('fa-eye-slash');
-        }
-      });
-
-      // Fungsi untuk menampilkan toast notification
-      function showToast(type, title, message) {
-        const toastContainer = document.getElementById('toastContainer');
-
-        const toast = document.createElement('div');
-        toast.className = `p-4 rounded-lg shadow-lg max-w-sm transform transition-all duration-300 ${type === 'success' ? 'bg-green-100 border-l-4 border-green-500' : type === 'error' ? 'bg-red-100 border-l-4 border-red-500' : type === 'warning' ? 'bg-yellow-100 border-l-4 border-yellow-500' : 'bg-blue-100 border-l-4 border-blue-500'}`;
-
-        toast.innerHTML = `
-          <div class="flex items-start gap-3">
-            <div class="${type === 'success' ? 'text-green-500' : type === 'error' ? 'text-red-500' : type === 'warning' ? 'text-yellow-500' : 'text-blue-500'}">
-              <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i>
-            </div>
-            <div class="flex-1">
-              <div class="font-medium ${type === 'success' ? 'text-green-800' : type === 'error' ? 'text-red-800' : type === 'warning' ? 'text-yellow-800' : 'text-blue-800'}">${title}</div>
-              <div class="text-sm ${type === 'success' ? 'text-green-600' : type === 'error' ? 'text-red-600' : type === 'warning' ? 'text-yellow-600' : 'text-blue-600'}">${message}</div>
-            </div>
-            <button class="text-gray-500 hover:text-gray-700" onclick="this.parentElement.parentElement.remove()">&times;</button>
-          </div>
-        `;
-
-        toastContainer.appendChild(toast);
-
-        // Hapus toast setelah 5 detik
-        setTimeout(() => {
-          if (toast.parentNode) {
-            toast.remove();
-          }
-        }, 5000);
-
-        return toast;
+      if (togglePassword && passwordInput && eyeIcon) {
+        togglePassword.addEventListener('click', function () {
+          const show = passwordInput.getAttribute('type') === 'password';
+          passwordInput.setAttribute('type', show ? 'text' : 'password');
+          eyeIcon.classList.toggle('fa-eye', !show);
+          eyeIcon.classList.toggle('fa-eye-slash', show);
+        });
       }
 
-      // Tampilkan alert jika ada dari session
-      <?php if (isset($_SESSION['toast'])): ?>
-      <script>
-          // Clean strings to prevent JS errors
-          var title = "<?php echo addslashes($_SESSION['toast']['title'] ?? ''); ?>";
-          var message = "<?php echo addslashes($_SESSION['toast']['message'] ?? ''); ?>";
+      if (loginForm && submitBtn) {
+        loginForm.addEventListener('submit', function () {
+          submitBtn.disabled = true;
+          submitBtn.classList.add('opacity-80', 'cursor-not-allowed');
+          submitBtn.querySelector('span:last-child').textContent = 'Memproses...';
+        });
+      }
 
-          // Display native alert
-          if (title && title !== 'null') {
-              alert(title + "\n\n" + message);
-          } else {
-              alert(message);
-          }
-          <?php unset($_SESSION['toast']); ?>
+      function showToast(type, title, message) {
+        const toastContainer = document.getElementById('toastContainer');
+        if (!toastContainer) return;
 
-          // Jika redirect diperlukan setelah alert ditampilkan
-          <?php if (isset($should_redirect) && $should_redirect): ?>
-          setTimeout(() => {
-              // Redirect ke dashboard berdasarkan role
-              const role = '<?php echo $_SESSION['user_role'] ?? 'Warga'; ?>';
-              let redirectUrl = 'index.php?controller=Beranda&action=index'; // Default untuk Warga
+        const styleMap = {
+          success: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+          error: 'border-rose-200 bg-rose-50 text-rose-700',
+          warning: 'border-amber-200 bg-amber-50 text-amber-700',
+          info: 'border-brand-200 bg-brand-50 text-brand-700'
+        };
+        const iconMap = {
+          success: 'fa-circle-check',
+          error: 'fa-circle-xmark',
+          warning: 'fa-triangle-exclamation',
+          info: 'fa-circle-info'
+        };
+        const key = styleMap[type] ? type : 'info';
 
-              switch(role) {
-                case 'Admin':
-                case 'PetugasBPBD':
-                case 'OperatorDesa':
-                  redirectUrl = 'index.php?controller=Dashboard&action=index';
-                  break;
-                default:
-                  redirectUrl = 'index.php?controller=Beranda&action=index';
-                  break;
-              }
+        const toast = document.createElement('div');
+        toast.className = 'animate-toastIn rounded-xl border px-4 py-3 shadow-pane backdrop-blur-sm ' + styleMap[key];
+        toast.innerHTML =
+          '<div class="flex items-start gap-3">' +
+            '<span class="pt-0.5"><i class="fa-solid ' + iconMap[key] + '"></i></span>' +
+            '<div class="flex-1">' +
+              '<p class="text-sm font-bold text-slate-800">' + title + '</p>' +
+              '<p class="text-sm text-slate-600">' + message + '</p>' +
+            '</div>' +
+            '<button type="button" class="text-slate-400 hover:text-slate-700" aria-label="Tutup">&times;</button>' +
+          '</div>';
 
-              window.location.href = redirectUrl;
-          }, 2000); // Tunggu 2 detik agar alert terlihat sebelum redirect
-          <?php endif; ?>
-      </script>
-      <?php endif; ?>
-
-      // Jika tidak ada toast tapi redirect diperlukan
-      <?php if (isset($should_redirect) && $should_redirect && !isset($_SESSION['toast'])): ?>
-      document.addEventListener('DOMContentLoaded', function() {
-        // Redirect ke dashboard berdasarkan role
-        const role = '<?php echo $_SESSION['user_role'] ?? 'Warga'; ?>';
-        let redirectUrl = 'index.php?controller=Beranda&action=index'; // Default untuk Warga
-
-        switch(role) {
-          case 'Admin':
-          case 'PetugasBPBD':
-          case 'OperatorDesa':
-            redirectUrl = 'index.php?controller=Dashboard&action=index';
-            break;
-          default:
-            redirectUrl = 'index.php?controller=Beranda&action=index';
-            break;
+        const closeButton = toast.querySelector('button');
+        if (closeButton) {
+          closeButton.addEventListener('click', function () {
+            toast.remove();
+          });
         }
 
+        toastContainer.appendChild(toast);
+        setTimeout(function () {
+          toast.remove();
+        }, 4500);
+      }
+
+      <?php $hasToast = isset($_SESSION['toast']); ?>
+      <?php if (isset($_SESSION['toast'])): ?>
+      <?php
+        $toastType = addslashes($_SESSION['toast']['type'] ?? 'info');
+        $toastTitle = addslashes($_SESSION['toast']['title'] ?? 'Informasi');
+        $toastMessage = addslashes($_SESSION['toast']['message'] ?? '');
+        unset($_SESSION['toast']);
+      ?>
+      showToast('<?php echo $toastType; ?>', '<?php echo $toastTitle; ?>', '<?php echo $toastMessage; ?>');
+
+      <?php if (isset($should_redirect) && $should_redirect): ?>
+      setTimeout(function () {
+        const role = '<?php echo $_SESSION['user']['role'] ?? 'Warga'; ?>';
+        let redirectUrl = 'index.php?controller=Dashboard&action=warga';
+        if (role === 'Admin') redirectUrl = 'index.php?controller=Dashboard&action=admin';
+        if (role === 'PetugasBPBD') redirectUrl = 'index.php?controller=Dashboard&action=petugas';
+        if (role === 'OperatorDesa') redirectUrl = 'index.php?controller=Dashboard&action=operator';
         window.location.href = redirectUrl;
-      });
+      }, 1200);
+      <?php endif; ?>
+      <?php endif; ?>
+
+      <?php if (isset($should_redirect) && $should_redirect && !$hasToast): ?>
+      const role = '<?php echo $_SESSION['user']['role'] ?? 'Warga'; ?>';
+      let redirectUrl = 'index.php?controller=Dashboard&action=warga';
+      if (role === 'Admin') redirectUrl = 'index.php?controller=Dashboard&action=admin';
+      if (role === 'PetugasBPBD') redirectUrl = 'index.php?controller=Dashboard&action=petugas';
+      if (role === 'OperatorDesa') redirectUrl = 'index.php?controller=Dashboard&action=operator';
+      window.location.href = redirectUrl;
       <?php endif; ?>
     });
   </script>

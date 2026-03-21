@@ -33,6 +33,10 @@ class LaporanOperatorService
             $url = API_LAPORANS . '?' . http_build_query($params);
             $response = apiRequest($url, 'GET', null, $this->getHeaders());
 
+            if ($response['success']) {
+                $response['pagination'] = $response['meta']['pagination'] ?? [];
+                $response['data'] = apiDataList($response['data']);
+            }
             return $response;
         } catch (Exception $e) {
             return [
@@ -54,6 +58,9 @@ class LaporanOperatorService
         try {
             $url = buildApiUrlLaporansById($id);
             $response = apiRequest($url, 'GET', null, $this->getHeaders());
+            if ($response['success']) {
+                $response['data'] = apiDataEntity($response['data']);
+            }
 
             // Additional check: ensure the report belongs to the operator's desa if needed
             $current_user = $_SESSION['user'] ?? null;
@@ -99,13 +106,15 @@ class LaporanOperatorService
                 return $report_response; // Return the error from access check
             }
 
-            // Check if there's a specific endpoint for updating status
-            // First try the update-status endpoint
-            $url = buildApiUrlLaporansById($id) . '/update-status';
-            $response = apiRequest($url, 'POST', $data, $this->getHeaders());
+            $status = $data['status'] ?? '';
 
-            // If the specific endpoint doesn't exist or method not allowed, try PUT method on main endpoint
-            if (!$response['success'] && in_array($response['http_code'], [404, 405])) {
+            if (in_array($status, ['Diverifikasi', 'Ditolak'], true)) {
+                $url = buildApiUrlLaporansVerifikasiById($id);
+                $response = apiRequest($url, 'POST', $data, $this->getHeaders());
+            } elseif (in_array($status, ['Diproses', 'Selesai'], true)) {
+                $url = buildApiUrlLaporansProsesById($id);
+                $response = apiRequest($url, 'POST', $data, $this->getHeaders());
+            } else {
                 $url = buildApiUrlLaporansById($id);
                 $response = apiRequest($url, 'PUT', $data, $this->getHeaders());
             }

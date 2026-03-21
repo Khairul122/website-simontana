@@ -18,6 +18,9 @@ class DashboardController {
         // Inisialisasi dashboard service
         require_once 'services/DashboardService.php';
         $this->dashboardService = new DashboardService();
+
+        require_once 'services/BmkgService.php';
+        $this->bmkgService = new BmkgService();
     }
 
     public function admin() {
@@ -41,9 +44,9 @@ class DashboardController {
         // Ambil data tambahan untuk chart
         $chartData = $this->dashboardService->getChartData();
 
-        // Ambil data BMKG (Gempa Terbaru)
-        $bmkgData = $this->dashboardService->getBmkgData();
-        $bmkgGempaDirasakan = $this->dashboardService->getBmkgGempaDirasakan();
+        // Ambil data BMKG dari BmkgService
+        $bmkgData = $this->bmkgService->getGempaTerbaru();
+        $bmkgGempaDirasakan = $this->bmkgService->getGempaDirasakan();
 
         // Siapkan semua data untuk ditampilkan di view
         $dashboardData = [
@@ -81,9 +84,9 @@ class DashboardController {
         // Ambil data tambahan untuk chart
         $chartData = $this->dashboardService->getChartData();
 
-        // Ambil data BMKG (Gempa Terbaru)
-        $bmkgData = $this->dashboardService->getBmkgData();
-        $bmkgGempaDirasakan = $this->dashboardService->getBmkgGempaDirasakan();
+        // Ambil data BMKG dari BmkgService
+        $bmkgData = $this->bmkgService->getGempaTerbaru();
+        $bmkgGempaDirasakan = $this->bmkgService->getGempaDirasakan();
 
         // Siapkan semua data untuk ditampilkan di view
         $dashboardData = [
@@ -156,6 +159,28 @@ class DashboardController {
         include 'views/dashboard/operator.php';
     }
 
+    public function warga() {
+        $currentUser = $this->authService->getCurrentUser();
+
+        if (!$currentUser['success'] || ($currentUser['data']['role'] ?? '') !== 'Warga') {
+            $this->redirectToRoleDashboard($currentUser['data']['role'] ?? 'Guest');
+            return;
+        }
+
+        $latestReports = $this->dashboardService->getLatestReports(5);
+        $categories = $this->dashboardService->getCategories();
+        $bmkgData = $this->bmkgService->getGempaTerbaru();
+
+        $dashboardData = [
+            'latestReports' => $latestReports,
+            'categories' => $categories,
+            'bmkgData' => $bmkgData
+        ];
+
+        $title = "Dashboard Warga - SIMONTA BENCANA";
+        include 'views/dashboard/warga.php';
+    }
+
     // Fungsi umum untuk redirect berdasarkan role (untuk validasi akses)
     private function redirectToRoleDashboard($role) {
         switch ($role) {
@@ -169,7 +194,7 @@ class DashboardController {
                 header('Location: index.php?controller=Dashboard&action=operator');
                 break;
             case 'Warga':
-                header('Location: index.php?controller=Beranda&action=index');
+                header('Location: index.php?controller=Dashboard&action=warga');
                 break;
             default:
                 header('Location: index.php?controller=Auth&action=login');

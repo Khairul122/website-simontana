@@ -16,10 +16,11 @@ class RiwayatTindakanController {
             exit;
         }
 
-        // Only allow roles: 'Admin', 'PetugasBPBD'
+        // Only allow roles: 'Admin', 'PetugasBPBD', 'OperatorDesa'
         $userRole = $currentUser['data']['role'] ?? '';
-        if ($userRole !== 'Admin' && $userRole !== 'PetugasBPBD') {
-            header('Location: index.php?controller=Dashboard&action=' . strtolower($userRole));
+        if (!in_array($userRole, ['Admin', 'PetugasBPBD', 'OperatorDesa'], true)) {
+            setDialog('Akses Ditolak', 'Anda tidak memiliki akses ke fitur riwayat tindakan.', 'error');
+            header('Location: index.php?controller=Dashboard&action=warga');
             exit;
         }
 
@@ -37,8 +38,7 @@ class RiwayatTindakanController {
         $response = $this->riwayatTindakanService->getAll($filters);
 
         if ($response['success']) {
-            // CRITICAL: Extract the array correctly: $riwayat = $response['data']['data'] ?? [];
-            $riwayat = $response['data']['data'] ?? [];
+            $riwayat = is_array($response['data']) ? $response['data'] : [];
         } else {
             $riwayat = [];
             $error_message = $response['message'] ?? 'Gagal mengambil data riwayat tindakan';
@@ -55,8 +55,7 @@ class RiwayatTindakanController {
         $response = $this->riwayatTindakanService->getAllTindakLanjut();
         $tindakLanjutList = [];
         if ($response['success']) {
-            // Handle both Paginated and Non-Paginated responses for safety
-            $tindakLanjutList = $response['data']['data'] ?? $response['data'] ?? [];
+            $tindakLanjutList = is_array($response['data']) ? $response['data'] : [];
         }
 
         $title = "Tambah Riwayat Tindakan - SIMONTA BENCANA";
@@ -79,10 +78,7 @@ class RiwayatTindakanController {
 
         // Validation
         if (empty($tindakLanjutId) || empty($keterangan) || empty($waktuTindakan)) {
-            $_SESSION['toast'] = [
-                'title' => 'Gagal',
-                'message' => 'Tindak lanjut, keterangan, dan waktu tindakan harus diisi'
-            ];
+            setDialog('Gagal', 'Tindak lanjut, keterangan, dan waktu tindakan harus diisi', 'error');
             header('Location: index.php?controller=RiwayatTindakan&action=create');
             exit;
         }
@@ -97,18 +93,10 @@ class RiwayatTindakanController {
         $response = $this->riwayatTindakanService->create($data);
 
         if ($response['success']) {
-            // On Success: Set $_SESSION['toast'] = ['title'=>'Berhasil', 'message'=>'...']. Redirect to index
-            $_SESSION['toast'] = [
-                'title' => 'Berhasil',
-                'message' => 'Riwayat tindakan berhasil ditambahkan'
-            ];
+            setDialog('Berhasil', 'Riwayat tindakan berhasil ditambahkan', 'success');
             header('Location: index.php?controller=RiwayatTindakan&action=index');
         } else {
-            // On Fail: Set error toast. Redirect to create
-            $_SESSION['toast'] = [
-                'title' => 'Gagal',
-                'message' => $response['message'] ?? 'Gagal menambahkan riwayat tindakan'
-            ];
+            setDialog('Gagal', $response['message'] ?? 'Gagal menambahkan riwayat tindakan', 'error');
             header('Location: index.php?controller=RiwayatTindakan&action=create');
         }
         exit;
@@ -135,8 +123,7 @@ class RiwayatTindakanController {
         $response = $this->riwayatTindakanService->getAllTindakLanjut();
         $tindakLanjutList = [];
         if ($response['success']) {
-            // Handle both Paginated and Non-Paginated responses for safety
-            $tindakLanjutList = $response['data']['data'] ?? $response['data'] ?? [];
+            $tindakLanjutList = is_array($response['data']) ? $response['data'] : [];
         }
 
         $title = "Edit Riwayat Tindakan - SIMONTA BENCANA";
@@ -164,10 +151,7 @@ class RiwayatTindakanController {
 
         // Validation
         if (empty($tindakLanjutId) || empty($keterangan) || empty($waktuTindakan)) {
-            $_SESSION['toast'] = [
-                'title' => 'Gagal',
-                'message' => 'Tindak lanjut, keterangan, dan waktu tindakan harus diisi'
-            ];
+            setDialog('Gagal', 'Tindak lanjut, keterangan, dan waktu tindakan harus diisi', 'error');
             header('Location: index.php?controller=RiwayatTindakan&action=edit&id=' . $id);
             exit;
         }
@@ -181,16 +165,10 @@ class RiwayatTindakanController {
         $response = $this->riwayatTindakanService->update($id, $data);
 
         if ($response['success']) {
-            $_SESSION['toast'] = [
-                'title' => 'Berhasil',
-                'message' => 'Riwayat tindakan berhasil diperbarui'
-            ];
+            setDialog('Berhasil', 'Riwayat tindakan berhasil diperbarui', 'success');
             header('Location: index.php?controller=RiwayatTindakan&action=detail&id=' . $id);
         } else {
-            $_SESSION['toast'] = [
-                'title' => 'Gagal',
-                'message' => $response['message'] ?? 'Gagal memperbarui riwayat tindakan'
-            ];
+            setDialog('Gagal', $response['message'] ?? 'Gagal memperbarui riwayat tindakan', 'error');
             header('Location: index.php?controller=RiwayatTindakan&action=edit&id=' . $id);
         }
         exit;
@@ -213,15 +191,9 @@ class RiwayatTindakanController {
         $response = $this->riwayatTindakanService->delete($id);
 
         if ($response['success']) {
-            $_SESSION['toast'] = [
-                'title' => 'Berhasil',
-                'message' => 'Riwayat tindakan berhasil dihapus'
-            ];
+            setDialog('Berhasil', 'Riwayat tindakan berhasil dihapus', 'success');
         } else {
-            $_SESSION['toast'] = [
-                'title' => 'Gagal',
-                'message' => $response['message'] ?? 'Gagal menghapus riwayat tindakan'
-            ];
+            setDialog('Gagal', $response['message'] ?? 'Gagal menghapus riwayat tindakan', 'error');
         }
 
         header('Location: index.php?controller=RiwayatTindakan&action=index');

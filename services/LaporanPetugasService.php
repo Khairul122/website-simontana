@@ -36,7 +36,11 @@ class LaporanPetugasService
 
         $headers = $this->getHeaders();
 
-        return apiRequest($url, 'GET', null, $headers);
+        $response = apiRequest($url, 'GET', null, $headers);
+        if ($response['success']) {
+            $response['data'] = apiDataList($response['data']);
+        }
+        return $response;
     }
 
     /**
@@ -47,7 +51,11 @@ class LaporanPetugasService
         $url = buildApiUrlLaporansById($id);
         $headers = $this->getHeaders();
 
-        return apiRequest($url, 'GET', null, $headers);
+        $response = apiRequest($url, 'GET', null, $headers);
+        if ($response['success']) {
+            $response['data'] = apiDataEntity($response['data']);
+        }
+        return $response;
     }
 
     /**
@@ -55,9 +63,20 @@ class LaporanPetugasService
      */
     public function updateStatus($id, $data)
     {
-        $url = buildApiUrlLaporansById($id);
         $headers = $this->getHeaders();
+        $status = $data['status'] ?? '';
 
+        if (in_array($status, ['Diverifikasi', 'Ditolak'], true)) {
+            $url = buildApiUrlLaporansVerifikasiById($id);
+            return apiRequest($url, 'POST', $data, $headers);
+        }
+
+        if (in_array($status, ['Diproses', 'Selesai'], true)) {
+            $url = buildApiUrlLaporansProsesById($id);
+            return apiRequest($url, 'POST', $data, $headers);
+        }
+
+        $url = buildApiUrlLaporansById($id);
         return apiRequest($url, 'PUT', $data, $headers);
     }
 
@@ -77,7 +96,7 @@ class LaporanPetugasService
      */
     public function updateToSelesai($id, $data = [])
     {
-        $url = buildApiUrlLaporansById($id);
+        $url = buildApiUrlLaporansProsesById($id);
         $headers = $this->getHeaders();
 
         // Data untuk mengubah status menjadi Selesai
@@ -85,7 +104,7 @@ class LaporanPetugasService
             'status' => 'Selesai'
         ], $data);
 
-        return apiRequest($url, 'PUT', $updateData, $headers);
+        return apiRequest($url, 'POST', $updateData, $headers);
     }
 
     /**
@@ -93,7 +112,7 @@ class LaporanPetugasService
      */
     public function updateToDitolak($id, $data = [])
     {
-        $url = buildApiUrlLaporansById($id);
+        $url = buildApiUrlLaporansVerifikasiById($id);
         $headers = $this->getHeaders();
 
         // Data untuk mengubah status menjadi Ditolak
@@ -101,7 +120,7 @@ class LaporanPetugasService
             'status' => 'Ditolak'
         ], $data);
 
-        return apiRequest($url, 'PUT', $updateData, $headers);
+        return apiRequest($url, 'POST', $updateData, $headers);
     }
 
     /**

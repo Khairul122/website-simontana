@@ -8,6 +8,7 @@ define('MODEL_PATH', BASE_PATH . '/models/');
 define('VIEW_PATH', BASE_PATH . '/views/');
 define('ASSET_PATH', BASE_PATH . '/assets/');
 require_once 'config/koneksi.php';
+require_once 'config/globals.php';
 
 $controller = isset($_GET['controller']) ? $_GET['controller'] : 'Auth';
 $action = isset($_GET['action']) ? $_GET['action'] : 'login';

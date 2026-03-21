@@ -7,6 +7,39 @@ class LaporanAdminService
 {
     private $apiEndpoint;
 
+    private function mapItem(array $item): array
+    {
+        $item['pelapor_id'] = isset($item['id_pelapor']) && is_numeric($item['id_pelapor'])
+            ? (int)$item['id_pelapor']
+            : (isset($item['pelapor']['id']) && is_numeric($item['pelapor']['id']) ? (int)$item['pelapor']['id'] : null);
+
+        $item['pelapor_nama'] = $item['pelapor']['nama']
+            ?? $item['pelapor']['username']
+            ?? null;
+
+        $item['kategori_nama'] = $item['kategori']['nama_kategori']
+            ?? $item['kategori']['nama']
+            ?? null;
+
+        $item['desa_nama'] = $item['desa']['nama'] ?? null;
+        $item['kecamatan_nama'] = $item['desa']['kecamatan']['nama'] ?? null;
+        $item['kabupaten_nama'] = $item['desa']['kecamatan']['kabupaten']['nama'] ?? null;
+        $item['provinsi_nama'] = $item['desa']['kecamatan']['kabupaten']['provinsi']['nama'] ?? null;
+
+        return $item;
+    }
+
+    private function mapList(array $rows): array
+    {
+        $mapped = [];
+        foreach ($rows as $row) {
+            if (is_array($row)) {
+                $mapped[] = $this->mapItem($row);
+            }
+        }
+        return $mapped;
+    }
+
     public function __construct()
     {
         // Gabungkan konstanta global + endpoint spesifik
@@ -36,7 +69,11 @@ class LaporanAdminService
 
         $headers = $this->getHeaders();
 
-        return apiRequest($url, 'GET', null, $headers);
+        $response = apiRequest($url, 'GET', null, $headers);
+        if ($response['success']) {
+            $response['data'] = $this->mapList(apiDataList($response['data']));
+        }
+        return $response;
     }
 
     /**
@@ -47,7 +84,11 @@ class LaporanAdminService
         $url = buildApiUrlLaporansById($id);
         $headers = $this->getHeaders();
 
-        return apiRequest($url, 'GET', null, $headers);
+        $response = apiRequest($url, 'GET', null, $headers);
+        if ($response['success']) {
+            $response['data'] = $this->mapItem(apiDataEntity($response['data']));
+        }
+        return $response;
     }
 
     /**

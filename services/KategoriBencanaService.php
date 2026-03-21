@@ -31,7 +31,11 @@ class KategoriBencanaService
         $url = $this->apiEndpoint;
         $headers = $this->getHeaders();
 
-        return apiRequest($url, 'GET', null, $headers);
+        $response = apiRequest($url, 'GET', null, $headers);
+        if ($response['success']) {
+            $response['data'] = apiDataList($response['data']);
+        }
+        return $response;
     }
 
     /**
