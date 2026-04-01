@@ -25,38 +25,120 @@ class BmkgController {
         }
     }
 
-    public function index() {
+    private function userRole(): string
+    {
         $currentUser = $this->authService->getCurrentUser();
+        if (!$currentUser['success']) {
+            return '';
+        }
+
+        $data = is_array($currentUser['data'] ?? null) ? $currentUser['data'] : [];
+        $role = $data['role'] ?? '';
+        return is_string($role) ? $role : '';
+    }
+
+    private function canAccessBmkgProtected(): bool
+    {
+        return in_array($this->userRole(), ['Admin', 'PetugasBPBD'], true);
+    }
+
+    private function extractGempaEntity($payload): array
+    {
+        if (!is_array($payload)) {
+            return [];
+        }
+
+        if (isset($payload['Infogempa']['gempa']) && is_array($payload['Infogempa']['gempa'])) {
+            return $payload['Infogempa']['gempa'];
+        }
+
+        if (isset($payload['gempa']) && is_array($payload['gempa'])) {
+            return $payload['gempa'];
+        }
+
+        if (isset($payload['data']) && is_array($payload['data'])) {
+            return $this->extractGempaEntity($payload['data']);
+        }
+
+        if (isset($payload['Tanggal']) || isset($payload['Magnitude']) || isset($payload['Wilayah'])) {
+            return $payload;
+        }
+
+        return [];
+    }
+
+    private function extractGempaList($payload): array
+    {
+        if (!is_array($payload)) {
+            return [];
+        }
+
+        if (isset($payload['Infogempa']['gempa']) && is_array($payload['Infogempa']['gempa'])) {
+            $gempa = $payload['Infogempa']['gempa'];
+            $first = $gempa[0] ?? null;
+            return is_array($first) ? $gempa : [];
+        }
+
+        if (isset($payload['gempa']) && is_array($payload['gempa'])) {
+            $gempa = $payload['gempa'];
+            $first = $gempa[0] ?? null;
+            return is_array($first) ? $gempa : [];
+        }
+
+        if (isset($payload['data']) && is_array($payload['data'])) {
+            return $this->extractGempaList($payload['data']);
+        }
+
+        $first = $payload[0] ?? null;
+        if (is_array($first) && (isset($first['Tanggal']) || isset($first['Magnitude']))) {
+            return $payload;
+        }
+
+        return [];
+    }
+
+    public function index() {
+        $currentUserResp = $this->authService->getCurrentUser();
+        $currentUser = is_array($currentUserResp['data'] ?? null) ? $currentUserResp['data'] : [];
         
         
-        $summaryCall = $this->bmkgService->getSummary();
         $terbaruCall = $this->bmkgService->getGempaTerbaru();
         $terkiniCall = $this->bmkgService->getGempaTerkini();
         $dirasakanCall = $this->bmkgService->getGempaDirasakan();
         $diniCuacaCall = $this->weatherService->getPeringatanDiniCuaca();
 
-        
-        $summary = $summaryCall['success'] ? $summaryCall['data'] : null;
-        if (!$summary && $terbaruCall['success']) {
-            
-            $gtRaw = $terbaruCall['data']['Infogempa']['gempa'] ?? null;
-            if ($gtRaw) {
-                $summary = ['gempa_terbaru' => $gtRaw];
-            }
-        } elseif ($summary && isset($summary['gempa_terbaru']['Infogempa'])) {
-            
-            $summary['gempa_terbaru'] = $summary['gempa_terbaru']['Infogempa']['gempa'] ?? $summary['gempa_terbaru'];
+        $summaryCall = ['success' => false, 'data' => null];
+        if ($this->canAccessBmkgProtected()) {
+            $summaryCall = $this->bmkgService->getSummary();
         }
 
-        
+        $summary = $summaryCall['success'] ? apiDataEntity($summaryCall['data']) : [];
+
+        $gempaTerbaru = [];
+        if (!empty($summary['gempa_terbaru'])) {
+            $gempaTerbaru = $this->extractGempaEntity($summary['gempa_terbaru']);
+        }
+        if (empty($gempaTerbaru) && $terbaruCall['success']) {
+            $gempaTerbaru = $this->extractGempaEntity($terbaruCall['data'] ?? []);
+        }
+        if (!empty($gempaTerbaru)) {
+            $summary['gempa_terbaru'] = $gempaTerbaru;
+        }
+
         $gempaTerkini = [];
-        if ($terkiniCall['success']) {
-            $gempaTerkini = $terkiniCall['data']['Infogempa']['gempa'] ?? [];
+        if (!empty($summary['daftar_gempa'])) {
+            $gempaTerkini = $this->extractGempaList($summary['daftar_gempa']);
+        }
+        if (empty($gempaTerkini) && $terkiniCall['success']) {
+            $gempaTerkini = $this->extractGempaList($terkiniCall['data'] ?? []);
         }
 
         $gempaDirasakan = [];
-        if ($dirasakanCall['success']) {
-            $gempaDirasakan = $dirasakanCall['data']['Infogempa']['gempa'] ?? [];
+        if (!empty($summary['gempa_dirasakan'])) {
+            $gempaDirasakan = $this->extractGempaList($summary['gempa_dirasakan']);
+        }
+        if (empty($gempaDirasakan) && $dirasakanCall['success']) {
+            $gempaDirasakan = $this->extractGempaList($dirasakanCall['data'] ?? []);
         }
 
         
@@ -71,14 +153,14 @@ class BmkgController {
             }
         }
 
-        $peringatanDiniCuaca = $diniCuacaCall['success'] ? $diniCuacaCall['data'] : null;
+        $peringatanDiniCuaca = $diniCuacaCall['success'] ? apiDataEntity($diniCuacaCall['data']) : null;
+        $cacheStatus = is_array($summary['cache_status'] ?? null) ? $summary['cache_status'] : null;
 
         $title = "Pusat Data Gempa BMKG - SIMONTA";
         include 'views/bmkg/index.php';
     }
 
     public function cuaca() {
-        $currentUser = $this->authService->getCurrentUser();
         $wilayahId = isset($_GET['wilayah_id']) ? $_GET['wilayah_id'] : null;
         
         
@@ -93,7 +175,12 @@ class BmkgController {
             if ($cuacaCall['success']) {
                 $cuacaData = $cuacaCall['data'];
             } else {
-                $error_message = $cuacaCall['message'] ?? "Gagal mengambil data prakiraan cuaca atau wilayah_id tidak valid.";
+                $httpCode = (int)($cuacaCall['http_code'] ?? 0);
+                if ($httpCode === 422) {
+                    $error_message = 'Kode wilayah tidak valid. Pilih provinsi, kabupaten, kecamatan, lalu desa dari daftar.';
+                } else {
+                    $error_message = $cuacaCall['message'] ?? "Gagal mengambil data prakiraan cuaca atau wilayah_id tidak valid.";
+                }
             }
         }
 
@@ -149,22 +236,20 @@ class BmkgController {
     }
 
     public function cache() {
-        $currentUser = $this->authService->getCurrentUser();
-        if ($currentUser['data']['role'] !== 'Admin' && $currentUser['data']['role'] !== 'PetugasBPBD') {
+        if (!$this->canAccessBmkgProtected()) {
             header('Location: index.php?controller=Bmkg&action=index');
             exit;
         }
 
         $statusCall = $this->bmkgService->getCacheStatus();
-        $cacheStatus = $statusCall['success'] ? $statusCall['data'] : null;
+        $cacheStatus = $statusCall['success'] ? apiDataEntity($statusCall['data']) : null;
 
         $title = "Manajemen Cache BMKG - SIMONTA";
         include 'views/bmkg/cache.php';
     }
 
     public function clearCache() {
-        $currentUser = $this->authService->getCurrentUser();
-        if ($currentUser['data']['role'] !== 'Admin' && $currentUser['data']['role'] !== 'PetugasBPBD') {
+        if (!$this->canAccessBmkgProtected()) {
             header('Location: index.php?controller=Bmkg&action=index');
             exit;
         }

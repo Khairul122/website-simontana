@@ -3,6 +3,33 @@ require_once __DIR__ . '/../config/koneksi.php';
 
 class WeatherService {
 
+    private function normalizePrakiraanPayload(array $payload): ?array
+    {
+        $lokasi = $payload['lokasi'] ?? null;
+        if (!is_array($lokasi)) {
+            return null;
+        }
+
+        if (isset($payload['cuaca']) && is_array($payload['cuaca'])) {
+            return [
+                'lokasi' => $lokasi,
+                'cuaca' => $payload['cuaca']
+            ];
+        }
+
+        if (isset($payload['data']) && is_array($payload['data'])) {
+            $first = $payload['data'][0] ?? null;
+            if (is_array($first) && isset($first['cuaca']) && is_array($first['cuaca'])) {
+                return [
+                    'lokasi' => $lokasi,
+                    'cuaca' => $first['cuaca']
+                ];
+            }
+        }
+
+        return null;
+    }
+
     
 
 
@@ -27,10 +54,10 @@ class WeatherService {
 
     public function getPrakiraanCuaca($wilayahId) {
         $formattedId = $this->formatAdm4Code($wilayahId);
+        $url = API_BMKG_PRAKIRAAN_CUACA . '?wilayah_id=' . urlencode($formattedId);
+        $headers = getAuthHeaders();
         
-        $url = 'https://api.bmkg.go.id/publik/prakiraan-cuaca?adm4=' . urlencode($formattedId);
-        
-        $response = apiRequest($url, 'GET', null, []);
+        $response = apiRequest($url, 'GET', null, $headers);
 
         if (!$response['success']) {
             return $response;
@@ -39,13 +66,23 @@ class WeatherService {
         
         
         $rawPayload = $response['raw'] ?? [];
-        if (is_array($rawPayload) && isset($rawPayload['lokasi']) && isset($rawPayload['data'])) {
-            $response['data'] = $rawPayload;
-            return $response;
+        if (is_array($rawPayload)) {
+            $normalized = $this->normalizePrakiraanPayload($rawPayload);
+            if ($normalized !== null) {
+                $response['data'] = $normalized;
+                return $response;
+            }
         }
 
-        
-        if (is_array($response['data']) && isset($response['data']['lokasi']) && isset($response['data']['data'])) {
+        if (is_array($response['data'])) {
+            $normalized = $this->normalizePrakiraanPayload($response['data']);
+            if ($normalized !== null) {
+                $response['data'] = $normalized;
+                return $response;
+            }
+        }
+
+        if (is_array($response['data']) && isset($response['data']['lokasi']) && isset($response['data']['cuaca'])) {
             return $response;
         }
 
@@ -58,8 +95,8 @@ class WeatherService {
 
 
     public function getPeringatanDiniCuaca() {
-        $url = API_BASE_URL . '/bmkg/peringatan-dini-cuaca';
-        $headers = getAuthHeaders($_SESSION['token'] ?? null);
+        $url = API_BMKG_PERINGATAN_DINI_CUACA;
+        $headers = getAuthHeaders();
         return apiRequest($url, 'GET', null, $headers);
     }
 }

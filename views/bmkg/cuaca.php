@@ -147,11 +147,25 @@
                   <div class="p-6 md:p-8 bg-slate-50/50 flex-1">
                     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                        <?php 
-                        $allSegments = $cuacaData['data'][0]['cuaca'] ?? [];
+                        $cuacaList = $cuacaData['cuaca'] ?? [];
                         $weathers = [];
-                        foreach ($allSegments as $segment) {
-                            if (is_array($segment)) {
+                        foreach ($cuacaList as $segment) {
+                            if (!is_array($segment)) {
+                                continue;
+                            }
+
+                            $first = reset($segment);
+                            if (is_array($first) && isset($first['local_datetime'])) {
                                 $weathers = array_merge($weathers, $segment);
+                                continue;
+                            }
+
+                            if (isset($segment['cuaca']) && is_array($segment['cuaca'])) {
+                                foreach ($segment['cuaca'] as $childSegment) {
+                                    if (is_array($childSegment)) {
+                                        $weathers = array_merge($weathers, $childSegment);
+                                    }
+                                }
                             }
                         }
                         

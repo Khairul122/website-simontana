@@ -85,6 +85,7 @@
                         <div>
                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 mt-0.5">Wilayah Administrasi</p>
                            <p class="font-bold text-slate-800">Desa <?php echo htmlspecialchars($report['desa']['nama'] ?? '-'); ?></p>
+                           <p class="text-xs font-medium text-slate-500 mt-1 line-clamp-2"><?php echo htmlspecialchars($report['alamat_laporan'] ?? ($report['alamat_lengkap'] ?? '-')); ?></p>
                         </div>
                      </div>
                   </div>
@@ -193,53 +194,18 @@
                    <div class="p-6">
                      <div class="relative border-l-2 border-slate-100 ml-3 space-y-6">
                         
-                        <?php
-                            $monitoring_data = [];
-                            if (!empty($report['monitoring'])) {
-                                $monitoring_data = $report['monitoring'];
-                            } elseif (!empty($report['hasil_monitoring'])) {
-                                $monitoring_data = [
-                                    [
-                                        'hasil_monitoring' => $report['hasil_monitoring'],
-                                        'waktu_monitoring' => $report['updated_at'] ?? $report['waktu_laporan'] ?? date('Y-m-d H:i:s')
-                                    ]
-                                ];
-                            }
-                        ?>
-
-                        
-                        <div class="relative pl-6">
-                            <div class="absolute w-4 h-4 bg-white border-4 border-slate-200 rounded-full -left-[-11px] top-1"></div>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1"><?php echo date('d M Y H:i', strtotime($report['waktu_laporan'] ?? '')); ?></p>
-                            <h4 class="text-sm font-bold text-slate-800">Laporan Dibuat</h4>
-                            <p class="text-xs text-slate-500 mt-1 line-clamp-2"><?php echo htmlspecialchars($report['judul_laporan'] ?? '-'); ?></p>
-                        </div>
-                        
-                        
-                        <?php if (!empty($monitoring_data)): ?>
-                          <?php foreach (array_reverse($monitoring_data) as $monitor): ?>
-                            <div class="relative pl-6">
-                                <div class="absolute w-4 h-4 bg-white border-4 border-amber-400 rounded-full -left-[-11px] top-1 z-10 shadow-[0_0_0_3px_white]"></div>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1"><?php echo date('d M Y H:i', strtotime($monitor['waktu_monitoring'] ?? '')); ?></p>
-                                <h4 class="text-sm font-bold text-slate-800">Pembaruan Monitoring</h4>
-                                <p class="text-xs text-slate-600 mt-1 p-2 bg-amber-50 rounded-lg border border-amber-100 font-medium"><?php echo htmlspecialchars($monitor['hasil_monitoring'] ?? '-'); ?></p>
-                            </div>
-                          <?php endforeach; ?>
-                        <?php endif; ?>
-
-                        
-                        <?php if (!empty($report['tindak_lanjut'])): ?>
-                           <?php foreach (array_reverse($report['tindak_lanjut']) as $tindak): ?>
-                              <div class="relative pl-6">
-                                  <div class="absolute w-4 h-4 bg-white border-4 border-emerald-500 rounded-full -left-[-11px] top-1 z-10 shadow-[0_0_0_3px_white]"></div>
-                                  <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1"><?php echo date('d M Y H:i', strtotime($tindak['created_at'] ?? $tindak['waktu_tindak_lanjut'] ?? '')); ?></p>
-                                  <h4 class="text-sm font-bold text-emerald-700">Tindak Lanjut: <?php echo htmlspecialchars($tindak['status'] ?? 'Proses'); ?></h4>
-                                  <p class="text-xs text-slate-500 mt-0.5"><i class="fa-solid fa-helmet-safety mr-1"></i> <?php echo htmlspecialchars($tindak['petugas']['nama'] ?? '-'); ?></p>
-                              </div>
+                         <?php if (!empty($riwayatList) && is_array($riwayatList)): ?>
+                           <?php foreach ($riwayatList as $riwayat): ?>
+                             <div class="relative pl-6">
+                                 <div class="absolute w-4 h-4 bg-white border-4 border-amber-400 rounded-full -left-[-11px] top-1 z-10 shadow-[0_0_0_3px_white]"></div>
+                                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1"><?php echo date('d M Y H:i', strtotime($riwayat['waktu'] ?? ($riwayat['created_at'] ?? 'now'))); ?></p>
+                                 <h4 class="text-sm font-bold text-slate-800"><?php echo htmlspecialchars($riwayat['status'] ?? '-'); ?></h4>
+                                 <?php if (!empty($riwayat['keterangan'] ?? $riwayat['catatan_verifikasi'] ?? '')): ?>
+                                   <p class="text-xs text-slate-600 mt-1 p-2 bg-amber-50 rounded-lg border border-amber-100 font-medium"><?php echo htmlspecialchars($riwayat['keterangan'] ?? $riwayat['catatan_verifikasi']); ?></p>
+                                 <?php endif; ?>
+                             </div>
                            <?php endforeach; ?>
-                        <?php endif; ?>
-                         
-                        <?php if (empty($monitoring_data) && empty($report['tindak_lanjut'])): ?>
+                        <?php else: ?>
                             <div class="relative pl-6 opacity-60">
                                 <div class="absolute w-4 h-4 bg-white border-4 border-slate-200 rounded-full -left-[-11px] top-1"></div>
                                 <h4 class="text-sm font-bold text-slate-400 italic">Belum ada riwayat pergerakan</h4>

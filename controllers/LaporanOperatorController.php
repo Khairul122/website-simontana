@@ -95,6 +95,14 @@ class LaporanOperatorController
                 }
             }
 
+            $riwayatList = [];
+            if ($report) {
+                $riwayatResponse = $this->service->getRiwayatByLaporanId((int)$id);
+                if ($riwayatResponse['success']) {
+                    $riwayatList = is_array($riwayatResponse['data'] ?? null) ? $riwayatResponse['data'] : [];
+                }
+            }
+
             
             include 'views/laporan-operator/detail.php';
         } catch (Exception $e) {
@@ -191,9 +199,12 @@ class LaporanOperatorController
 
             
             $data = [
-                'status' => $status,
-                'catatan_verifikasi' => $catatan_verifikasi
+                'status' => $status
             ];
+
+            if (in_array($status, ['Diverifikasi', 'Ditolak'], true)) {
+                $data['catatan_verifikasi'] = $catatan_verifikasi;
+            }
 
             $response = $this->service->updateStatus($id, $data);
 

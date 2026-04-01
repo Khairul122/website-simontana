@@ -49,7 +49,7 @@ if ($selectedProvinsiId === null && isset($kabupaten['id_parent'])) {
                   <select class="w-full rounded-xl border border-slate-300 bg-slate-50 py-3 pl-4 pr-10 text-sm font-bold text-slate-800 outline-none transition-all focus:border-indigo-500 focus:bg-white appearance-none cursor-pointer" id="id_provinsi" name="id_provinsi" required <?php echo $isEditMode ? 'disabled' : ''; ?>>
                     <option value="">-- Pemetaan Provinsi Hub --</option>
                     <?php foreach ($provinsiList as $provinsi): ?>
-                      <option value="<?php echo (int)$provinsi['id']; ?>" <?php echo ((string)$selectedProvinsiId === (string)$provinsi['id']) ? 'selected' : ''; ?>>
+                      <option value="<?php echo htmlspecialchars((string)$provinsi['id']); ?>" <?php echo ((string)$selectedProvinsiId === (string)$provinsi['id']) ? 'selected' : ''; ?>>
                         <?php echo htmlspecialchars($provinsi['nama'] ?? $provinsi['name'] ?? '-'); ?>
                       </option>
                     <?php endforeach; ?>

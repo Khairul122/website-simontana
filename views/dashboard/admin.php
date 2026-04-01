@@ -66,9 +66,6 @@ $bmkgGempa = (isset($bmkgData['data']['Magnitude'])) ? $bmkgData['data'] : null;
             
             <div class="flex items-center gap-3 shrink-0">
               <a href="index.php?controller=LaporanAdmin&action=index" class="px-5 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 font-semibold text-sm hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm">Lihat Semua Data</a>
-              <a href="index.php?controller=LaporanAdmin&action=create" class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-600 text-white font-semibold text-sm hover:bg-brand-700 hover:shadow-float transition-all shadow-sm">
-                <i class="fa-solid fa-plus"></i> Tambah Laporan
-              </a>
             </div>
           </div>
         </div>
@@ -183,7 +180,7 @@ $bmkgGempa = (isset($bmkgData['data']['Magnitude'])) ? $bmkgData['data'] : null;
                       <tr class="hover:bg-slate-50/70 transition-colors group cursor-pointer" onclick="window.location='index.php?controller=LaporanAdmin&action=detail&id=<?= $row['id'] ?>'">
                         <td class="px-6 py-4">
                           <p class="text-sm font-bold text-slate-800 mb-0.5 group-hover:text-brand-600 transition-colors"><?= htmlspecialchars($row['judul_laporan'] ?? $row['judul'] ?? '-') ?></p>
-                          <p class="text-xs text-slate-500 flex items-center gap-1.5"><i class="fa-solid fa-location-dot"></i> <?= htmlspecialchars($row['alamat_lengkap'] ?? '-') ?></p>
+                          <p class="text-xs text-slate-500 flex items-center gap-1.5"><i class="fa-solid fa-location-dot"></i> <?= htmlspecialchars($row['alamat_laporan'] ?? ($row['alamat_lengkap'] ?? '-')) ?></p>
                         </td>
                         <td class="px-6 py-4">
                           <p class="text-sm font-semibold text-slate-700"><?= htmlspecialchars($row['nama_pelapor'] ?? ($row['pelapor']['nama'] ?? '-')) ?></p>

@@ -138,7 +138,7 @@ foreach ($rows as $metricRow) {
                       <td class="px-5 py-4 text-center font-bold text-slate-400"><?php echo $no++; ?></td>
                       <td class="px-5 py-4">
                         <p class="font-bold text-slate-800 mb-0.5 group-hover:text-brand-600 transition-colors"><?php echo htmlspecialchars($row['laporan_judul'] ?? $row['laporan']['judul_laporan'] ?? '-'); ?></p>
-                        <p class="text-xs text-slate-500 flex items-start gap-1"><i class="fa-solid fa-location-dot mt-[3px] text-slate-400"></i> <span class="leading-tight"><?php echo htmlspecialchars($row['laporan']['alamat_lengkap'] ?? '-'); ?></span></p>
+                        <p class="text-xs text-slate-500 flex items-start gap-1"><i class="fa-solid fa-location-dot mt-[3px] text-slate-400"></i> <span class="leading-tight"><?php echo htmlspecialchars($row['laporan']['alamat_laporan'] ?? ($row['laporan']['alamat_lengkap'] ?? '-')); ?></span></p>
                       </td>
                       <td class="px-5 py-4 font-semibold text-indigo-700">
                         <i class="fa-solid fa-shield-halved text-indigo-300 mr-1"></i> <?php echo htmlspecialchars($row['petugas_nama'] ?? $row['petugas']['nama'] ?? '-'); ?>

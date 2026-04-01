@@ -55,7 +55,17 @@ class UserController
     {
         $this->checkRole();
 
-        $response = $this->service->getAll();
+        $filters = [];
+        if (!empty($_GET['search'])) {
+            $filters['search'] = trim((string)$_GET['search']);
+        }
+        if (!empty($_GET['role'])) {
+            $filters['role'] = trim((string)$_GET['role']);
+        }
+        $perPage = (int)($_GET['per_page'] ?? 20);
+        $filters['per_page'] = $perPage > 0 ? $perPage : 20;
+
+        $response = $this->service->getAll($filters);
 
         
         if ($this->isUnauthorized($response)) {

@@ -7,6 +7,22 @@ class LaporanAdminController
 {
     private $service;
 
+    private function blockCreateEdit(): void
+    {
+        setDialog('Fitur Dinonaktifkan', 'Fitur buat dan edit laporan saat ini dinonaktifkan.', 'info');
+        header('Location: index.php?controller=LaporanAdmin&action=index');
+        exit;
+    }
+
+    private function normalizeSeverity(string $severity): string
+    {
+        $value = trim($severity);
+        if (strcasecmp($value, 'Sangat Tinggi') === 0) {
+            return 'Kritis';
+        }
+        return $value;
+    }
+
     public function __construct()
     {
         if (!isset($_SESSION['user'])) {
@@ -88,6 +104,11 @@ class LaporanAdminController
         }
 
         $laporan = $response['data'];
+        $riwayatList = [];
+        $riwayatResponse = $this->service->getRiwayatByLaporanId((int)$id);
+        if ($riwayatResponse['success']) {
+            $riwayatList = is_array($riwayatResponse['data'] ?? null) ? $riwayatResponse['data'] : [];
+        }
 
         include __DIR__ . '/../views/laporan-admin/detail.php';
     }
@@ -97,6 +118,8 @@ class LaporanAdminController
 
     public function edit()
     {
+        $this->blockCreateEdit();
+
         $this->requireAdmin();
 
         
@@ -124,6 +147,12 @@ class LaporanAdminController
         }
 
         $laporan = $response['data'];
+
+        $kategoriList = [];
+        $kategoriResponse = apiRequest(API_KATEGORI_BENCANA, 'GET', null, getAuthHeaders($_SESSION['token'] ?? null));
+        if ($kategoriResponse['success']) {
+            $kategoriList = apiDataList($kategoriResponse['data']);
+        }
 
         $provinsiList = [];
         $kabupatenList = [];
@@ -186,6 +215,8 @@ class LaporanAdminController
 
     public function update()
     {
+        $this->blockCreateEdit();
+
         $this->requireAdmin();
 
         
@@ -205,12 +236,13 @@ class LaporanAdminController
         
         $judul = trim($_POST['judul_laporan'] ?? $_POST['judul'] ?? '');
         $deskripsi = trim($_POST['deskripsi'] ?? '');
-        $tingkat_kedaruratan = trim($_POST['tingkat_keparahan'] ?? $_POST['tingkat_kedaruratan'] ?? '');
-        $alamat = trim($_POST['alamat_lengkap'] ?? $_POST['alamat'] ?? '');
+        $tingkat_kedaruratan = $this->normalizeSeverity(trim($_POST['tingkat_keparahan'] ?? $_POST['tingkat_kedaruratan'] ?? ''));
+        $alamat = trim($_POST['alamat_laporan'] ?? $_POST['alamat_lengkap'] ?? $_POST['alamat'] ?? '');
+        $kategoriId = (int)($_POST['id_kategori_bencana'] ?? $_POST['kategori_id'] ?? 0);
 
         
-        if (empty($judul) || empty($deskripsi) || empty($tingkat_kedaruratan)) {
-            setDialog('Gagal', 'Judul, deskripsi, dan tingkat kedaruratan wajib diisi', 'error');
+        if (empty($judul) || empty($deskripsi) || empty($tingkat_kedaruratan) || $kategoriId <= 0) {
+            setDialog('Gagal', 'Judul, deskripsi, tingkat kedaruratan, dan kategori bencana wajib diisi', 'error');
             header('Location: index.php?controller=LaporanAdmin&action=edit&id=' . $id);
             exit();
         }
@@ -220,7 +252,9 @@ class LaporanAdminController
             'judul_laporan' => $judul,
             'deskripsi' => $deskripsi,
             'tingkat_keparahan' => $tingkat_kedaruratan,
+            'alamat_laporan' => $alamat,
             'alamat_lengkap' => $alamat,
+            'id_kategori_bencana' => $kategoriId,
             'id_desa' => trim($_POST['id_desa'] ?? '')
         ];
 
@@ -282,6 +316,8 @@ class LaporanAdminController
 
     public function create()
     {
+        $this->blockCreateEdit();
+
         $userRole = $_SESSION['user']['role'] ?? '';
 
         if (!in_array($userRole, ['Admin', 'Warga'], true)) {
@@ -300,11 +336,19 @@ class LaporanAdminController
             $error_message = $desaResponse['message'] ?? 'Gagal memuat daftar desa.';
         }
 
+        $kategoriList = [];
+        $kategoriResponse = apiRequest(API_KATEGORI_BENCANA, 'GET', null, getAuthHeaders($_SESSION['token'] ?? null));
+        if ($kategoriResponse['success']) {
+            $kategoriList = apiDataList($kategoriResponse['data']);
+        }
+
         include __DIR__ . '/../views/laporan-admin/create.php';
     }
 
     public function store()
     {
+        $this->blockCreateEdit();
+
         $userRole = $_SESSION['user']['role'] ?? '';
 
         if (!in_array($userRole, ['Admin', 'Warga'], true)) {
@@ -320,12 +364,13 @@ class LaporanAdminController
 
         $judul = trim($_POST['judul_laporan'] ?? '');
         $deskripsi = trim($_POST['deskripsi'] ?? '');
-        $tingkat = trim($_POST['tingkat_keparahan'] ?? '');
+        $tingkat = $this->normalizeSeverity(trim($_POST['tingkat_keparahan'] ?? ''));
         $idDesa = trim($_POST['id_desa'] ?? '');
-        $alamat = trim($_POST['alamat_lengkap'] ?? '');
+        $alamat = trim($_POST['alamat_laporan'] ?? $_POST['alamat_lengkap'] ?? '');
+        $kategoriId = (int)($_POST['id_kategori_bencana'] ?? $_POST['kategori_id'] ?? 0);
 
-        if ($judul === '' || $deskripsi === '' || $tingkat === '' || $idDesa === '') {
-            setDialog('Gagal', 'Judul, deskripsi, tingkat keparahan, dan kode desa wajib diisi.', 'error');
+        if ($judul === '' || $deskripsi === '' || $tingkat === '' || $idDesa === '' || $kategoriId <= 0) {
+            setDialog('Gagal', 'Judul, deskripsi, tingkat keparahan, kategori bencana, dan kode desa wajib diisi.', 'error');
             header('Location: index.php?controller=LaporanAdmin&action=create');
             exit;
         }
@@ -335,7 +380,9 @@ class LaporanAdminController
             'deskripsi' => $deskripsi,
             'tingkat_keparahan' => $tingkat,
             'id_desa' => (int)$idDesa,
+            'alamat_laporan' => $alamat,
             'alamat_lengkap' => $alamat,
+            'id_kategori_bencana' => $kategoriId,
             'latitude' => trim($_POST['latitude'] ?? ''),
             'longitude' => trim($_POST['longitude'] ?? ''),
             'jumlah_korban' => (int)($_POST['jumlah_korban'] ?? 0),

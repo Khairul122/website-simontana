@@ -1,4 +1,12 @@
-<?php include('template/header.php'); ?>
+<?php
+$metaDescription = 'Dashboard warga SIMONTANA untuk memantau informasi bencana, data BMKG terkini, dan status laporan darurat di sekitar wilayah Anda.';
+$metaKeywords = 'dashboard warga, informasi bencana, bmkg terkini, status laporan darurat, simontana';
+$schemaBreadcrumbs = [
+  ['name' => 'Beranda', 'url' => 'index.php?controller=Dashboard&action=warga'],
+  ['name' => 'Dashboard Warga', 'url' => 'index.php?controller=Dashboard&action=warga'],
+];
+include('template/header.php');
+?>
 
 
 <div class="flex h-screen overflow-hidden bg-slate-50">
@@ -26,8 +34,11 @@
               </p>
             </div>
             <div class="shrink-0 flex flex-col gap-3">
-              <a href="index.php?controller=LaporanAdmin&action=create" class="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white text-brand-800 font-bold hover:bg-slate-50 hover:scale-105 transition-all shadow-lg active:scale-95">
-                <i class="fa-solid fa-truck-medical text-lg"></i> Lapor Darurat!
+              <a href="index.php?controller=Bmkg&action=index" class="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white text-brand-800 font-bold hover:bg-slate-50 hover:scale-105 transition-all shadow-lg active:scale-95">
+                <i class="fa-solid fa-tower-broadcast text-lg"></i> Pantau BMKG Sekarang
+              </a>
+              <a href="index.php?controller=LaporanAdmin&action=index" class="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-brand-600 text-white font-bold hover:bg-brand-700 transition-all shadow-lg active:scale-95">
+                <i class="fa-solid fa-list-check text-lg"></i> Lihat Status Laporan
               </a>
             </div>
           </div>

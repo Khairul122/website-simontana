@@ -34,11 +34,7 @@ foreach ($reportRows as $reportItem) {
             <h1 class="font-display text-2xl md:text-3xl font-bold text-slate-900">Data Laporan Bencana</h1>
             <p class="text-sm text-slate-500 mt-1">Kelola laporan masyarakat, status validasi, dan rincian kejadian darurat.</p>
           </div>
-          <div class="shrink-0 flex gap-3">
-            <a href="index.php?controller=LaporanAdmin&action=create" class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-600 text-white font-bold text-sm hover:bg-brand-700 hover:shadow-float transition-all shadow-sm">
-              <i class="fa-solid fa-plus"></i> Buat Laporan
-            </a>
-          </div>
+          <div class="shrink-0 flex gap-3"></div>
         </div>
 
         
@@ -96,7 +92,7 @@ foreach ($reportRows as $reportItem) {
                 <option value="Rendah" <?php echo (isset($_GET['tingkat_keparahan']) && $_GET['tingkat_keparahan'] == 'Rendah') ? 'selected' : ''; ?>>Rendah</option>
                 <option value="Sedang" <?php echo (isset($_GET['tingkat_keparahan']) && $_GET['tingkat_keparahan'] == 'Sedang') ? 'selected' : ''; ?>>Sedang</option>
                 <option value="Tinggi" <?php echo (isset($_GET['tingkat_keparahan']) && $_GET['tingkat_keparahan'] == 'Tinggi') ? 'selected' : ''; ?>>Tinggi</option>
-                <option value="Sangat Tinggi" <?php echo (isset($_GET['tingkat_keparahan']) && $_GET['tingkat_keparahan'] == 'Sangat Tinggi') ? 'selected' : ''; ?>>Sangat Tinggi</option>
+                <option value="Kritis" <?php echo (isset($_GET['tingkat_keparahan']) && in_array($_GET['tingkat_keparahan'], ['Kritis', 'Sangat Tinggi'], true)) ? 'selected' : ''; ?>>Kritis</option>
               </select>
             </div>
 
@@ -174,7 +170,7 @@ foreach ($reportRows as $reportItem) {
                           if ($tingkat === 'Rendah') { $tingkatClass = 'bg-emerald-50 text-emerald-700 border-emerald-200'; $tingkatIcon = 'fa-check'; }
                           if ($tingkat === 'Sedang') { $tingkatClass = 'bg-amber-50 text-amber-700 border-amber-200'; $tingkatIcon = 'fa-triangle-exclamation'; }
                           if ($tingkat === 'Tinggi') { $tingkatClass = 'bg-orange-50 text-orange-700 border-orange-200'; $tingkatIcon = 'fa-fire'; }
-                          if ($tingkat === 'Sangat Tinggi') { $tingkatClass = 'bg-red-50 text-red-700 border-red-200'; $tingkatIcon = 'fa-radiation'; }
+                          if ($tingkat === 'Sangat Tinggi' || $tingkat === 'Kritis') { $tingkatClass = 'bg-red-50 text-red-700 border-red-200'; $tingkatIcon = 'fa-radiation'; }
                         ?>
                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-bold tracking-widest uppercase <?php echo $tingkatClass; ?> whitespace-nowrap">
                           <i class="fa-solid <?php echo $tingkatIcon; ?>"></i> <?php echo htmlspecialchars($tingkat); ?>
@@ -201,9 +197,6 @@ foreach ($reportRows as $reportItem) {
                         <div class="flex items-center justify-center gap-1.5">
                           <a href="index.php?controller=LaporanAdmin&action=detail&id=<?php echo $laporan['id']; ?>" class="inline-flex items-center justify-center h-8 w-8 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 hover:text-indigo-700 transition" title="Lihat Detail">
                             <i class="fa-solid fa-eye text-sm"></i>
-                          </a>
-                          <a href="index.php?controller=LaporanAdmin&action=edit&id=<?php echo $laporan['id']; ?>" class="inline-flex items-center justify-center h-8 w-8 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700 transition" title="Edit Laporan">
-                            <i class="fa-solid fa-pen text-sm"></i>
                           </a>
                           <form method="POST" action="index.php?controller=LaporanAdmin&action=delete&id=<?php echo $laporan['id']; ?>" class="inline-block delete-laporan-form">
                             <button type="submit" class="inline-flex items-center justify-center h-8 w-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 transition" title="Hapus Laporan">

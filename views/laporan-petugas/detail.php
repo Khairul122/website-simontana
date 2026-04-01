@@ -111,7 +111,7 @@ function laporanPetugasDetailStatusBadge($statusRaw) {
                         <div class="w-10 h-10 rounded-full bg-red-50 text-red-500 border border-red-100 flex items-center justify-center shrink-0"><i class="fa-solid fa-map-location-dot"></i></div>
                         <div>
                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Alamat / Wilayah</p>
-                           <p class="text-sm font-bold text-slate-700 line-clamp-2"><?php echo htmlspecialchars($laporan['alamat_lengkap'] ?? '-'); ?></p>
+                           <p class="text-sm font-bold text-slate-700 line-clamp-2"><?php echo htmlspecialchars($laporan['alamat_laporan'] ?? ($laporan['alamat_lengkap'] ?? '-')); ?></p>
                            <p class="text-xs font-medium text-slate-500 mt-1"><?php echo htmlspecialchars($laporan['administrative_area'] ?? '-'); ?></p>
                         </div>
                      </div>
@@ -207,16 +207,18 @@ function laporanPetugasDetailStatusBadge($statusRaw) {
                    <div class="p-6">
                      <div class="relative border-l-2 border-slate-100 ml-3 space-y-6">
                         
-                        <?php if (!empty($laporan['tindak_lanjut']) && is_array($laporan['tindak_lanjut'])): ?>
-                           <?php foreach (array_reverse($laporan['tindak_lanjut']) as $tindak): ?>
-                              <div class="relative pl-6">
-                                  <div class="absolute w-4 h-4 bg-white border-4 border-indigo-400 rounded-full -left-[-11px] top-1 z-10"></div>
-                                  <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1"><?php echo date('d M Y H:i', strtotime($tindak['tanggal_tanggapan'] ?? 'now')); ?></p>
-                                  <h4 class="text-sm font-bold text-indigo-900"><?php echo htmlspecialchars($tindak['status'] ?? '-'); ?></h4>
-                                  <p class="text-xs text-slate-500 mt-1 bg-slate-50 border border-slate-100 p-2 rounded-lg font-medium"><i class="fa-regular fa-id-badge mr-1 text-slate-400"></i> Oleh: <?php echo htmlspecialchars($tindak['petugas']['nama'] ?? 'Petugas Lapangan'); ?></p>
-                              </div>
-                           <?php endforeach; ?>
-                        <?php else: ?>
+                         <?php if (!empty($riwayatList) && is_array($riwayatList)): ?>
+                            <?php foreach ($riwayatList as $riwayat): ?>
+                               <div class="relative pl-6">
+                                   <div class="absolute w-4 h-4 bg-white border-4 border-indigo-400 rounded-full -left-[-11px] top-1 z-10"></div>
+                                   <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1"><?php echo date('d M Y H:i', strtotime($riwayat['waktu'] ?? ($riwayat['created_at'] ?? 'now'))); ?></p>
+                                   <h4 class="text-sm font-bold text-indigo-900"><?php echo htmlspecialchars($riwayat['status'] ?? '-'); ?></h4>
+                                   <?php if (!empty($riwayat['keterangan'] ?? $riwayat['catatan_verifikasi'] ?? '')): ?>
+                                     <p class="text-xs text-slate-500 mt-1 bg-slate-50 border border-slate-100 p-2 rounded-lg font-medium"><?php echo htmlspecialchars($riwayat['keterangan'] ?? $riwayat['catatan_verifikasi']); ?></p>
+                                   <?php endif; ?>
+                               </div>
+                            <?php endforeach; ?>
+                         <?php else: ?>
                             <div class="relative pl-6 opacity-60">
                                 <div class="absolute w-4 h-4 bg-white border-4 border-slate-200 rounded-full -left-[-11px] top-1"></div>
                                 <h4 class="text-sm font-bold text-slate-400 italic">Belum ada progres lanjut</h4>

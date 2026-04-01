@@ -115,10 +115,6 @@ function navIconActive($controllers, $current) {
       <div class="px-3 mb-2 mt-6">
         <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Aksi</p>
       </div>
-      <a href="index.php?controller=LaporanAdmin&action=create" class="group flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all <?= navActive(['LaporanAdmin'], $currentController) ?>">
-        <i class="fa-solid fa-circle-plus w-5 text-center text-lg <?= navIconActive(['LaporanAdmin'], $currentController) ?>"></i>
-        <span class="text-sm">Buat Laporan Baru</span>
-      </a>
       <a href="index.php?controller=LaporanAdmin&action=index" class="group flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all <?= navActive(['LaporanAdmin'], $currentController) ?>">
         <i class="fa-solid fa-list-check w-5 text-center text-lg <?= navIconActive(['LaporanAdmin'], $currentController) ?>"></i>
         <span class="text-sm">Laporan Anda</span>

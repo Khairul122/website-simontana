@@ -5,7 +5,7 @@ class ProfileService {
     private $apiUrl;
 
     public function __construct() {
-        $this->apiUrl = API_BASE_URL . '/auth/me';
+        $this->apiUrl = API_USERS_PROFILE;
     }
 
     public function getProfile() {

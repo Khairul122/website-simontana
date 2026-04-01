@@ -84,7 +84,7 @@ function riwayatDetailStatusBadge($statusRaw) {
                     <div class="w-12 h-12 rounded-xl bg-white border border-indigo-100 text-indigo-600 flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-file-invoice"></i></div>
                     <div>
                        <h4 class="font-bold text-indigo-900 group-hover:text-brand-600 transition-colors cursor-pointer mb-1"><?php echo htmlspecialchars($riwayatTindakan['laporan_judul'] ?? $riwayatTindakan['tindak_lanjut']['laporan']['judul_laporan'] ?? 'Untitled Laporan'); ?></h4>
-                       <p class="text-xs text-indigo-700/80 mb-2 line-clamp-2 leading-relaxed"><i class="fa-solid fa-location-dot mr-1"></i> <?php echo htmlspecialchars($riwayatTindakan['tindak_lanjut']['laporan']['alamat_lengkap'] ?? '-'); ?></p>
+                       <p class="text-xs text-indigo-700/80 mb-2 line-clamp-2 leading-relaxed"><i class="fa-solid fa-location-dot mr-1"></i> <?php echo htmlspecialchars($riwayatTindakan['tindak_lanjut']['laporan']['alamat_laporan'] ?? ($riwayatTindakan['tindak_lanjut']['laporan']['alamat_lengkap'] ?? '-')); ?></p>
                        <a href="index.php?controller=LaporanAdmin&action=detail&id=<?php echo $riwayatTindakan['tindak_lanjut']['laporan_id'] ?? 0; ?>" class="inline-block text-[11px] font-bold text-white bg-indigo-600 px-3 py-1.5 rounded-lg shadow-sm hover:bg-indigo-700 transition">Buka Bukti Laporan Full &rarr;</a>
                     </div>
                  </div>

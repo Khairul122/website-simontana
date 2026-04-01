@@ -36,7 +36,7 @@ class UserService
     
 
 
-    public function getAll()
+    public function getAll(array $filters = [])
     {
         $headers = $this->getHeaders();
 
@@ -50,6 +50,9 @@ class UserService
         }
 
         $url = $this->apiEndpoint;
+        if (!empty($filters)) {
+            $url .= '?' . http_build_query($filters);
+        }
         $response = apiRequest($url, 'GET', null, $headers);
         if ($response['success']) {
             $response['data'] = apiDataList($response['data']);

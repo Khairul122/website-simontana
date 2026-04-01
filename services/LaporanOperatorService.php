@@ -90,6 +90,24 @@ class LaporanOperatorService
         }
     }
 
+    public function getRiwayatByLaporanId($id)
+    {
+        try {
+            $url = buildApiUrlLaporansRiwayatById((int)$id);
+            $response = apiRequest($url, 'GET', null, $this->getHeaders());
+            if ($response['success']) {
+                $response['data'] = apiDataList($response['data']);
+            }
+            return $response;
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Error fetching report history: ' . $e->getMessage(),
+                'data' => null
+            ];
+        }
+    }
+
     
 
 

@@ -40,7 +40,7 @@
   if ($tingkat === 'Rendah') { $tingkatClass = 'text-emerald-600'; }
   if ($tingkat === 'Sedang') { $tingkatClass = 'text-amber-600'; }
   if ($tingkat === 'Tinggi') { $tingkatClass = 'text-orange-600'; }
-  if ($tingkat === 'Sangat Tinggi') { $tingkatClass = 'text-red-600 font-bold'; }
+  if ($tingkat === 'Sangat Tinggi' || $tingkat === 'Kritis') { $tingkatClass = 'text-red-600 font-bold'; }
 ?>
 
 <div class="flex h-screen overflow-hidden bg-slate-50">
@@ -63,11 +63,7 @@
               <p class="text-sm text-slate-500">Tinjau informasi lengkap, lokasi, dan bukti lapangan.</p>
             </div>
           </div>
-          <div class="shrink-0 flex gap-3">
-            <a href="index.php?controller=LaporanAdmin&action=edit&id=<?php echo $laporan['id']; ?>" class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 font-bold text-sm hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm">
-              <i class="fa-solid fa-pen"></i> Edit Laporan
-            </a>
-          </div>
+          <div class="shrink-0 flex gap-3"></div>
         </div>
 
         
@@ -209,7 +205,7 @@
               <div class="p-6 bg-slate-50/50">
                 <div class="mb-4">
                   <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5">Alamat Detail Titik Terdampak</p>
-                  <p class="text-sm font-semibold text-slate-700 leading-relaxed"><i class="fa-solid fa-location-dot text-brand-500 mr-1.5"></i> <?php echo htmlspecialchars($laporan['alamat_lengkap'] ?? 'Alamat tidak ditulis rinci.'); ?></p>
+                  <p class="text-sm font-semibold text-slate-700 leading-relaxed"><i class="fa-solid fa-location-dot text-brand-500 mr-1.5"></i> <?php echo htmlspecialchars($laporan['alamat_laporan'] ?? ($laporan['alamat_lengkap'] ?? 'Alamat tidak ditulis rinci.')); ?></p>
                 </div>
                 <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-200 text-sm">
                   <div>
@@ -221,6 +217,32 @@
                     <p class="font-mono text-slate-700"><?php echo htmlspecialchars($laporan['longitude'] ?? '-'); ?></p>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            <div class="rounded-2xl bg-white border border-slate-200 shadow-card overflow-hidden">
+              <div class="p-6 border-b border-slate-100">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                  <i class="fa-solid fa-clock-rotate-left text-slate-400"></i> Riwayat Status Laporan
+                </h3>
+              </div>
+              <div class="p-6">
+                <?php if (!empty($riwayatList) && is_array($riwayatList)): ?>
+                  <div class="relative border-l-2 border-slate-100 ml-3 space-y-5">
+                    <?php foreach ($riwayatList as $riwayat): ?>
+                      <div class="relative pl-6">
+                        <div class="absolute w-4 h-4 bg-white border-4 border-brand-300 rounded-full -left-[-11px] top-1 z-10"></div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1"><?php echo date('d M Y H:i', strtotime($riwayat['waktu'] ?? ($riwayat['created_at'] ?? 'now'))); ?></p>
+                        <h4 class="text-sm font-bold text-slate-800"><?php echo htmlspecialchars($riwayat['status'] ?? '-'); ?></h4>
+                        <?php if (!empty($riwayat['keterangan'] ?? $riwayat['catatan_verifikasi'] ?? '')): ?>
+                          <p class="text-xs text-slate-600 mt-1 p-2 bg-slate-50 rounded-lg border border-slate-100"><?php echo htmlspecialchars($riwayat['keterangan'] ?? $riwayat['catatan_verifikasi']); ?></p>
+                        <?php endif; ?>
+                      </div>
+                    <?php endforeach; ?>
+                  </div>
+                <?php else: ?>
+                  <div class="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-4 text-sm text-slate-500">Riwayat status belum tersedia.</div>
+                <?php endif; ?>
               </div>
             </div>
 

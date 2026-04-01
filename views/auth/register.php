@@ -4,6 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <title><?= $title ?? 'Registrasi Akun - SIMONTA Bencana' ?></title>
+  <meta name="description" content="Daftar akun SIMONTA untuk akses informasi bencana, status pelaporan, dan notifikasi kesiapsiagaan wilayah." />
+  <meta name="keywords" content="registrasi simonta, akun warga bencana, pelaporan bencana" />
+  <meta name="robots" content="noindex, nofollow" />
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -83,7 +86,13 @@
   </style>
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 antialiased h-screen overflow-hidden selection:bg-brand-500 selection:text-white">
-  <?php $desaList = is_array($desaList ?? null) ? $desaList : []; ?>
+<?php $desaList = is_array($desaList ?? null) ? $desaList : []; ?>
+<?php
+$rolesMap = is_array($rolesMap ?? null) ? $rolesMap : [];
+if (empty($rolesMap)) {
+  $rolesMap = ['Warga' => 'Warga'];
+}
+?>
 
   <div class="flex h-full w-full">
     
@@ -191,16 +200,16 @@
                   </div>
                   <select id="role" name="role" required 
                     class="block w-full appearance-none rounded-2xl border border-slate-200 bg-white/80 py-3 pl-10 pr-10 text-slate-900 shadow-sm focus:bg-white focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 sm:text-sm transition-all cursor-pointer font-medium">
-                    <option value="" disabled selected>Pilih Peran Sistem</option>
-                    <option value="Warga">Warga Biasa</option>
-                    <option value="OperatorDesa">Operator Desa</option>
-                    <option value="PetugasBPBD">Petugas BPBD</option>
-                    <option value="Admin">Administrator</option>
+                    <?php foreach ($rolesMap as $roleKey => $roleLabel): ?>
+                      <?php if ((string)$roleKey !== 'Warga') { continue; } ?>
+                      <option value="<?php echo htmlspecialchars((string)$roleKey); ?>" selected><?php echo htmlspecialchars((string)$roleLabel); ?></option>
+                    <?php endforeach; ?>
                   </select>
                   <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-slate-500">
                     <i class="fa-solid fa-caret-down"></i>
                   </div>
                 </div>
+                <p class="mt-2 text-xs text-slate-500">Registrasi publik hanya untuk role Warga sesuai kebijakan backend.</p>
               </div>
 
               <!-- Bagian 2: Wilayah -->

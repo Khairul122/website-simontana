@@ -1,20 +1,31 @@
-# FETCH Role: PetugasBPBD (Full Response)
+# FETCH Role: PetugasBPBD
+
+Panduan endpoint utama untuk role `PetugasBPBD`.
 
 ## Setup
 
 ```bash
 BASE_URL="http://127.0.0.1:8000/api/v1"
-TOKEN="token_petugas"
+TOKEN="token_petugas_bpbd"
 ```
 
 ## 1) Workflow Laporan
 
 Endpoint:
+
 - `POST /laporans/{id}/verifikasi`
 - `POST /laporans/{id}/proses`
 - `GET /laporans/{id}/riwayat`
 
-Contoh `POST /laporans/1/proses`:
+### Contoh POST /laporans/{id}/proses
+
+Request body:
+
+```json
+{
+  "status": "Diproses"
+}
+```
 
 ```bash
 curl -X POST "$BASE_URL/laporans/1/proses" \
@@ -24,44 +35,26 @@ curl -X POST "$BASE_URL/laporans/1/proses" \
   -d '{"status":"Diproses"}'
 ```
 
-### 200 Response Body
-
-```json
-{
-  "success": true,
-  "message": "Status laporan berhasil diperbarui",
-  "data": {
-    "id": 1,
-    "status": "Diproses",
-    "id_penanggung_jawab": 3,
-    "penanggungJawab": {
-      "id": 3,
-      "nama": "Petugas BPBD"
-    }
-  },
-  "request_id": "req_01HZY2P0W7D3G4"
-}
-```
-
-### 422 Response Body
+Jika transisi invalid:
 
 ```json
 {
   "success": false,
   "message": "Transisi status tidak valid: Ditolak -> Diproses",
   "code": "INVALID_STATUS_TRANSITION",
-  "request_id": "req_01HZY2P0W7D3G4"
+  "request_id": "f79802f8-4778-4a8f-a6cc-2794f20a2ee2"
 }
 ```
 
-## 2) Operasional
+## 2) Operasional Lapangan
 
 Endpoint:
+
 - `GET/POST/PUT/DELETE /monitoring`
 - `GET/POST/PUT/DELETE /tindak-lanjut`
 - `GET/POST/PUT/DELETE /riwayat-tindakan`
 
-Contoh `GET /tindak-lanjut`:
+### Contoh GET /tindak-lanjut
 
 ```bash
 curl -X GET "$BASE_URL/tindak-lanjut?per_page=20" \
@@ -69,55 +62,71 @@ curl -X GET "$BASE_URL/tindak-lanjut?per_page=20" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
-### 200 Response Body (Paginated)
+### Contoh POST /riwayat-tindakan
+
+Body:
 
 ```json
 {
-  "success": true,
-  "message": "Data tindak lanjut berhasil diambil",
-  "data": [
-    {
-      "id_tindaklanjut": 7,
-      "laporan_id": 1,
-      "id_petugas": 3,
-      "tanggal_tanggapan": "2026-03-20 09:00:00",
-      "status": "Menuju Lokasi",
-      "petugas": {
-        "id": 3,
-        "nama": "Petugas BPBD"
-      },
-      "laporan": {
-        "id": 1,
-        "judul_laporan": "Banjir RT 03"
-      }
-    }
-  ],
-  "meta": {
-    "pagination": {
-      "current_page": 1,
-      "last_page": 2,
-      "per_page": 20,
-      "total": 23,
-      "from": 1,
-      "to": 20
-    }
-  },
-  "request_id": "req_01HZY2P0W7D3G4"
+  "tindaklanjut_id": 7,
+  "id_petugas": 3,
+  "keterangan": "Distribusi logistik tahap 1",
+  "waktu_tindakan": "2026-04-01 12:00:00"
 }
 ```
 
-### 403 Response Body
+```bash
+curl -X POST "$BASE_URL/riwayat-tindakan" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{
+    "tindaklanjut_id":7,
+    "id_petugas":3,
+    "keterangan":"Distribusi logistik tahap 1",
+    "waktu_tindakan":"2026-04-01 12:00:00"
+  }'
+```
+
+## 3) Laporan Read/Update
+
+PetugasBPBD juga dapat:
+
+- `GET /laporans`
+- `GET /laporans/{id}`
+- `PUT /laporans/{id}` (sesuai policy)
+- `GET /laporans/statistics`
+
+## 4) BMKG Protected
+
+Endpoint:
+
+- `GET /bmkg`
+- `GET /bmkg/cache/status`
+- `POST /bmkg/cache/clear`
+
+### Contoh GET /bmkg
+
+```bash
+curl -X GET "$BASE_URL/bmkg" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+## 5) Error Contract Umum
+
+### 403
 
 ```json
 {
   "success": false,
   "message": "Akses ditolak",
   "code": "FORBIDDEN",
-  "request_id": "req_01HZY2P0W7D3G4"
+  "request_id": "f79802f8-4778-4a8f-a6cc-2794f20a2ee2"
 }
 ```
 
-### 422 Response Body (validasi)
+### 422
 
 ```json
 {
@@ -134,80 +143,6 @@ curl -X GET "$BASE_URL/tindak-lanjut?per_page=20" \
       "The waktu tindakan field is required."
     ]
   },
-  "request_id": "req_01HZY2P0W7D3G4"
+  "request_id": "f79802f8-4778-4a8f-a6cc-2794f20a2ee2"
 }
 ```
-
-## 3) BMKG Protected
-
-Endpoint:
-- `GET /bmkg`
-- `GET /bmkg/cache/status`
-- `POST /bmkg/cache/clear`
-
-### 200 Response Body (`GET /bmkg`)
-
-```json
-{
-  "success": true,
-  "message": "Data BMKG berhasil diambil",
-  "data": {
-    "gempa_terbaru": {
-      "Magnitude": "5.2",
-      "Wilayah": "Selatan Jawa"
-    },
-    "daftar_gempa": [],
-    "gempa_dirasakan": [],
-    "cache_status": {
-      "available": true,
-      "ttl": 300
-    }
-  },
-  "request_id": "req_01HZY2P0W7D3G4"
-}
-```
-
-## 4) Matriks Status Semua Endpoint PetugasBPBD
-
-- `GET /auth/me`, `GET /users/profile`
-  - `200`, `401`
-
-- `POST /auth/refresh`, `POST /auth/logout`
-  - `200`, `401`
-
-- `GET /check-token`
-  - `200`, `401`
-
-- `GET /laporans`, `GET /laporans/{id}`, `GET /laporans/statistics`
-  - `200`
-  - `404` khusus endpoint detail
-
-- `PUT /laporans/{id}`
-  - `200`, `403`, `422`, `404`
-
-- `POST /laporans/{id}/verifikasi`, `POST /laporans/{id}/proses`
-  - `200`, `403`, `404`, `422`
-
-- `GET /laporans/{id}/riwayat`
-  - `200`, `404`
-
-- `GET/POST/PUT/DELETE /monitoring`
-  - `GET`: `200`
-  - `POST`: `201`, `403`, `422`
-  - `PUT`: `200`, `403`, `404`, `422`
-  - `DELETE`: `200`, `403`, `404`
-
-- `GET/POST/PUT/DELETE /tindak-lanjut`
-  - `GET`: `200`
-  - `POST`: `201`, `403`, `422`
-  - `PUT`: `200`, `403`, `404`, `422`
-  - `DELETE`: `200`, `403`, `404`
-
-- `GET/POST/PUT/DELETE /riwayat-tindakan`
-  - `GET`: `200`
-  - `POST`: `201`, `403`, `422`
-  - `PUT`: `200`, `403`, `404`, `422`
-  - `DELETE`: `200`, `403`, `404`
-
-- `GET /bmkg`, `GET /bmkg/cache/status`, `POST /bmkg/cache/clear`
-  - `200`, `500`

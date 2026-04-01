@@ -56,7 +56,7 @@
                 <tr class="bg-slate-50/80 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
                   <th class="px-5 py-4 w-16 text-center">Urutan</th>
                   <th class="px-5 py-4 min-w-[200px]">Nama Provinsi Terdaftar</th>
-                  <th class="px-5 py-4 text-center w-36">Kontrol Data</th>
+                  <th class="px-5 py-4 text-center w-40">Status</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-100 text-sm">
@@ -72,21 +72,14 @@
                           </div>
                           <div>
                             <p class="font-bold text-slate-800 mb-0.5 leading-none"><?php echo htmlspecialchars($provinsi['nama'] ?? $provinsi['name'] ?? ''); ?></p>
-                            <p class="text-[11px] text-slate-400 font-medium">Level 1 Tree Directory</p>
+                            <p class="text-[11px] text-slate-400 font-medium">ADM1: <?php echo htmlspecialchars((string)($provinsi['adm1'] ?? $provinsi['id'] ?? '-')); ?></p>
                           </div>
                         </div>
                       </td>
                       <td class="px-5 py-4 text-center">
-                        <div class="flex items-center justify-center gap-1.5">
-                          <a href="index.php?controller=Wilayah&action=editProvinsi&id=<?php echo $provinsi['id']; ?>" class="inline-flex items-center justify-center h-8 w-8 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700 transition" title="Edit Data">
-                            <i class="fa-solid fa-pen text-sm"></i>
-                          </a>
-                          <form method="POST" action="index.php?controller=Wilayah&action=deleteProvinsi&id=<?php echo $provinsi['id']; ?>" class="inline-block m-0 delete-wilayah-form" data-label="provinsi">
-                            <button type="submit" class="inline-flex items-center justify-center h-8 w-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 transition" title="Hapus Permanen">
-                              <i class="fa-solid fa-trash-can text-sm"></i>
-                            </button>
-                          </form>
-                        </div>
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-100 text-slate-600 text-xs font-bold border border-slate-200">
+                          <i class="fa-solid fa-lock"></i> Read Only
+                        </span>
                       </td>
                     </tr>
                   <?php endforeach; ?>
@@ -115,40 +108,6 @@
 <?php include 'template/script.php'; ?>
 
 <script>
-  document.addEventListener('submit', function (event) {
-    const form = event.target.closest('.delete-wilayah-form');
-    if (!form) return;
-    event.preventDefault();
-
-    const label = form.getAttribute('data-label') || 'Wilayah';
-    
-    if (typeof Swal !== 'undefined') {
-      Swal.fire({
-        title: `Hapus Referensi ${label}?`,
-        text: 'Ini akan berakibat fatal jika ada data hierarki atau user yang sedang menggunakan referensi ini!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#ef4444',
-        cancelButtonColor: '#e2e8f0',
-        confirmButtonText: 'Tetap Hapus',
-        cancelButtonText: 'Batalkan',
-        customClass: {
-          popup: 'rounded-2xl',
-          confirmButton: 'rounded-xl px-5 py-2.5 font-bold shadow-sm',
-          cancelButton: 'rounded-xl px-5 py-2.5 font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50'
-        }
-      }).then(function (result) {
-        if (result.isConfirmed) {
-          form.submit();
-        }
-      });
-    } else {
-      if (window.confirm(`Apakah Anda yakin ingin menghapus referensi ${label} ini?\n\nPERINGATAN: Memungkinkan terjadinya data corrupt pada level bawahnya!`)) {
-        form.submit();
-      }
-    }
-  });
-
   const urlParams = new URLSearchParams(window.location.search);
   if(urlParams.has('success') && typeof Swal !== 'undefined') {
       Swal.fire({icon: 'success', title: 'Berhasil', text: urlParams.get('success'), toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true});

@@ -4,6 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title><?= $title ?? 'Login - SIMONTA Bencana' ?></title>
+  <meta name="description" content="Masuk ke SIMONTA untuk memantau laporan bencana, data BMKG, dan operasional tanggap darurat sesuai role Anda." />
+  <meta name="keywords" content="login simonta, dashboard bencana, monitoring bencana, bmkg" />
+  <meta name="robots" content="noindex, nofollow" />
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

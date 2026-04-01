@@ -193,7 +193,7 @@ include('template/header.php');
                      <p class="text-xs text-slate-500 flex items-center gap-1 mt-0.5"><i class="fa-solid fa-user-tag text-slate-300"></i> by <?php echo htmlspecialchars($report['nama_pelapor'] ?? ($report['pelapor']['nama'] ?? '-')); ?></p>
                    </td>
                    <td class="px-6 py-4 text-slate-600 line-clamp-2 leading-relaxed">
-                     <i class="fa-solid fa-location-dot text-red-400 mr-1.5"></i><?php echo htmlspecialchars($report['alamat_lengkap'] ?? $report['lokasi'] ?? '-'); ?>
+                     <i class="fa-solid fa-location-dot text-red-400 mr-1.5"></i><?php echo htmlspecialchars($report['alamat_laporan'] ?? ($report['alamat_lengkap'] ?? ($report['lokasi'] ?? '-'))); ?>
                    </td>
                    <td class="px-6 py-4 text-center">
                      <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md <?php echo $badgeClass; ?> text-xs font-bold border border-current shadow-[0_0_0_1px_rgba(255,255,255,1)]">

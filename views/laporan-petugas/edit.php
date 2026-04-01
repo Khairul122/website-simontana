@@ -153,7 +153,7 @@ function laporanPetugasEditStatusBadge($statusRaw) {
                        
                        <div>
                           <p class="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Titik Masalah (Alamat)</p>
-                          <p class="text-slate-100 leading-relaxed"><?php echo htmlspecialchars($laporan['alamat_lengkap'] ?? '-'); ?></p>
+                          <p class="text-slate-100 leading-relaxed"><?php echo htmlspecialchars($laporan['alamat_laporan'] ?? ($laporan['alamat_lengkap'] ?? '-')); ?></p>
                           <p class="text-xs text-slate-400 mt-1"><?php echo htmlspecialchars($laporan['administrative_area'] ?? '-'); ?></p>
                        </div>
                     </div>

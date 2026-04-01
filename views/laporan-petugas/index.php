@@ -127,7 +127,7 @@ if (!is_array($reports)) {
                         <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 text-xs font-semibold mb-1">
                           <i class="fa-solid fa-layer-group text-[10px] text-slate-400"></i> <?php echo htmlspecialchars($laporan['kategori']['nama_kategori'] ?? '-'); ?>
                         </div>
-                        <p class="text-xs text-slate-500 font-medium ml-1 line-clamp-1"><i class="fa-solid fa-location-dot mr-1 text-red-400"></i> <?php echo htmlspecialchars($laporan['alamat_lengkap'] ?? '-'); ?></p>
+                        <p class="text-xs text-slate-500 font-medium ml-1 line-clamp-1"><i class="fa-solid fa-location-dot mr-1 text-red-400"></i> <?php echo htmlspecialchars($laporan['alamat_laporan'] ?? ($laporan['alamat_lengkap'] ?? '-')); ?></p>
                       </td>
                       <td class="px-5 py-4 text-center">
                         <?php 

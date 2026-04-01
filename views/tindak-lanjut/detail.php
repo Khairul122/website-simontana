@@ -161,7 +161,7 @@ function tindakStatusTheme($statusRaw) {
 
                 <div class="p-5 bg-slate-50/50">
                   <div class="mb-3">
-                    <p class="text-xs font-semibold text-slate-600 leading-relaxed"><i class="fa-solid fa-location-dot text-brand-500 mr-1.5"></i> <?php echo htmlspecialchars($tindakLanjut['laporan']['alamat_lengkap'] ?? '-'); ?></p>
+                    <p class="text-xs font-semibold text-slate-600 leading-relaxed"><i class="fa-solid fa-location-dot text-brand-500 mr-1.5"></i> <?php echo htmlspecialchars($tindakLanjut['laporan']['alamat_laporan'] ?? ($tindakLanjut['laporan']['alamat_lengkap'] ?? '-')); ?></p>
                   </div>
                   <div class="grid grid-cols-2 gap-2 pt-3 border-t border-slate-200 text-sm">
                     <div>

@@ -5,5 +5,5 @@ if (!defined('API_DOMAIN_PREFIX')) {
 }
 
 if (!defined('API_BASE_URL')) {
-    define('API_BASE_URL', rtrim(API_DOMAIN_PREFIX, '/') . '/api');
+    define('API_BASE_URL', rtrim(API_DOMAIN_PREFIX, '/') . '/api/v1');
 }

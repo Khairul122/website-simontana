@@ -8,6 +8,9 @@ if (!defined('API_AUTH_REGISTER')) {
 if (!defined('API_AUTH_LOGIN')) {
     define('API_AUTH_LOGIN', API_BASE_URL . '/auth/login');
 }
+if (!defined('API_AUTH_ROLES')) {
+    define('API_AUTH_ROLES', API_BASE_URL . '/auth/roles');
+}
 if (!defined('API_AUTH_ME')) {
     define('API_AUTH_ME', API_BASE_URL . '/auth/me');
 }
@@ -17,9 +20,15 @@ if (!defined('API_AUTH_REFRESH')) {
 if (!defined('API_AUTH_LOGOUT')) {
     define('API_AUTH_LOGOUT', API_BASE_URL . '/auth/logout');
 }
+if (!defined('API_CHECK_TOKEN')) {
+    define('API_CHECK_TOKEN', API_BASE_URL . '/check-token');
+}
 
 if (!defined('API_USERS')) {
     define('API_USERS', API_BASE_URL . '/users');
+}
+if (!defined('API_USERS_PROFILE')) {
+    define('API_USERS_PROFILE', API_BASE_URL . '/users/profile');
 }
 if (!defined('API_USERS_STATISTICS')) {
     define('API_USERS_STATISTICS', API_BASE_URL . '/users/statistics');
@@ -110,15 +119,36 @@ if (!defined('API_WILAYAH_DETAIL')) {
 if (!defined('API_WILAYAH_HIERARCHY')) {
     define('API_WILAYAH_HIERARCHY', API_BASE_URL . '/wilayah/hierarchy/{desa_id}');
 }
+if (!defined('API_WILAYAH_SEARCH')) {
+    define('API_WILAYAH_SEARCH', API_BASE_URL . '/wilayah/search');
+}
 if (!defined('API_DESA')) {
     define('API_DESA', API_BASE_URL . '/wilayah?jenis=desa');
 }
 
+if (!defined('API_BMKG')) {
+    define('API_BMKG', API_BASE_URL . '/bmkg');
+}
 if (!defined('API_BMKG_GEMPATERBARU')) {
     define('API_BMKG_GEMPATERBARU', API_BASE_URL . '/bmkg/gempa/terbaru');
 }
+if (!defined('API_BMKG_GEMPA_TERKINI')) {
+    define('API_BMKG_GEMPA_TERKINI', API_BASE_URL . '/bmkg/gempa/terkini');
+}
 if (!defined('API_BMKG_GEMPA_DIRASAKAN')) {
     define('API_BMKG_GEMPA_DIRASAKAN', API_BASE_URL . '/bmkg/gempa/dirasakan');
+}
+if (!defined('API_BMKG_PRAKIRAAN_CUACA')) {
+    define('API_BMKG_PRAKIRAAN_CUACA', API_BASE_URL . '/bmkg/prakiraan-cuaca');
+}
+if (!defined('API_BMKG_PERINGATAN_DINI_CUACA')) {
+    define('API_BMKG_PERINGATAN_DINI_CUACA', API_BASE_URL . '/bmkg/peringatan-dini-cuaca');
+}
+if (!defined('API_BMKG_CACHE_STATUS')) {
+    define('API_BMKG_CACHE_STATUS', API_BASE_URL . '/bmkg/cache/status');
+}
+if (!defined('API_BMKG_CACHE_CLEAR')) {
+    define('API_BMKG_CACHE_CLEAR', API_BASE_URL . '/bmkg/cache/clear');
 }
 
 function getAuthHeaders(?string $token = null): array

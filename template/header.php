@@ -3,7 +3,95 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <title><?php echo $title ?? 'SIMONTANA - Sistem Informasi Monitoring Bencana'; ?></title>
+  <?php
+    $seoTitle = $title ?? 'SIMONTANA - Sistem Informasi Monitoring Bencana';
+    $seoDescription = $metaDescription ?? 'SIMONTANA membantu monitoring bencana, verifikasi laporan, tindak lanjut lapangan, dan informasi BMKG secara terintegrasi.';
+    $seoKeywords = $metaKeywords ?? 'simontana, monitoring bencana, laporan bencana, bmkg, bpbd, operator desa, petugas bpbd';
+    $seoImage = $metaImage ?? 'assets/images/favicon.png';
+    $seoUrl = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . ($_SERVER['REQUEST_URI'] ?? '/');
+    $baseUrl = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
+
+    if (strpos($seoImage, 'http') !== 0) {
+      $seoImage = rtrim($baseUrl, '/') . '/' . ltrim($seoImage, '/');
+    }
+
+    $schemaGraph = [];
+
+    $schemaGraph[] = [
+      '@type' => 'Organization',
+      '@id' => $baseUrl . '/#organization',
+      'name' => 'SIMONTANA',
+      'url' => $baseUrl,
+      'logo' => $seoImage,
+      'description' => $seoDescription,
+    ];
+
+    $schemaGraph[] = [
+      '@type' => 'WebSite',
+      '@id' => $baseUrl . '/#website',
+      'url' => $baseUrl,
+      'name' => 'SIMONTANA',
+      'inLanguage' => 'id-ID',
+      'publisher' => ['@id' => $baseUrl . '/#organization'],
+    ];
+
+    $schemaGraph[] = [
+      '@type' => 'WebPage',
+      '@id' => $seoUrl . '#webpage',
+      'url' => $seoUrl,
+      'name' => $seoTitle,
+      'description' => $seoDescription,
+      'inLanguage' => 'id-ID',
+      'isPartOf' => ['@id' => $baseUrl . '/#website'],
+      'primaryImageOfPage' => ['@type' => 'ImageObject', 'url' => $seoImage],
+    ];
+
+    if (isset($schemaBreadcrumbs) && is_array($schemaBreadcrumbs) && !empty($schemaBreadcrumbs)) {
+      $itemList = [];
+      $position = 1;
+      foreach ($schemaBreadcrumbs as $crumb) {
+        if (!is_array($crumb) || empty($crumb['name']) || empty($crumb['url'])) {
+          continue;
+        }
+        $itemList[] = [
+          '@type' => 'ListItem',
+          'position' => $position++,
+          'name' => (string)$crumb['name'],
+          'item' => (string)$crumb['url'],
+        ];
+      }
+
+      if (!empty($itemList)) {
+        $schemaGraph[] = [
+          '@type' => 'BreadcrumbList',
+          '@id' => $seoUrl . '#breadcrumb',
+          'itemListElement' => $itemList,
+        ];
+      }
+    }
+
+    $schemaJson = [
+      '@context' => 'https://schema.org',
+      '@graph' => $schemaGraph,
+    ];
+  ?>
+  <title><?php echo htmlspecialchars($seoTitle); ?></title>
+  <meta name="description" content="<?php echo htmlspecialchars($seoDescription); ?>" />
+  <meta name="keywords" content="<?php echo htmlspecialchars($seoKeywords); ?>" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="<?php echo htmlspecialchars($seoUrl); ?>" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="id_ID" />
+  <meta property="og:title" content="<?php echo htmlspecialchars($seoTitle); ?>" />
+  <meta property="og:description" content="<?php echo htmlspecialchars($seoDescription); ?>" />
+  <meta property="og:url" content="<?php echo htmlspecialchars($seoUrl); ?>" />
+  <meta property="og:site_name" content="SIMONTANA" />
+  <meta property="og:image" content="<?php echo htmlspecialchars($seoImage); ?>" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="<?php echo htmlspecialchars($seoTitle); ?>" />
+  <meta name="twitter:description" content="<?php echo htmlspecialchars($seoDescription); ?>" />
+  <meta name="twitter:image" content="<?php echo htmlspecialchars($seoImage); ?>" />
+  <script type="application/ld+json"><?php echo json_encode($schemaJson, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?></script>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

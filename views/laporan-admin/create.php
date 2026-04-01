@@ -2,6 +2,7 @@
 
 <?php
 $desaList = is_array($desaList ?? null) ? $desaList : [];
+$kategoriList = is_array($kategoriList ?? null) ? $kategoriList : [];
 ?>
 
 <div class="flex h-screen overflow-hidden bg-slate-50">
@@ -61,10 +62,27 @@ $desaList = is_array($desaList ?? null) ? $desaList : [];
                         <option value="Rendah">🔴 Rendah</option>
                         <option value="Sedang">🟠 Sedang</option>
                         <option value="Tinggi">🟡 Tinggi</option>
-                        <option value="Sangat Tinggi">🚨 Sangat Tinggi</option>
+                        <option value="Kritis">🚨 Kritis</option>
                       </select>
                       <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
                     </div>
+                  </div>
+                </div>
+
+                <div class="mb-6">
+                  <label class="block text-sm font-bold text-slate-700 mb-2">Kategori Bencana <span class="text-red-500">*</span></label>
+                  <div class="relative">
+                    <select name="id_kategori_bencana" required class="w-full rounded-xl border border-slate-300 bg-white py-3 pl-11 pr-10 text-sm font-semibold outline-none transition-all focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 hover:border-slate-400 shadow-sm appearance-none">
+                      <option value="">Pilih Kategori</option>
+                      <?php foreach ($kategoriList as $kategori): ?>
+                        <?php $kategoriId = (int)($kategori['id'] ?? 0); ?>
+                        <?php if ($kategoriId > 0): ?>
+                          <option value="<?php echo $kategoriId; ?>"><?php echo htmlspecialchars($kategori['nama_kategori'] ?? $kategori['nama'] ?? 'Kategori'); ?></option>
+                        <?php endif; ?>
+                      <?php endforeach; ?>
+                    </select>
+                    <i class="fa-solid fa-layer-group absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                    <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
                   </div>
                 </div>
 
@@ -135,7 +153,7 @@ $desaList = is_array($desaList ?? null) ? $desaList : [];
 
                 <div>
                   <label class="block text-sm font-bold text-slate-700 mb-2">Detail Alamat Lingkungan / RT RW</label>
-                  <textarea name="alamat_lengkap" rows="3" placeholder="Sebutkan patokan jalan, nama gang, nomor RT / RW dengan jelas agar mudah ditemukan..." class="w-full rounded-xl border border-slate-300 bg-white py-3 px-4 text-sm outline-none transition-all focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 hover:border-slate-400 shadow-sm resize-none"></textarea>
+                  <textarea name="alamat_laporan" rows="3" placeholder="Sebutkan patokan jalan, nama gang, nomor RT / RW dengan jelas agar mudah ditemukan..." class="w-full rounded-xl border border-slate-300 bg-white py-3 px-4 text-sm outline-none transition-all focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 hover:border-slate-400 shadow-sm resize-none"></textarea>
                 </div>
               </div>
 

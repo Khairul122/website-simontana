@@ -25,6 +25,7 @@ class LaporanAdminService
         $item['kecamatan_nama'] = $item['desa']['kecamatan']['nama'] ?? null;
         $item['kabupaten_nama'] = $item['desa']['kecamatan']['kabupaten']['nama'] ?? null;
         $item['provinsi_nama'] = $item['desa']['kecamatan']['kabupaten']['provinsi']['nama'] ?? null;
+        $item['alamat_laporan'] = $item['alamat_laporan'] ?? ($item['alamat_lengkap'] ?? null);
 
         return $item;
     }
@@ -87,6 +88,18 @@ class LaporanAdminService
         $response = apiRequest($url, 'GET', null, $headers);
         if ($response['success']) {
             $response['data'] = $this->mapItem(apiDataEntity($response['data']));
+        }
+        return $response;
+    }
+
+    public function getRiwayatByLaporanId($id)
+    {
+        $url = buildApiUrlLaporansRiwayatById((int)$id);
+        $headers = $this->getHeaders();
+
+        $response = apiRequest($url, 'GET', null, $headers);
+        if ($response['success']) {
+            $response['data'] = apiDataList($response['data']);
         }
         return $response;
     }

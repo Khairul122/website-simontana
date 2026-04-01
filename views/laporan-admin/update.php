@@ -10,6 +10,7 @@ $provinsiList = is_array($provinsiList ?? null) ? $provinsiList : [];
 $kabupatenList = is_array($kabupatenList ?? null) ? $kabupatenList : [];
 $kecamatanList = is_array($kecamatanList ?? null) ? $kecamatanList : [];
 $desaList = is_array($desaList ?? null) ? $desaList : [];
+$kategoriList = is_array($kategoriList ?? null) ? $kategoriList : [];
 ?>
 
 <div class="flex h-screen overflow-hidden bg-slate-50">
@@ -120,7 +121,22 @@ $desaList = is_array($desaList ?? null) ? $desaList : [];
                       <option value="Rendah" <?php echo (isset($laporan['tingkat_keparahan']) && $laporan['tingkat_keparahan'] == 'Rendah') ? 'selected' : ''; ?>>Rendah - Skala Kecil</option>
                       <option value="Sedang" <?php echo (isset($laporan['tingkat_keparahan']) && $laporan['tingkat_keparahan'] == 'Sedang') ? 'selected' : ''; ?>>Sedang - Menengah</option>
                       <option value="Tinggi" <?php echo (isset($laporan['tingkat_keparahan']) && $laporan['tingkat_keparahan'] == 'Tinggi') ? 'selected' : ''; ?>>Tinggi - Gawat Darurat</option>
-                      <option value="Sangat Tinggi" <?php echo (isset($laporan['tingkat_keparahan']) && $laporan['tingkat_keparahan'] == 'Sangat Tinggi') ? 'selected' : ''; ?>>Sangat Tinggi - Kritis Nasional</option>
+                      <option value="Kritis" <?php echo (isset($laporan['tingkat_keparahan']) && in_array($laporan['tingkat_keparahan'], ['Kritis', 'Sangat Tinggi'], true)) ? 'selected' : ''; ?>>Kritis - Kritis Nasional</option>
+                    </select>
+                 </div>
+
+                 <div>
+                    <label for="id_kategori_bencana" class="block text-sm font-bold text-slate-700 mb-2">Kategori Bencana</label>
+                    <select class="block w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors appearance-none cursor-pointer" id="id_kategori_bencana" name="id_kategori_bencana" required>
+                      <option value="">-- Tentukan Kategori --</option>
+                      <?php
+                        $selectedKategori = (int)($laporan['id_kategori_bencana'] ?? ($laporan['kategori']['id'] ?? 0));
+                        foreach ($kategoriList as $kategori):
+                          $kategoriId = (int)($kategori['id'] ?? 0);
+                          if ($kategoriId <= 0) { continue; }
+                      ?>
+                        <option value="<?php echo $kategoriId; ?>" <?php echo $selectedKategori === $kategoriId ? 'selected' : ''; ?>><?php echo htmlspecialchars($kategori['nama_kategori'] ?? $kategori['nama'] ?? 'Kategori'); ?></option>
+                      <?php endforeach; ?>
                     </select>
                  </div>
 
@@ -142,8 +158,8 @@ $desaList = is_array($desaList ?? null) ? $desaList : [];
                  </div>
 
                  <div>
-                    <label for="alamat_lengkap" class="block text-sm font-bold text-slate-700 mb-2">Patokan Jalan Lengkap</label>
-                    <textarea class="block w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors text-sm" id="alamat_lengkap" name="alamat_lengkap" rows="2" placeholder="Sebut gang, jalan, RTRW..."><?php echo htmlspecialchars($laporan['alamat_lengkap'] ?? ''); ?></textarea>
+                    <label for="alamat_laporan" class="block text-sm font-bold text-slate-700 mb-2">Patokan Jalan Lengkap</label>
+                    <textarea class="block w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors text-sm" id="alamat_laporan" name="alamat_laporan" rows="2" placeholder="Sebut gang, jalan, RTRW..."><?php echo htmlspecialchars($laporan['alamat_laporan'] ?? ($laporan['alamat_lengkap'] ?? '')); ?></textarea>
                  </div>
 
                  <div>

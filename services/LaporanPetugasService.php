@@ -58,6 +58,18 @@ class LaporanPetugasService
         return $response;
     }
 
+    public function getRiwayatByLaporanId($id)
+    {
+        $url = buildApiUrlLaporansRiwayatById((int)$id);
+        $headers = $this->getHeaders();
+
+        $response = apiRequest($url, 'GET', null, $headers);
+        if ($response['success']) {
+            $response['data'] = apiDataList($response['data']);
+        }
+        return $response;
+    }
+
     
 
 
@@ -68,12 +80,22 @@ class LaporanPetugasService
 
         if (in_array($status, ['Diverifikasi', 'Ditolak'], true)) {
             $url = buildApiUrlLaporansVerifikasiById($id);
-            return apiRequest($url, 'POST', $data, $headers);
+            $payload = ['status' => $status];
+            $catatan = trim((string) ($data['catatan_verifikasi'] ?? $data['keterangan'] ?? ''));
+            if ($catatan !== '') {
+                $payload['catatan_verifikasi'] = $catatan;
+            }
+            return apiRequest($url, 'POST', $payload, $headers);
         }
 
         if (in_array($status, ['Diproses', 'Selesai'], true)) {
             $url = buildApiUrlLaporansProsesById($id);
-            return apiRequest($url, 'POST', $data, $headers);
+            $payload = ['status' => $status];
+            $keterangan = trim((string) ($data['keterangan'] ?? ''));
+            if ($keterangan !== '') {
+                $payload['keterangan'] = $keterangan;
+            }
+            return apiRequest($url, 'POST', $payload, $headers);
         }
 
         $url = buildApiUrlLaporansById($id);
@@ -88,7 +110,11 @@ class LaporanPetugasService
         $url = buildApiUrlLaporansProsesById($id);
         $headers = $this->getHeaders();
 
-        return apiRequest($url, 'POST', $data, $headers);
+        $payload = array_merge([
+            'status' => 'Diproses'
+        ], $data);
+
+        return apiRequest($url, 'POST', $payload, $headers);
     }
 
     
@@ -115,10 +141,14 @@ class LaporanPetugasService
         $url = buildApiUrlLaporansVerifikasiById($id);
         $headers = $this->getHeaders();
 
-        
         $updateData = array_merge([
             'status' => 'Ditolak'
         ], $data);
+
+        if (isset($updateData['keterangan']) && !isset($updateData['catatan_verifikasi'])) {
+            $updateData['catatan_verifikasi'] = $updateData['keterangan'];
+        }
+        unset($updateData['keterangan']);
 
         return apiRequest($url, 'POST', $updateData, $headers);
     }
@@ -128,15 +158,14 @@ class LaporanPetugasService
 
     public function addTindakLanjut($id, $data)
     {
-        $url = buildApiUrlLaporansById($id);
+        $url = API_TINDAK_LANJUT;
         $headers = $this->getHeaders();
 
-        
-        $updateData = array_merge([
-            'status' => 'Tindak Lanjut'
-        ], $data);
+        if (!isset($data['laporan_id'])) {
+            $data['laporan_id'] = (int) $id;
+        }
 
-        return apiRequest($url, 'PUT', $updateData, $headers);
+        return apiRequest($url, 'POST', $data, $headers);
     }
 
     
@@ -144,8 +173,12 @@ class LaporanPetugasService
 
     public function addMonitoring($id, $data)
     {
-        $url = buildApiUrlLaporansRiwayatById($id);
+        $url = API_MONITORING;
         $headers = $this->getHeaders();
+
+        if (!isset($data['id_laporan'])) {
+            $data['id_laporan'] = (int) $id;
+        }
 
         return apiRequest($url, 'POST', $data, $headers);
     }

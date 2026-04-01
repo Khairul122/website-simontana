@@ -192,7 +192,7 @@ class DashboardService {
         $headers = $this->getAuthHeaders();
 
         
-        $url = API_LAPORANS . "?limit={$limit}";
+        $url = API_LAPORANS . "?limit={$limit}&per_page={$limit}";
         $response = apiRequest($url, 'GET', null, $headers);
 
         if ($response['success']) {
@@ -316,7 +316,7 @@ class DashboardService {
 
         try {
             
-            $url = API_LAPORANS . '?id_desa=' . $id_desa . '&limit=100'; 
+            $url = API_LAPORANS . '?id_desa=' . $id_desa . '&limit=100&per_page=100'; 
             $response = apiRequest($url, 'GET', null, $headers);
 
             $total_laporan = 0;
@@ -350,7 +350,7 @@ class DashboardService {
             }
 
             
-            $desa_detail_url = buildApiUrlWilayahDetailByDesaId($id_desa);
+            $desa_detail_url = buildApiUrlWilayahDetailByDesaId((int) $id_desa);
             $desa_response = apiRequest($desa_detail_url, 'GET', null, $headers);
 
             $desa_info = null;
@@ -402,7 +402,7 @@ class DashboardService {
 
             
             
-            $logistik_url = API_WILAYAH_DETAIL . '?id_desa=' . $id_desa . '&include=logistik';
+            $logistik_url = buildApiUrlWilayahDetailByDesaId((int) $id_desa) . '?include=logistik';
             $logistik_response = apiRequest($logistik_url, 'GET', null, $headers);
 
             if ($logistik_response['success'] && isset($logistik_response['data'])) {

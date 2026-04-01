@@ -77,6 +77,14 @@ class LaporanPetugasController {
             $error_message = $response['message'] ?? 'Gagal mengambil detail laporan';
         }
 
+        $riwayatList = [];
+        if ($laporan) {
+            $riwayatResponse = $this->laporanService->getRiwayatByLaporanId((int)$id);
+            if ($riwayatResponse['success']) {
+                $riwayatList = is_array($riwayatResponse['data'] ?? null) ? $riwayatResponse['data'] : [];
+            }
+        }
+
         $title = "Detail Laporan - Petugas BPBD";
         include 'views/laporan-petugas/detail.php';
     }
@@ -124,7 +132,7 @@ class LaporanPetugasController {
 
         
         $status = $_POST['status'] ?? '';
-        $keterangan = $_POST['keterangan'] ?? '';
+        $keterangan = trim((string)($_POST['keterangan'] ?? ''));
 
         
         if (empty($status)) {
@@ -135,9 +143,14 @@ class LaporanPetugasController {
 
         
         $data = [
-            'status' => $status,
-            'keterangan' => $keterangan
+            'status' => $status
         ];
+
+        if (in_array($status, ['Diverifikasi', 'Ditolak'], true)) {
+            $data['catatan_verifikasi'] = $keterangan;
+        } else {
+            $data['keterangan'] = $keterangan;
+        }
 
         
         $response = $this->laporanService->updateStatus($id, $data);
@@ -198,12 +211,13 @@ class LaporanPetugasController {
         $currentUser = $this->authService->getCurrentUser();
 
         
-        $keterangan = $_POST['keterangan'] ?? '';
+        $keterangan = trim((string)($_POST['keterangan'] ?? ''));
 
         
-        $data = [
-            'keterangan' => $keterangan
-        ];
+        $data = [];
+        if ($keterangan !== '') {
+            $data['keterangan'] = $keterangan;
+        }
 
         
         $response = $this->laporanService->updateToSelesai($id, $data);
@@ -235,12 +249,13 @@ class LaporanPetugasController {
         $currentUser = $this->authService->getCurrentUser();
 
         
-        $keterangan = $_POST['keterangan'] ?? '';
+        $keterangan = trim((string)($_POST['keterangan'] ?? ''));
 
         
-        $data = [
-            'keterangan' => $keterangan
-        ];
+        $data = [];
+        if ($keterangan !== '') {
+            $data['catatan_verifikasi'] = $keterangan;
+        }
 
         
         $response = $this->laporanService->updateToDitolak($id, $data);

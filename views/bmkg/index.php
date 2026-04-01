@@ -1,4 +1,12 @@
-<?php include('template/header.php'); ?>
+<?php
+$metaDescription = 'Pusat informasi BMKG di SIMONTANA: gempa terbaru, daftar gempa dirasakan, peringatan dini cuaca, dan status kesiapsiagaan bencana.';
+$metaKeywords = 'bmkg, gempa terbaru, gempa dirasakan, peringatan dini cuaca, simontana';
+$schemaBreadcrumbs = [
+  ['name' => 'Beranda', 'url' => 'index.php?controller=Dashboard&action=warga'],
+  ['name' => 'BMKG', 'url' => 'index.php?controller=Bmkg&action=index'],
+];
+include('template/header.php');
+?>
 
 <div class="flex h-screen overflow-hidden bg-slate-50">
   <?php include 'template/sidebar.php'; ?>
@@ -13,6 +21,7 @@
           <p class="text-slate-500 mt-1">Pantau rilis resmi gempa bumi dan peringatan tsunami dari Badan Meteorologi, Klimatologi, dan Geofisika.</p>
         </div>
         <div class="flex gap-2">
+            <a href="index.php?controller=Bmkg&action=index" class="px-4 py-2 rounded-xl bg-brand-600 text-white font-bold shadow-sm hover:bg-brand-700 transition-colors flex items-center gap-2"><i class="fa-solid fa-rotate"></i> Refresh Data BMKG</a>
             <a href="index.php?controller=Bmkg&action=cuaca" class="px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-600 font-bold shadow-sm hover:text-brand-600 hover:border-brand-200 transition-colors flex items-center gap-2"><i class="fa-solid fa-cloud-sun-rain"></i> Prakiraan Cuaca</a>
             <?php if (isset($currentUser['role']) && in_array($currentUser['role'], ['Admin', 'PetugasBPBD'])): ?>
             <a href="index.php?controller=Bmkg&action=cache" class="px-4 py-2 rounded-xl bg-slate-800 text-white font-bold shadow-sm hover:bg-slate-700 transition-colors flex items-center gap-2"><i class="fa-solid fa-server"></i> Kelola Cache API</a>

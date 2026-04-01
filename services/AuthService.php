@@ -50,6 +50,27 @@ class AuthService {
         return $response;
     }
 
+    public function getRoles() {
+        $response = apiRequest(API_AUTH_ROLES, 'GET');
+        if ($response['success']) {
+            $response['data'] = apiDataEntity($response['data']);
+        }
+        return $response;
+    }
+
+    public function checkToken() {
+        $token = $_SESSION['token'] ?? null;
+        if (!$token) {
+            return [
+                'success' => false,
+                'message' => 'Token tidak ditemukan',
+                'data' => null
+            ];
+        }
+
+        return apiRequest(API_CHECK_TOKEN, 'GET', null, getAuthHeaders($token));
+    }
+
     public function register($userData) {
         
         $response = apiRequest(API_AUTH_REGISTER, 'POST', $userData);
@@ -91,11 +112,21 @@ class AuthService {
 
     public function getCurrentUser() {
         if (isset($_SESSION['token']) && isset($_SESSION['user'])) {
-            
+            $check = $this->checkToken();
+            if ($check['success']) {
+                return [
+                    'success' => true,
+                    'message' => 'Data user ditemukan',
+                    'data' => $_SESSION['user']
+                ];
+            }
+
+            unset($_SESSION['token']);
+            unset($_SESSION['user']);
             return [
-                'success' => true,
-                'message' => 'Data user ditemukan',
-                'data' => $_SESSION['user']
+                'success' => false,
+                'message' => $check['message'] ?? 'Token tidak valid',
+                'data' => null
             ];
         } else {
             

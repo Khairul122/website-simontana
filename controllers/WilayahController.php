@@ -14,6 +14,16 @@ class WilayahController
         exit;
     }
 
+    private function blockEditDelete(string $redirectUrl): void
+    {
+        $this->redirectWithDialog(
+            'Fitur Dinonaktifkan',
+            'Fitur edit dan hapus wilayah saat ini dinonaktifkan.',
+            $redirectUrl,
+            'info'
+        );
+    }
+
     public function __construct()
     {
         
@@ -103,6 +113,8 @@ class WilayahController
 
     public function editProvinsi()
     {
+        $this->blockEditDelete('index.php?controller=Wilayah&action=indexProvinsi');
+
         
         $id = $_GET['id'] ?? null;
 
@@ -133,6 +145,8 @@ class WilayahController
 
     public function updateProvinsi()
     {
+        $this->blockEditDelete('index.php?controller=Wilayah&action=indexProvinsi');
+
         
         $id = $_GET['id'] ?? null;
 
@@ -176,6 +190,8 @@ class WilayahController
 
     public function deleteProvinsi()
     {
+        $this->blockEditDelete('index.php?controller=Wilayah&action=indexProvinsi');
+
         
         $id = $_GET['id'] ?? null;
 
@@ -219,10 +235,10 @@ class WilayahController
         }
 
         
-        $provinsi_id = $_GET['provinsi_id'] ?? 0;
+        $provinsi_id = trim((string)($_GET['provinsi_id'] ?? ''));
 
         
-        if ($provinsi_id > 0) {
+        if ($provinsi_id !== '') {
             $response = $this->service->getAllKabupaten($provinsi_id);
         } else {
             
@@ -302,6 +318,8 @@ class WilayahController
 
     public function editKabupaten()
     {
+        $this->blockEditDelete('index.php?controller=Wilayah&action=indexKabupaten');
+
         
         $id = $_GET['id'] ?? null;
 
@@ -340,6 +358,8 @@ class WilayahController
 
     public function updateKabupaten()
     {
+        $this->blockEditDelete('index.php?controller=Wilayah&action=indexKabupaten');
+
         
         $id = $_GET['id'] ?? null;
 
@@ -389,6 +409,8 @@ class WilayahController
 
     public function deleteKabupaten()
     {
+        $this->blockEditDelete('index.php?controller=Wilayah&action=indexKabupaten');
+
         
         $id = $_GET['id'] ?? null;
 
@@ -432,9 +454,9 @@ class WilayahController
         }
 
         
-        $provinsi_id = $_GET['provinsi_id'] ?? 0;
+        $provinsi_id = trim((string)($_GET['provinsi_id'] ?? ''));
         $kabupatenList = [];
-        if ($provinsi_id > 0) {
+        if ($provinsi_id !== '') {
             $kabupatenResponse = $this->service->getAllKabupaten($provinsi_id);
             if ($kabupatenResponse['success']) {
                 $kabupatenList = $kabupatenResponse['data'] ?? [];
@@ -442,9 +464,9 @@ class WilayahController
         }
 
         
-        $kabupaten_id = $_GET['kabupaten_id'] ?? 0;
+        $kabupaten_id = trim((string)($_GET['kabupaten_id'] ?? ''));
         $kecamatanList = [];
-        if ($kabupaten_id > 0) {
+        if ($kabupaten_id !== '') {
             $kecamatanResponse = $this->service->getAllKecamatan($kabupaten_id);
             if ($kecamatanResponse['success']) {
                 $kecamatanList = $kecamatanResponse['data'] ?? [];
@@ -452,7 +474,9 @@ class WilayahController
         }
 
         
-        $response = $this->service->getAllKecamatan($_GET['kabupaten_id'] ?? 0);
+        $response = $kabupaten_id !== ''
+            ? $this->service->getAllKecamatan($kabupaten_id)
+            : ['success' => true, 'data' => []];
 
         if (!$response['success']) {
             $kecamatanList = [];
@@ -477,7 +501,7 @@ class WilayahController
         }
 
         
-        $provinsi_id = $_GET['provinsi_id'] ?? 0;
+        $provinsi_id = trim((string)($_GET['provinsi_id'] ?? ''));
         $kabupatenResponse = $this->service->getAllKabupaten($provinsi_id);
         if (!$kabupatenResponse['success']) {
             $kabupatenList = [];
@@ -536,6 +560,8 @@ class WilayahController
 
     public function editKecamatan()
     {
+        $this->blockEditDelete('index.php?controller=Wilayah&action=indexKecamatan');
+
         
         $id = $_GET['id'] ?? null;
 
@@ -558,7 +584,7 @@ class WilayahController
         $provinsi_id = $_GET['provinsi_id'] ?? 0;
 
         
-        if ($provinsi_id == 0 && $kabupaten_id > 0) {
+        if ($provinsi_id === '' && $kabupaten_id !== '') {
             $kabupatenResponse = $this->service->getById($kabupaten_id, 'kabupaten');
             if ($kabupatenResponse['success'] && isset($kabupatenResponse['data'])) {
                 $kabupatenDetail = $kabupatenResponse['data'];
@@ -571,7 +597,7 @@ class WilayahController
         }
 
         
-        if ($provinsi_id > 0) {
+        if ($provinsi_id !== '') {
             $kabupatenResponse = $this->service->getAllKabupaten($provinsi_id);
             if (!$kabupatenResponse['success']) {
                 $kabupatenList = [];
@@ -604,6 +630,8 @@ class WilayahController
 
     public function updateKecamatan()
     {
+        $this->blockEditDelete('index.php?controller=Wilayah&action=indexKecamatan');
+
         
         $id = $_GET['id'] ?? null;
 
@@ -653,6 +681,8 @@ class WilayahController
 
     public function deleteKecamatan()
     {
+        $this->blockEditDelete('index.php?controller=Wilayah&action=indexKecamatan');
+
         
         $id = $_GET['id'] ?? null;
 
@@ -696,9 +726,9 @@ class WilayahController
         }
 
         
-        $provinsi_id = $_GET['provinsi_id'] ?? 0;
+        $provinsi_id = trim((string)($_GET['provinsi_id'] ?? ''));
         $kabupatenList = [];
-        if ($provinsi_id > 0) {
+        if ($provinsi_id !== '') {
             $kabupatenResponse = $this->service->getAllKabupaten($provinsi_id);
             if ($kabupatenResponse['success']) {
                 $kabupatenList = $kabupatenResponse['data'] ?? [];
@@ -706,9 +736,9 @@ class WilayahController
         }
 
         
-        $kabupaten_id = $_GET['kabupaten_id'] ?? 0;
+        $kabupaten_id = trim((string)($_GET['kabupaten_id'] ?? ''));
         $kecamatanList = [];
-        if ($kabupaten_id > 0) {
+        if ($kabupaten_id !== '') {
             $kecamatanResponse = $this->service->getAllKecamatan($kabupaten_id);
             if ($kecamatanResponse['success']) {
                 $kecamatanList = $kecamatanResponse['data'] ?? [];
@@ -716,10 +746,10 @@ class WilayahController
         }
 
         
-        $kecamatan_id = $_GET['kecamatan_id'] ?? 0;
+        $kecamatan_id = trim((string)($_GET['kecamatan_id'] ?? ''));
 
         
-        if ($kecamatan_id > 0) {
+        if ($kecamatan_id !== '') {
             $response = $this->service->getAllDesa($kecamatan_id);
         } else {
             
@@ -817,6 +847,8 @@ class WilayahController
 
     public function editDesa()
     {
+        $this->blockEditDelete('index.php?controller=Wilayah&action=indexDesa');
+
         
         $id = $_GET['id'] ?? null;
 
@@ -873,6 +905,8 @@ class WilayahController
 
     public function updateDesa()
     {
+        $this->blockEditDelete('index.php?controller=Wilayah&action=indexDesa');
+
         
         $id = $_GET['id'] ?? null;
 
@@ -922,6 +956,8 @@ class WilayahController
 
     public function deleteDesa()
     {
+        $this->blockEditDelete('index.php?controller=Wilayah&action=indexDesa');
+
         
         $id = $_GET['id'] ?? null;
 

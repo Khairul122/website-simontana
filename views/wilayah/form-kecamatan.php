@@ -57,7 +57,7 @@ if ($selectedKabupatenId === null && isset($kecamatan['id_parent'])) {
                     <select class="w-full rounded-xl border border-slate-300 bg-slate-50 py-3 pl-4 pr-10 text-sm font-bold text-slate-800 outline-none transition-all focus:border-emerald-500 focus:bg-white appearance-none cursor-pointer" id="id_provinsi" name="id_provinsi" required <?php echo $isEditMode ? 'disabled' : ''; ?>>
                       <option value="">-- Pemetaan Provinsi Hub --</option>
                       <?php foreach ($provinsiList as $provinsi): ?>
-                        <option value="<?php echo (int)$provinsi['id']; ?>" <?php echo ((string)$selectedProvinsiId === (string)$provinsi['id']) ? 'selected' : ''; ?>>
+                        <option value="<?php echo htmlspecialchars((string)$provinsi['id']); ?>" <?php echo ((string)$selectedProvinsiId === (string)$provinsi['id']) ? 'selected' : ''; ?>>
                           <?php echo htmlspecialchars($provinsi['nama'] ?? $provinsi['name'] ?? '-'); ?>
                         </option>
                       <?php endforeach; ?>
@@ -75,7 +75,7 @@ if ($selectedKabupatenId === null && isset($kecamatan['id_parent'])) {
                     <select class="w-full rounded-xl border border-slate-300 bg-slate-50 py-3 pl-4 pr-10 text-sm font-bold text-indigo-700 outline-none transition-all focus:border-emerald-500 focus:bg-white appearance-none cursor-pointer" id="id_kabupaten" name="id_kabupaten" required>
                       <option value="">-- Pilih Kab target --</option>
                       <?php foreach ($kabupatenList as $kabupaten): ?>
-                        <option value="<?php echo (int)$kabupaten['id']; ?>" <?php echo ((string)$selectedKabupatenId === (string)$kabupaten['id']) ? 'selected' : ''; ?>>
+                        <option value="<?php echo htmlspecialchars((string)$kabupaten['id']); ?>" <?php echo ((string)$selectedKabupatenId === (string)$kabupaten['id']) ? 'selected' : ''; ?>>
                           <?php echo htmlspecialchars($kabupaten['nama'] ?? $kabupaten['name'] ?? '-'); ?>
                         </option>
                       <?php endforeach; ?>

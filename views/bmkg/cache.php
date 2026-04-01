@@ -1,4 +1,25 @@
 <?php include('template/header.php'); ?>
+<?php
+$cacheStatus = is_array($cacheStatus ?? null) ? $cacheStatus : [];
+
+$cacheDuration = (int)($cacheStatus['cache_duration_minutes'] ?? 0);
+$docCacheRows = [
+  'gempa_terbaru_cached' => $cacheStatus['gempa_terbaru_cached'] ?? null,
+  'daftar_gempa_cached' => $cacheStatus['daftar_gempa_cached'] ?? null,
+  'gempa_dirasakan_cached' => $cacheStatus['gempa_dirasakan_cached'] ?? null,
+  'peringatan_dini_cuaca_cached' => $cacheStatus['peringatan_dini_cuaca_cached'] ?? null,
+];
+$docRowsAvailable = false;
+foreach ($docCacheRows as $v) {
+  if ($v !== null) {
+    $docRowsAvailable = true;
+    break;
+  }
+}
+
+$legacyDriver = $cacheStatus['driver'] ?? null;
+$legacyCachedKeys = is_array($cacheStatus['cached_keys'] ?? null) ? $cacheStatus['cached_keys'] : [];
+?>
 
 <div class="flex h-screen overflow-hidden bg-slate-50">
   <?php include 'template/sidebar.php'; ?>
@@ -40,26 +61,53 @@
                <p class="text-sm text-slate-500">Diagnosis keberadaan *file caching* API Data BMKG di dalam sistem lokal.</p>
             </div>
             <div class="p-6 md:p-8">
-               <?php if (isset($cacheStatus)): ?>
+               <?php if (!empty($cacheStatus)): ?>
+                  <?php if ($cacheDuration > 0): ?>
+                  <div class="mb-6">
+                     <p class="text-xs uppercase font-bold text-slate-400 mb-1 tracking-widest">Durasi Cache</p>
+                     <p class="text-sm font-mono font-bold bg-slate-50 border border-slate-200 px-3 py-1.5 rounded inline-block text-slate-700"><i class="fa-solid fa-stopwatch mr-1"></i> <?php echo $cacheDuration; ?> menit</p>
+                  </div>
+                  <?php elseif (!empty($legacyDriver)): ?>
                   <div class="mb-6">
                      <p class="text-xs uppercase font-bold text-slate-400 mb-1 tracking-widest">Driver Cache Penyimpanan</p>
-                     <p class="text-sm font-mono font-bold bg-slate-50 border border-slate-200 px-3 py-1.5 rounded inline-block text-slate-700"><i class="fa-solid fa-hard-drive mr-1"></i> <?php echo htmlspecialchars($cacheStatus['driver'] ?? 'File System'); ?></p>
+                     <p class="text-sm font-mono font-bold bg-slate-50 border border-slate-200 px-3 py-1.5 rounded inline-block text-slate-700"><i class="fa-solid fa-hard-drive mr-1"></i> <?php echo htmlspecialchars((string)$legacyDriver); ?></p>
                   </div>
+                  <?php endif; ?>
 
-                  <p class="text-xs uppercase font-bold text-slate-400 mb-2 tracking-widest">Ketersediaan File Cache Endpoint</p>
-                  <ul class="space-y-3">
-                     <?php if (isset($cacheStatus['cached_keys'])): foreach ($cacheStatus['cached_keys'] as $key => $status): ?>
-                     <li class="flex items-center justify-between p-3 rounded-xl border <?php echo $status ? 'border-emerald-100 bg-emerald-50/50' : 'border-rose-100 bg-rose-50/50'; ?>">
+                  <?php if ($docRowsAvailable): ?>
+                    <p class="text-xs uppercase font-bold text-slate-400 mb-2 tracking-widest">Status Cache Endpoint (Format Dokumen)</p>
+                    <ul class="space-y-3 mb-4">
+                      <?php foreach ($docCacheRows as $key => $status): ?>
+                        <?php if ($status === null) { continue; } ?>
+                        <?php $ok = (bool)$status; ?>
+                        <li class="flex items-center justify-between p-3 rounded-xl border <?php echo $ok ? 'border-emerald-100 bg-emerald-50/50' : 'border-rose-100 bg-rose-50/50'; ?>">
+                          <div class="flex items-center gap-2">
+                            <i class="fa-solid <?php echo $ok ? 'fa-check text-emerald-500' : 'fa-xmark text-rose-500'; ?> w-4 text-center"></i>
+                            <span class="text-sm font-mono font-bold <?php echo $ok ? 'text-emerald-800' : 'text-rose-800'; ?>"><?php echo htmlspecialchars($key); ?></span>
+                          </div>
+                          <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded <?php echo $ok ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'; ?> tracking-widest"><?php echo $ok ? 'Cached' : 'Tidak Cached'; ?></span>
+                        </li>
+                      <?php endforeach; ?>
+                    </ul>
+                    <div class="p-3 rounded-xl border border-slate-200 bg-slate-50 text-xs text-slate-600 font-semibold">
+                      Jumlah key prakiraan cuaca tercache: <span class="font-bold text-slate-800"><?php echo (int)($cacheStatus['prakiraan_cuaca_keys_count'] ?? 0); ?></span>
+                    </div>
+                  <?php elseif (!empty($legacyCachedKeys)): ?>
+                    <p class="text-xs uppercase font-bold text-slate-400 mb-2 tracking-widest">Ketersediaan File Cache Endpoint (Legacy)</p>
+                    <ul class="space-y-3">
+                      <?php foreach ($legacyCachedKeys as $key => $status): ?>
+                      <li class="flex items-center justify-between p-3 rounded-xl border <?php echo $status ? 'border-emerald-100 bg-emerald-50/50' : 'border-rose-100 bg-rose-50/50'; ?>">
                         <div class="flex items-center gap-2">
-                           <i class="fa-solid <?php echo $status ? 'fa-check text-emerald-500' : 'fa-xmark text-rose-500'; ?> w-4 text-center"></i>
-                           <span class="text-sm font-mono font-bold <?php echo $status ? 'text-emerald-800' : 'text-rose-800'; ?>"><?php echo htmlspecialchars($key); ?></span>
+                          <i class="fa-solid <?php echo $status ? 'fa-check text-emerald-500' : 'fa-xmark text-rose-500'; ?> w-4 text-center"></i>
+                          <span class="text-sm font-mono font-bold <?php echo $status ? 'text-emerald-800' : 'text-rose-800'; ?>"><?php echo htmlspecialchars((string)$key); ?></span>
                         </div>
                         <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded <?php echo $status ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'; ?> tracking-widest"><?php echo $status ? 'Hit Tersedia' : 'Miss/Kosong'; ?></span>
-                     </li>
-                     <?php endforeach; else: ?>
-                     <li class="p-4 rounded-xl border border-slate-200 bg-slate-50 text-slate-500 text-sm font-bold text-center">Data Key Cache Tidak Muncul Dari Respon API</li>
-                     <?php endif; ?>
-                  </ul>
+                      </li>
+                      <?php endforeach; ?>
+                    </ul>
+                  <?php else: ?>
+                    <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 text-slate-500 text-sm font-bold text-center">Data status cache tidak tersedia pada respons API.</div>
+                  <?php endif; ?>
                <?php else: ?>
                   <div class="p-6 rounded-2xl border-2 border-dashed border-rose-200 bg-rose-50 text-rose-600 text-center">
                      <i class="fa-solid fa-bug text-3xl mb-2 opacity-50"></i>

@@ -102,6 +102,12 @@ class AuthController {
         
         $title = "Register - SIMONTA BENCANA";
         $desaList = [];
+        $rolesMap = [];
+
+        $rolesResponse = $this->authService->getRoles();
+        if ($rolesResponse['success']) {
+            $rolesMap = is_array($rolesResponse['data'] ?? null) ? $rolesResponse['data'] : [];
+        }
 
         $desaResponse = apiRequest(API_DESA, 'GET', null, getAuthHeaders($_SESSION['token'] ?? null));
         if ($desaResponse['success']) {
@@ -120,7 +126,8 @@ class AuthController {
             $email = $_POST['email'] ?? '';
             $password = $_POST['password'] ?? '';
             $password_confirmation = $_POST['password_confirmation'] ?? '';
-            $role = $_POST['role'] ?? 'Warga';
+            $roleInput = trim((string)($_POST['role'] ?? 'Warga'));
+            $role = strcasecmp($roleInput, 'Warga') === 0 ? 'Warga' : 'Warga';
             $no_telepon = $_POST['no_telepon'] ?? '';
             $alamat = $_POST['alamat'] ?? '';
             $id_desa = $_POST['id_desa'] ?? '';
